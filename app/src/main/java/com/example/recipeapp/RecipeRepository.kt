@@ -13,6 +13,38 @@ import java.lang.Exception
 
 private val DAILY_RANDOM_MEAL_TYPES = listOf("breakfast", "lunch", "dinner")
 
+private object RecipeStorage {
+    fun isDailyRecipeLoaded(context: Context): Boolean {
+        val prefs = context.getSharedPreferences("recipe_prefs", Context.MODE_PRIVATE)
+        return prefs.getBoolean("is_daily_recipe_loaded", false)
+    }
+
+    fun saveDailyRecipe(context: Context, recipe: Recipe, mealType: String) {
+        Log.d("RecipeRepository", "Saving recipe to shared prefs")
+
+        val prefs = context.getSharedPreferences("recipe_prefs", Context.MODE_PRIVATE)
+        val prefEditor: SharedPreferences.Editor = prefs.edit()
+
+        prefEditor.putString("daily_random_$mealType", Gson().toJson(recipe))
+        prefEditor.putBoolean("is_daily_recipe_loaded", true)
+
+        prefEditor.commit()
+    }
+
+    fun getDailyRecipes(context: Context): List<Recipe> {
+        Log.d("RecipeRepository", "Getting recipes from shared prefs")
+
+        val prefs = context.getSharedPreferences("recipe_prefs", Context.MODE_PRIVATE)
+
+        return DAILY_RANDOM_MEAL_TYPES.map {
+            Gson().fromJson(
+                prefs.getString("daily_random_$it",null),
+                Recipe::class.java
+            )
+        }
+    }
+}
+
 object RecipeRepository: ViewModel() {
     private var _recipes: SnapshotStateList<Recipe> = mutableStateListOf<Recipe>()
     val recipes: List<Recipe> get() = _recipes

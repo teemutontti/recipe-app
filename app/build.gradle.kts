@@ -1,3 +1,6 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -18,6 +21,22 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val keystoreFile = project.rootProject.file("api.keystore")
+        val properties = Properties()
+        properties.load(keystoreFile.inputStream())
+
+        val appId: String = properties.getProperty("APP_ID") ?: ""
+        val appKey: String = properties.getProperty("APP_KEY") ?: ""
+        //val apiKey: String = properties.getProperty("API_KEY") ?: ""
+
+        buildConfigField("String", "APP_ID", "$appId")
+        buildConfigField("String", "APP_KEY", "$appKey")
+        //buildConfigField("String", "API_KEY", "$apiKey")
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -66,4 +85,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Added dependencies
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 }

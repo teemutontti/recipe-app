@@ -3,7 +3,9 @@ package com.example.recipeapp.screens
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -43,13 +45,10 @@ fun HomeScreen(navController: NavController) {
     }
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.padding(top = 50.dp)
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Column(modifier = Modifier.padding(horizontal = 25.dp, vertical = 35.dp)) {
             Column {
                 Text(
                     text = "Recipe App",
@@ -65,11 +64,8 @@ fun HomeScreen(navController: NavController) {
                     )
                 )
             }
-            Column(
-                horizontalAlignment = Alignment.Start,
-                modifier = Modifier
-                    .padding(vertical = 50.dp)
-            ) {
+            Spacer(modifier = Modifier.height(50.dp))
+            Column(horizontalAlignment = Alignment.Start) {
                 Text("Daily Random Recipes", textAlign = TextAlign.Left)
                 if (loading) {
                     CircularProgressIndicator()

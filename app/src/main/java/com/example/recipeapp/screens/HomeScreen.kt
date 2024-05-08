@@ -66,13 +66,13 @@ fun HomeScreen(navController: NavController) {
             }
             Spacer(modifier = Modifier.height(50.dp))
             Column(horizontalAlignment = Alignment.Start) {
-                Text("Daily Random Recipes", textAlign = TextAlign.Left)
+                Text("Today's Specials:", textAlign = TextAlign.Left)
                 if (loading) {
                     CircularProgressIndicator()
                 } else {
                     LazyColumn {
                         items(RecipeRepository.recipes) {
-                            TextButton(onClick = { /*TODO*/ }) {
+                            TextButton(onClick = {/*TODO:*/}) {
                                 Text(
                                     text = it.label,
                                     style = TextStyle(

@@ -26,7 +26,7 @@ object SharedPreferencesManager {
     fun saveTodaysSpecial(context: Context, recipe: Recipe, mealType: String) {
         Log.d("RecipeRepository", "Saving recipe to shared prefs")
 
-        val prefs = context.getSharedPreferences("recipe_prefs", Context.MODE_PRIVATE)
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val prefEditor: SharedPreferences.Editor = prefs.edit()
 
         prefEditor.putString("todays_${mealType}_special", Gson().toJson(recipe))
@@ -38,13 +38,11 @@ object SharedPreferencesManager {
     fun getTodaysSpecials(context: Context): List<Recipe> {
         Log.d("RecipeRepository", "Getting todays specials from shared prefs")
 
-        val prefs = context.getSharedPreferences("recipe_prefs", Context.MODE_PRIVATE)
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
         return TODAYS_SPECIAL_MEAL_TYPES.map {
-            Gson().fromJson(
-                prefs.getString("todays_${it}_special",null),
-                Recipe::class.java
-            )
+            val recipeJson: String = prefs.getString("todays_${it}_special", null) ?: return listOf()
+            Gson().fromJson(recipeJson, Recipe::class.java)
         }
     }
 }

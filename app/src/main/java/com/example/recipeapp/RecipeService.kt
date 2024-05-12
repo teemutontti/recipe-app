@@ -40,6 +40,35 @@ data class Recipe(
     val image: String,
     val ingredients: List<Ingredient>,
     val calories: Number,
+    val source: String,
+    val yield: Number,
+    val dietLabels: List<String>,
+    val healthLabels: List<String>,
+    val cautions: List<String>,
+    val totalTime: Number,
+    val cuisineType: List<String>,
+    val mealType: List<String>,
+    val dishType: List<String>,
+    val totalNutrients: Nutrients
+)
+
+data class Nutrients (
+    val ENERC_KCAL: Nutrient,
+    val FAT: Nutrient,
+    val FASAT: Nutrient,
+    val FATRN: Nutrient,
+    val FAMS: Nutrient,
+    val FAPU: Nutrient,
+    val CHOCDF: Nutrient,
+    val FIBTG: Nutrient,
+    val SUGAR: Nutrient,
+    val PROCNT: Nutrient,
+)
+
+data class Nutrient (
+    val label: String,
+    val quantity: Number,
+    val unit: String
 )
 data class Ingredient(
     val text: String,
@@ -47,5 +76,7 @@ data class Ingredient(
     val measure: String,
     val food: String,
     val weight: Number,
-    val foodId: String
+    val foodCategory: String,
+    val foodId: String,
+    val image: String,
 )

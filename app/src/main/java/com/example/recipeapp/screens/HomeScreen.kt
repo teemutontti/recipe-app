@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -31,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.RecipeRepository
 import com.example.recipeapp.composables.NavBar
+import com.example.recipeapp.composables.RecipeButton
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -39,7 +41,7 @@ fun HomeScreen(navController: NavController) {
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     LaunchedEffect(key1 = Unit) {
-        delay(1000)
+        //delay(1000)
         RecipeRepository.fetchRandomRecipes(context)
         loading = false
     }
@@ -72,14 +74,8 @@ fun HomeScreen(navController: NavController) {
                 } else {
                     LazyColumn {
                         items(RecipeRepository.recipes) {
-                            TextButton(onClick = {/*TODO:*/}) {
-                                Text(
-                                    text = it.label,
-                                    style = TextStyle(
-                                        fontSize = 20.sp
-                                    )
-                                )
-                            }
+                            RecipeButton(recipe = it)
+                            Spacer(modifier = Modifier.height(10.dp))
                         }
                     }
                 }

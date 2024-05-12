@@ -30,8 +30,8 @@ android {
         val appKey: String = properties.getProperty("APP_KEY") ?: ""
         //val apiKey: String = properties.getProperty("API_KEY") ?: ""
 
-        buildConfigField("String", "APP_ID", "$appId")
-        buildConfigField("String", "APP_KEY", "$appKey")
+        buildConfigField("String", "APP_ID", appId)
+        buildConfigField("String", "APP_KEY", appKey)
         //buildConfigField("String", "API_KEY", "$apiKey")
     }
 
@@ -93,4 +93,5 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material.icons.core)
+    implementation(libs.coil.compose.v260)
 }

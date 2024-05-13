@@ -1,28 +1,21 @@
 package com.example.recipeapp.composables
 
-import android.transition.CircularPropagation
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,8 +24,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -40,8 +31,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.recipeapp.Recipe
-import com.example.recipeapp.RecipeRepository
+import com.example.recipeapp.api.Recipe
+import com.example.recipeapp.repositories.RecipeRepository
 
 @Composable
 fun RecipeButton(navController: NavController, recipe: Recipe) {
@@ -51,11 +42,7 @@ fun RecipeButton(navController: NavController, recipe: Recipe) {
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     fun handleRecipeClick() {
-        // Replacing characters that caused problems with navhost
-        val uri: String = recipe.uri
-            .replace("/", "___")
-            .replace("#", "...")
-        navController.navigate("recipe/$uri")
+        navController.navigate("recipe/${recipe.id}")
     }
 
     Button(
@@ -82,7 +69,7 @@ fun RecipeButton(navController: NavController, recipe: Recipe) {
                 if (imageError) Text("Image Error")
                 AsyncImage(
                     model = recipe.image,
-                    contentDescription = "${recipe.label} picture",
+                    contentDescription = "${recipe.title} picture",
                     onSuccess = { (_) -> loading = false },
                     onError = { (_) -> imageError = true },
                     modifier = Modifier
@@ -91,7 +78,7 @@ fun RecipeButton(navController: NavController, recipe: Recipe) {
                 )
             }
             Text(
-                text = recipe.label,
+                text = recipe.title,
                 style = TextStyle(
                     fontSize = 20.sp
                 )

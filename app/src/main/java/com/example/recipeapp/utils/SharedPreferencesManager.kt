@@ -1,12 +1,9 @@
-package com.example.recipeapp
+package com.example.recipeapp.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.health.connect.datatypes.MealType
-import java.util.Calendar
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
+import com.example.recipeapp.api.Recipe
 import com.google.gson.Gson
 import java.time.LocalDate
 
@@ -41,9 +38,12 @@ object SharedPreferencesManager {
 
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-        return TODAYS_SPECIAL_MEAL_TYPES.map {
+        val specials: List<Recipe> = TODAYS_SPECIAL_MEAL_TYPES.map {
             val recipeJson: String = prefs.getString("todays_${it}_special", null) ?: return listOf()
             Gson().fromJson(recipeJson, Recipe::class.java)
         }
+        Log.d("SharedPrefs", specials.toString())
+
+        return specials
     }
 }

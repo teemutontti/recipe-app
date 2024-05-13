@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -24,6 +25,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -72,9 +76,10 @@ fun RecipeButton(navController: NavController, recipe: Recipe) {
                     contentDescription = "${recipe.title} picture",
                     onSuccess = { (_) -> loading = false },
                     onError = { (_) -> imageError = true },
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .height(125.dp)
-                        .width(125.dp)
+                        .size(width = 125.dp, height = 125.dp)
+                        .clip(RoundedCornerShape(8.dp))
                 )
             }
             Text(

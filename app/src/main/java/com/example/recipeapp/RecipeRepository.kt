@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import com.example.recipeapp.BuildConfig.APP_ID
 import com.example.recipeapp.BuildConfig.APP_KEY
 import com.google.gson.Gson
-import java.lang.Exception
 
 object RecipeRepository: ViewModel() {
     private var _recipes: SnapshotStateList<Recipe> = mutableStateListOf<Recipe>()
@@ -43,5 +42,14 @@ object RecipeRepository: ViewModel() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    suspend fun fetchRecipeByUri(context: Context, uri: String): Recipe {
+        return RetrofitInstance().recipeService.getRecipeByUri(
+            type = "public",
+            uri = uri,
+            appId = APP_ID,
+            appKey = APP_KEY,
+        ).hits[0].recipe
     }
 }

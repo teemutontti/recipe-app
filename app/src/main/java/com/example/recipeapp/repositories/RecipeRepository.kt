@@ -1,17 +1,15 @@
 package com.example.recipeapp.repositories
 
 import android.content.Context
-import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import com.example.recipeapp.BuildConfig.API_KEY
+import com.example.recipeapp.api.Instructions
 import com.example.recipeapp.services.RetrofitInstance
 import com.example.recipeapp.utils.SharedPreferencesManager
 import com.example.recipeapp.api.Recipe
+import retrofit2.Response
 
 object RecipeRepository: ViewModel() {
     private val prefs = SharedPreferencesManager
@@ -36,7 +34,9 @@ object RecipeRepository: ViewModel() {
         try {
             _specials.clear()
             if (SharedPreferencesManager.isTodaysSpecialsLoaded(context)) {
-                val recipe: List<Recipe> = SharedPreferencesManager.getTodaysSpecials(context)
+                SharedPreferencesManager.getTodaysSpecials(context).forEach {
+                    _specials.add(it)
+                }
             } else {
                 SharedPreferencesManager.TODAYS_SPECIAL_MEAL_TYPES.map {
                     val recipe: Recipe = fetchRandomMeal(context, it)
@@ -56,6 +56,16 @@ object RecipeRepository: ViewModel() {
             )
             //_current.value = recipe
             return recipe
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
+    suspend fun fetchRecipeInstructions(context: Context, recipeId: Int): List<Instructions>? {
+        try {
+            val response: Response<List<Instructions>> = RetrofitInstance().recipeService.getRecipeInstructions(recipeId, API_KEY)
+            return response.body()
         } catch (e: Exception) {
             e.printStackTrace()
         }

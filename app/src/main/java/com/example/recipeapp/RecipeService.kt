@@ -25,6 +25,14 @@ interface RecipeService {
         @Query("random") random: Boolean,
         @Query("mealType") mealType: String
     ): EdamamResponse
+
+    @GET("recipes/v2/by-uri")
+    suspend fun getRecipeByUri(
+        @Query("type") type: String,
+        @Query("uri") uri: String,
+        @Query("app_id") appId: String,
+        @Query("app_key") appKey: String,
+    ): EdamamResponse
 }
 
 data class EdamamResponse(
@@ -49,7 +57,9 @@ data class Recipe(
     val cuisineType: List<String>,
     val mealType: List<String>,
     val dishType: List<String>,
-    val totalNutrients: Nutrients
+    val totalNutrients: Nutrients,
+    val uri: String,
+    val externalId: String
 )
 
 data class Nutrients (

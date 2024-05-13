@@ -32,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.recipeapp.Ingredient
 import com.example.recipeapp.Recipe
 import com.example.recipeapp.RecipeRepository
+import com.example.recipeapp.composables.IngredientLine
 import com.example.recipeapp.composables.NavBar
 import com.example.recipeapp.composables.RecipeButton
 
@@ -71,7 +72,7 @@ fun RecipeScreen(uri: String?) {
                     Text("Ingredients")
                     Column {
                         recipe?.ingredients?.forEach {
-                            Text(text = "$it")
+                            IngredientLine(ingredient = it)
                         }
                     }
                 }

@@ -1,5 +1,6 @@
 package com.example.recipeapp
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -7,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.recipeapp.composables.NavBar
 import com.example.recipeapp.screens.HomeScreen
 import com.example.recipeapp.screens.MyRecipesScreen
+import com.example.recipeapp.screens.RecipeScreen
 import com.example.recipeapp.screens.SearchScreen
 
 @Composable
@@ -22,6 +24,10 @@ fun App() {
         }
         composable("my_recipes") {
             MyRecipesScreen(navController)
+        }
+        composable("recipe/{uri}") {
+            val uri: String? = it.arguments?.getString("uri")
+            RecipeScreen(uri)
         }
     }
 }

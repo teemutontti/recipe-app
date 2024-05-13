@@ -42,7 +42,7 @@ fun HomeScreen(navController: NavController) {
 
     LaunchedEffect(key1 = Unit) {
         //delay(1000)
-        RecipeRepository.fetchRandomRecipes(context)
+        recipeViewModel.fetchRandomRecipes(context)
         loading = false
     }
 
@@ -74,7 +74,7 @@ fun HomeScreen(navController: NavController) {
                 } else {
                     LazyColumn {
                         items(RecipeRepository.recipes) {
-                            RecipeButton(recipe = it)
+                            RecipeButton(navController = navController, recipe = it)
                             Spacer(modifier = Modifier.height(10.dp))
                         }
                     }

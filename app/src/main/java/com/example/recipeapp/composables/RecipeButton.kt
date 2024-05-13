@@ -1,6 +1,7 @@
 package com.example.recipeapp.composables
 
 import android.transition.CircularPropagation
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,16 +33,30 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.recipeapp.Recipe
+import com.example.recipeapp.RecipeRepository
 
 @Composable
-fun RecipeButton(recipe: Recipe) {
+fun RecipeButton(navController: NavController, recipe: Recipe) {
+    val context = LocalContext.current
     var loading by remember { mutableStateOf(true) }
     var imageError by remember { mutableStateOf(false) }
+    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
+
+    fun handleRecipeClick() {
+        // Replacing characters that caused problems with navhost
+        val uri: String = recipe.uri
+            .replace("/", "___")
+            .replace("#", "...")
+        navController.navigate("recipe/$uri")
+    }
 
     Button(
         colors = ButtonDefaults.buttonColors(
@@ -51,7 +66,7 @@ fun RecipeButton(recipe: Recipe) {
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary),
         modifier = Modifier.padding(16.dp),
-        onClick = { /*TODO*/ }
+        onClick = { handleRecipeClick() }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

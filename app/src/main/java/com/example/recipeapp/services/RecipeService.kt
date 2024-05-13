@@ -1,7 +1,9 @@
 package com.example.recipeapp.services
 
+import com.example.recipeapp.api.Instructions
 import com.example.recipeapp.api.Recipe
 import com.example.recipeapp.api.SpoonacularResponse
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -32,4 +34,10 @@ interface RecipeService {
         @Path("id") id: Int,
         @Query("apiKey") apiKey: String
     ): Recipe
+
+    @GET("recipes/{id}/analyzedInstructions")
+    suspend fun getRecipeInstructions(
+        @Path("id") id: Int,
+        @Query("apiKey") apiKey: String
+    ): Response<List<Instructions>>
 }

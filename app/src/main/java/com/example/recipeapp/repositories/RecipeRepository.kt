@@ -12,7 +12,6 @@ import com.example.recipeapp.api.Recipe
 import retrofit2.Response
 
 object RecipeRepository: ViewModel() {
-    private val prefs = SharedPreferencesManager
     private var _specials: SnapshotStateList<Recipe> = mutableStateListOf<Recipe>()
     //private var _current: MutableState<Recipe> = mutableStateOf<Recipe>(value )
     val specials: List<Recipe> get() = _specials
@@ -26,7 +25,7 @@ object RecipeRepository: ViewModel() {
         ).recipes[0]
 
         // Saving to shared prefs
-        prefs.saveTodaysSpecial(context, recipe, mealType)
+        SharedPreferencesManager.saveTodaysSpecial(context, recipe, mealType)
         return recipe
     }
 

@@ -17,6 +17,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,24 +41,22 @@ import com.example.recipeapp.repositories.RecipeRepository
 
 @Composable
 fun RecipeButton(navController: NavController, recipe: Recipe) {
-    val context = LocalContext.current
     var loading by remember { mutableStateOf(true) }
     var imageError by remember { mutableStateOf(false) }
-    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     fun handleRecipeClick() {
         navController.navigate("recipe/${recipe.id}")
     }
 
-    Button(
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            contentColor = MaterialTheme.colorScheme.onBackground
-        ),
+    TextButton(
         shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.secondary),
-        modifier = Modifier.padding(16.dp),
-        onClick = { handleRecipeClick() }
+        border = BorderStroke(2.dp, MaterialTheme.colorScheme.surfaceVariant),
+        onClick = { handleRecipeClick() },
+        modifier = Modifier.padding(0.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onBackground
+        )
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -65,9 +64,9 @@ fun RecipeButton(navController: NavController, recipe: Recipe) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Box(contentAlignment = Alignment.Center, modifier = Modifier
-                .padding(end = 10.dp, top = 10.dp, bottom = 10.dp)
+                .padding(8.dp)
                 .clip(RoundedCornerShape(15.dp))
-                .border(8.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(15.dp))
+                .border(4.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(15.dp))
             ) {
                 if (loading && !imageError) CircularProgressIndicator()
                 if (imageError) Text("Image Error")
@@ -78,12 +77,12 @@ fun RecipeButton(navController: NavController, recipe: Recipe) {
                     onError = { (_) -> imageError = true },
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(width = 125.dp, height = 125.dp)
+                        .size(width = 96.dp, height = 96.dp)
                         .clip(RoundedCornerShape(8.dp))
                 )
             }
             Text(
-                text = recipe.title,
+                text = recipe.title ?: "Loading...",
                 style = TextStyle(
                     fontSize = 20.sp
                 )

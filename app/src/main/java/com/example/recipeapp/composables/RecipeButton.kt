@@ -43,9 +43,11 @@ import com.example.recipeapp.repositories.RecipeRepository
 fun RecipeButton(navController: NavController, recipe: Recipe) {
     var loading by remember { mutableStateOf(true) }
     var imageError by remember { mutableStateOf(false) }
+    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     fun handleRecipeClick() {
-        navController.navigate("recipe/${recipe.id}")
+        recipeViewModel.updateSelectedRecipe(recipe)
+        navController.navigate("recipe")
     }
 
     TextButton(

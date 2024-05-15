@@ -25,9 +25,8 @@ fun App() {
         composable("my_recipes") {
             MyRecipesScreen(navController)
         }
-        composable("recipe/{id}") {
-            val id: Int? = it.arguments?.getString("id")?.toIntOrNull()
-            RecipeScreen(id = id)
+        composable("recipe") {
+            RecipeScreen(navController)
         }
     }
 }

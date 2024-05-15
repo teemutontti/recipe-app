@@ -13,7 +13,7 @@ import com.example.recipeapp.api.Ingredient
 fun IngredientLine(ingredient: Ingredient) {
     Row {
         Text(text = "${ingredient.measures.metric.amount} ${ingredient.measures.metric.unitShort} of ${ingredient.name}")
-        Spacer(modifier = Modifier.width(6.dp))
+        Spacer(modifier = Modifier.width(8.dp))
 
         // TODO: Show weight of the ingredient?
         //Text(text = "${ingredient.weight}")

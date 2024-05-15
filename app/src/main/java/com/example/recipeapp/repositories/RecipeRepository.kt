@@ -1,6 +1,7 @@
 package com.example.recipeapp.repositories
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
@@ -9,24 +10,29 @@ import com.example.recipeapp.api.Instructions
 import com.example.recipeapp.services.RetrofitInstance
 import com.example.recipeapp.utils.SharedPreferencesManager
 import com.example.recipeapp.api.Recipe
+import com.example.recipeapp.api.SpoonacularResponse
 import retrofit2.Response
 
 object RecipeRepository: ViewModel() {
     private var _specials: SnapshotStateList<Recipe> = mutableStateListOf<Recipe>()
-    //private var _current: MutableState<Recipe> = mutableStateOf<Recipe>(value )
     val specials: List<Recipe> get() = _specials
-    //val current: Recipe get() = _current.value
 
-    private suspend fun fetchRandomMeal(context: Context, mealType: String): Recipe {
-        val recipe: Recipe = RetrofitInstance().recipeService.getRandomRecipes(
-            apiKey = API_KEY,
-            includeTags = mealType,
-            number = 1
-        ).recipes[0]
+    private var _selectedRecipe: Recipe? = null
+    val selectedRecipe: Recipe? get() = _selectedRecipe
 
-        // Saving to shared prefs
-        SharedPreferencesManager.saveTodaysSpecial(context, recipe, mealType)
-        return recipe
+    private suspend fun fetchRandomMeal(context: Context, mealType: String): Recipe? {
+        val response: Response<SpoonacularResponse> = RetrofitInstance().recipeService
+            .getRandomRecipes(apiKey = API_KEY, includeTags = mealType, number = 1)
+
+        if (response.isSuccessful) {
+            // Saving to shared prefs
+            val recipe: Recipe? = response.body()?.recipes?.get(0)
+            if (recipe != null) {
+                SharedPreferencesManager.saveTodaysSpecial(context, recipe, mealType)
+                return recipe
+            }
+        }
+        return null
     }
 
     suspend fun fetchRandomRecipes(context: Context) {
@@ -38,8 +44,8 @@ object RecipeRepository: ViewModel() {
                 }
             } else {
                 SharedPreferencesManager.TODAYS_SPECIAL_MEAL_TYPES.map {
-                    val recipe: Recipe = fetchRandomMeal(context, it)
-                    _specials.add(recipe)
+                    val recipe: Recipe? = fetchRandomMeal(context, it)
+                    if (recipe != null) _specials.add(recipe)
                 }
             }
         } catch (e: Exception) {
@@ -47,27 +53,19 @@ object RecipeRepository: ViewModel() {
         }
     }
 
-    suspend fun fetchRecipeById(context: Context, id: Int): Recipe? {
+    suspend fun fetchRecipeById(context: Context, id: Int) {
         try {
-            val recipe = RetrofitInstance().recipeService.getRecipeInformation(
+            val response: Response<Recipe> = RetrofitInstance().recipeService.getRecipeInformation(
                 apiKey = API_KEY,
                 id = id
             )
-            //_current.value = recipe
-            return recipe
+            if (response.isSuccessful) _selectedRecipe = response.body()
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        return null
     }
 
-    suspend fun fetchRecipeInstructions(context: Context, recipeId: Int): List<Instructions>? {
-        try {
-            val response: Response<List<Instructions>> = RetrofitInstance().recipeService.getRecipeInstructions(recipeId, API_KEY)
-            return response.body()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return null
+    fun updateSelectedRecipe(recipe: Recipe) {
+        _selectedRecipe = recipe
     }
 }

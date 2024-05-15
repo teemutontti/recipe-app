@@ -100,7 +100,7 @@ fun SearchScreenContent(navController: NavController, paddingValues: PaddingValu
                 if (loading) LinearProgressIndicator()
                 else {
                     recipeViewModel.searchResults.map {
-                        Text(it.title)
+                        RecipeButton(navController = navController, recipe = it, fetchInfo = true)
                     }
                 }
             }

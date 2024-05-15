@@ -53,7 +53,8 @@ fun RecipeButton(navController: NavController, recipe: Recipe, fetchInfo: Boolea
 
     fun handleRecipeClick() {
         recipeViewModel.updateSelectedRecipe(recipe)
-        navController.navigate("recipe")
+        if (fetchInfo) navController.navigate("recipe_fetch")
+        else navController.navigate("recipe")
     }
 
     TextButton(

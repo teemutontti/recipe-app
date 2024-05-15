@@ -36,6 +36,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.composables.NavBar
 import com.example.recipeapp.composables.RecipeButton
+import com.example.recipeapp.composables.RecipeList
 import com.example.recipeapp.composables.TopBar
 import com.example.recipeapp.repositories.RecipeRepository
 import kotlinx.coroutines.delay
@@ -76,14 +77,11 @@ private fun HomeScreenContent(navController: NavController, paddingValues: Paddi
             else {
                 Text("Today's Specials:", style = TextStyle(fontSize = 24.sp))
                 Spacer(modifier = Modifier.height(16.dp))
-                if (recipeViewModel.specials.isNotEmpty()) {
-                    recipeViewModel.specials.map {
-                        RecipeButton(navController = navController, recipe = it)
-                        Spacer(modifier = Modifier.height(16.dp))
-                    }
-                } else {
-                    Text(text = "Error loading specials")
-                }
+                RecipeList(
+                    navController = navController,
+                    recipes = recipeViewModel.specials,
+                    onEmptyMessage = "Couldn't find specials"
+                )
             }
         }
     }

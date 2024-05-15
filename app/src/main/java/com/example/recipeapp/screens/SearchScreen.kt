@@ -41,6 +41,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.composables.NavBar
 import com.example.recipeapp.composables.RecipeButton
+import com.example.recipeapp.composables.RecipeList
 import com.example.recipeapp.composables.TopBar
 import com.example.recipeapp.repositories.RecipeRepository
 import kotlinx.coroutines.CoroutineScope
@@ -99,9 +100,10 @@ fun SearchScreenContent(navController: NavController, paddingValues: PaddingValu
             Column {
                 if (loading) LinearProgressIndicator()
                 else {
-                    recipeViewModel.searchResults.map {
-                        RecipeButton(navController = navController, recipe = it, fetchInfo = true)
-                    }
+                    RecipeList(
+                        navController = navController,
+                        recipes = recipeViewModel.searchResults,
+                    )
                 }
             }
         }

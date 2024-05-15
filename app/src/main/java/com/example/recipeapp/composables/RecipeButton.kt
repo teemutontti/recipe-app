@@ -45,7 +45,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
-fun RecipeButton(navController: NavController, recipe: Recipe, fetchInfo: Boolean = false) {
+fun RecipeButton(navController: NavController, recipe: Recipe) {
     val context = LocalContext.current
     var loading by remember { mutableStateOf(true) }
     var imageError by remember { mutableStateOf(false) }
@@ -53,8 +53,7 @@ fun RecipeButton(navController: NavController, recipe: Recipe, fetchInfo: Boolea
 
     fun handleRecipeClick() {
         recipeViewModel.updateSelectedRecipe(recipe)
-        if (fetchInfo) navController.navigate("recipe_fetch")
-        else navController.navigate("recipe")
+        navController.navigate("recipe")
     }
 
     TextButton(

@@ -28,8 +28,5 @@ fun App() {
         composable("recipe") {
             RecipeScreen(navController)
         }
-        composable("recipe_fetch") {
-            RecipeScreen(navController, fetchInfo = true)
-        }
     }
 }

@@ -51,11 +51,18 @@ import com.example.recipeapp.repositories.RecipeRepository
 import kotlinx.coroutines.delay
 
 @Composable
-fun RecipeScreen(navController: NavController) {
+fun RecipeScreen(navController: NavController, fetchInfo: Boolean = false) {
+    val context = LocalContext.current
     var loading by remember { mutableStateOf(true) }
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     LaunchedEffect(Unit) {
+        if (fetchInfo) {
+            val id: Int? = recipeViewModel.selectedRecipe?.id?.toInt()
+            if (id != null) {
+                recipeViewModel.fetchRecipeById(context, id)
+            }
+        }
         loading = false
     }
 

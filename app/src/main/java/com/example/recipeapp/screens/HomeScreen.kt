@@ -40,7 +40,6 @@ import com.example.recipeapp.composables.TopBar
 import com.example.recipeapp.repositories.RecipeRepository
 import kotlinx.coroutines.delay
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
     Scaffold(
@@ -61,7 +60,6 @@ private fun HomeScreenContent(navController: NavController, paddingValues: Paddi
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     LaunchedEffect(key1 = Unit) {
-        delay(1000)
         recipeViewModel.fetchRandomRecipes(context)
         Log.d("HomeScreen", "${recipeViewModel.specials.size}")
         for (item in recipeViewModel.specials) {
@@ -78,9 +76,13 @@ private fun HomeScreenContent(navController: NavController, paddingValues: Paddi
             else {
                 Text("Today's Specials:", style = TextStyle(fontSize = 24.sp))
                 Spacer(modifier = Modifier.height(16.dp))
-                recipeViewModel.specials.map {
-                    RecipeButton(navController = navController, recipe = it)
-                    Spacer(modifier = Modifier.height(16.dp))
+                if (recipeViewModel.specials.isNotEmpty()) {
+                    recipeViewModel.specials.map {
+                        RecipeButton(navController = navController, recipe = it)
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
+                } else {
+                    Text(text = "Error loading specials")
                 }
             }
         }

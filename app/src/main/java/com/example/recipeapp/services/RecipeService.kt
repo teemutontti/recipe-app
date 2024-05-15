@@ -27,17 +27,11 @@ interface RecipeService {
         @Query("apiKey") apiKey: String,
         @Query("include-tags") includeTags: String,
         @Query("number") number: Int,
-    ): SpoonacularResponse
+    ): Response<SpoonacularResponse>
 
     @GET("recipes/{id}/information")
     suspend fun getRecipeInformation(
         @Path("id") id: Int,
         @Query("apiKey") apiKey: String
-    ): Recipe
-
-    @GET("recipes/{id}/analyzedInstructions")
-    suspend fun getRecipeInstructions(
-        @Path("id") id: Int,
-        @Query("apiKey") apiKey: String
-    ): Response<List<Instructions>>
+    ): Response<Recipe>
 }

@@ -1,5 +1,6 @@
 package com.example.recipeapp.screens
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -51,24 +52,28 @@ import com.example.recipeapp.repositories.RecipeRepository
 import kotlinx.coroutines.delay
 
 @Composable
-fun RecipeScreen(navController: NavController, fetchInfo: Boolean = false) {
+fun RecipeScreen(navController: NavController) {
     val context = LocalContext.current
-    var loading by remember { mutableStateOf(true) }
+    var loading by remember { mutableStateOf(false) }
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     LaunchedEffect(Unit) {
-        if (fetchInfo) {
+        // When navigating from search view the result recipe doesn't have ingredients
+        // In that case the info has to be fetched manually
+        if (recipeViewModel.selectedRecipe?.extendedIngredients == null) {
+            loading = true
             val id: Int? = recipeViewModel.selectedRecipe?.id?.toInt()
             if (id != null) {
                 recipeViewModel.fetchRecipeById(context, id)
+                loading = false
             }
         }
-        loading = false
     }
 
     Column(modifier = Modifier
         .padding(32.dp)
-        .verticalScroll(rememberScrollState())) {
+        .verticalScroll(rememberScrollState())
+    ) {
         if (loading) LinearProgressIndicator()
         else {
             Row(

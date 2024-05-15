@@ -36,6 +36,8 @@ object RecipeRepository: ViewModel() {
                 SharedPreferencesManager.saveTodaysSpecial(context, recipe, mealType)
                 return recipe
             }
+        } else {
+            Log.d("API", "Error in fetching: ${response.errorBody()?.string()}")
         }
         return null
     }
@@ -64,7 +66,11 @@ object RecipeRepository: ViewModel() {
                 apiKey = API_KEY,
                 id = id
             )
-            if (response.isSuccessful) _selectedRecipe = response.body()
+            if (response.isSuccessful) {
+                _selectedRecipe = response.body()
+            } else {
+                Log.d("API", "Error in fetching: ${response.errorBody()?.string()}")
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -86,6 +92,8 @@ object RecipeRepository: ViewModel() {
                 response.body()?.results?.map {
                     _searchResults.add(it)
                 }
+            } else {
+                Log.d("API", "Error in fetching: ${response.errorBody()?.string()}")
             }
         } catch (e: Exception) {
             e.printStackTrace()

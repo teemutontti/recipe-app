@@ -2,6 +2,7 @@ package com.example.recipeapp.services
 
 import com.example.recipeapp.api.Instructions
 import com.example.recipeapp.api.Recipe
+import com.example.recipeapp.api.SearchResponse
 import com.example.recipeapp.api.SpoonacularResponse
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -34,4 +35,11 @@ interface RecipeService {
         @Path("id") id: Int,
         @Query("apiKey") apiKey: String
     ): Response<Recipe>
+
+    @GET("recipes/complexSearch")
+    suspend fun searchRecipes(
+        @Query("apiKey") apiKey: String,
+        @Query("query") query: String,
+        @Query("number") number: Int
+    ): Response<SearchResponse>
 }

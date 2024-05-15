@@ -1,5 +1,6 @@
 package com.example.recipeapp.composables
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
@@ -19,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,9 +40,13 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.recipeapp.api.Recipe
 import com.example.recipeapp.repositories.RecipeRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
-fun RecipeButton(navController: NavController, recipe: Recipe) {
+fun RecipeButton(navController: NavController, recipe: Recipe, fetchInfo: Boolean = false) {
+    val context = LocalContext.current
     var loading by remember { mutableStateOf(true) }
     var imageError by remember { mutableStateOf(false) }
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)

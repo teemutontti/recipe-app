@@ -17,6 +17,8 @@ data class Recipe(
     val sourceName: String,
     val sourceUrl: String,
     val extendedIngredients: List<Ingredient>,
+    val instructions: String,
+    val analyzedInstructions: List<Instructions>,
 )
 
 data class Ingredient(

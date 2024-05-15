@@ -75,3 +75,7 @@ data class InstructionsIngredient(
     val image: String,
     val name: String
 )
+
+data class SearchResponse(
+    val results: List<Recipe>
+)

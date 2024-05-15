@@ -1,24 +1,28 @@
 package com.example.recipeapp.screens
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.twotone.Star
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,104 +33,114 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.recipeapp.api.Instructions
 import com.example.recipeapp.api.Recipe
 import com.example.recipeapp.composables.IngredientLine
 import com.example.recipeapp.repositories.RecipeRepository
+import kotlinx.coroutines.delay
 
 @Composable
-fun RecipeScreen(id: Int?) {
-    val BASE_PIXELS: Int = 8
-
+fun RecipeScreen(navController: NavController) {
     var loading by remember { mutableStateOf(true) }
-    var recipe: Recipe? by remember { mutableStateOf(null) }
-    var instructions: List<Instructions>? by remember { mutableStateOf(null) }
-
-    val context = LocalContext.current
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
-    LaunchedEffect(key1 = id) {
-        if (id != null) {
-            recipe = recipeViewModel.fetchRecipeById(context, id)
-            if (recipe != null) {
-                instructions = recipeViewModel.fetchRecipeInstructions(context, recipe!!.id.toInt())
-            }
-        }
+    LaunchedEffect(Unit) {
         loading = false
     }
 
-    Column(
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.verticalScroll(rememberScrollState())
-    ) {
-        Column(modifier = Modifier.padding(horizontal = 25.dp, vertical = 35.dp)) {
-            Text(
-                text = recipe?.title ?: "Loading...",
-                style = TextStyle(
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold
+    Column(modifier = Modifier
+        .padding(32.dp)
+        .verticalScroll(rememberScrollState())) {
+        if (loading) LinearProgressIndicator()
+        else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = recipeViewModel.selectedRecipe?.title ?: "Error",
+                    overflow = TextOverflow.Visible,
+                    modifier = Modifier.weight(1f),
+                    style = TextStyle(
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
                 )
-            )
+                IconButton(onClick = {/* TODO */}) {
+                    Icon(
+                        imageVector = Icons.TwoTone.Star,
+                        contentDescription = "star icon",
+                        modifier = Modifier
+                            .width(32.dp)
+                            .height(32.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
             AsyncImage(
-                model = recipe?.image,
-                contentDescription = "${recipe?.title} image",
+                model = recipeViewModel.selectedRecipe?.image,
+                contentDescription = "${recipeViewModel.selectedRecipe?.title} image",
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1.5f)
+                    .clip(RoundedCornerShape(15.dp))
+                    .border(
+                        4.dp,
+                        MaterialTheme.colorScheme.surfaceVariant,
+                        RoundedCornerShape(15.dp)
+                    )
             )
-            Spacer(modifier = Modifier.height((BASE_PIXELS * 4).dp))
-            Column(horizontalAlignment = Alignment.Start) {
-                if (loading) {
-                    CircularProgressIndicator()
-                } else if (recipe != null) {
-                    Text(text = "For ${recipe?.servings} people")
-                    Text(
-                        text = "Ingredients",
-                        style = TextStyle(
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    )
-                    Column {
-                        recipe?.extendedIngredients?.forEach {
-                            IngredientLine(ingredient = it)
-                        }
+            Spacer(modifier = Modifier.height(24.dp))
+            Column {
+                // TODO: Add functionality to change the serving size
+                Text(text = "${recipeViewModel.selectedRecipe?.servings} servings")
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Ingredients",
+                    style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Column {
+                    recipeViewModel.selectedRecipe?.extendedIngredients?.forEach {
+                        IngredientLine(ingredient = it)
                     }
-                    Spacer(modifier = Modifier.height((BASE_PIXELS * 2).dp))
-                    Text(
-                        text = "Instructions",
-                        style = TextStyle(
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    )
-                    instructions?.map { x ->
-                        Text(text = if (x.name != "") x.name else "No name")
-                        x.steps.map { y ->
-                            Row {
-                                Text(
-                                    text = "${y.number}",
-                                    style = TextStyle(
-                                        fontSize = (BASE_PIXELS * 3).sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+                Text(
+                    text = "Instructions",
+                    style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                recipeViewModel.selectedRecipe?.analyzedInstructions?.map { instruction ->
+                    instruction.steps.map { step ->
+                        Row {
+                            Text(
+                                text = "${step.number}",
+                                modifier = Modifier
+                                    .width(24.dp)
+                                    .height(24.dp),
+                                style = TextStyle(
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.primary
                                 )
-                                Spacer(modifier = Modifier.width((BASE_PIXELS * 2).dp))
-                                Text(
-                                    text = y.step,
-                                    modifier = Modifier.padding(top = 2.dp)
-                                )
-                            }
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(text = step.step, modifier = Modifier.padding(top = 2.dp))
                         }
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }

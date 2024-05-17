@@ -1,12 +1,15 @@
 package com.example.recipeapp.composables
 
+import android.hardware.SensorAdditionalInfo
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -32,12 +36,15 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.recipeapp.R
 import com.example.recipeapp.api.Recipe
 import com.example.recipeapp.repositories.RecipeRepository
 import kotlinx.coroutines.CoroutineScope
@@ -45,7 +52,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
-fun RecipeButton(navController: NavController, recipe: Recipe) {
+fun RecipeButton(navController: NavController, recipe: Recipe, showAdditionalInfo: Boolean = false) {
     val context = LocalContext.current
     var loading by remember { mutableStateOf(true) }
     var imageError by remember { mutableStateOf(false) }
@@ -77,7 +84,7 @@ fun RecipeButton(navController: NavController, recipe: Recipe) {
                 .border(4.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(15.dp))
             ) {
                 if (loading && !imageError) CircularProgressIndicator()
-                if (imageError) Text("Image Error")
+                if (imageError) Text("Image Not Found")
                 AsyncImage(
                     model = recipe.image,
                     contentDescription = "${recipe.title} picture",
@@ -89,12 +96,32 @@ fun RecipeButton(navController: NavController, recipe: Recipe) {
                         .clip(RoundedCornerShape(8.dp))
                 )
             }
-            Text(
-                text = recipe.title ?: "Loading...",
-                style = TextStyle(
-                    fontSize = 20.sp
+            Column {
+                Text(
+                    text = recipe.title ?: "Loading...",
+                    style = TextStyle(
+                        fontSize = 20.sp
+                    )
                 )
-            )
+                if (showAdditionalInfo) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.schedule),
+                            contentDescription = "Clock icon",
+                            modifier = Modifier
+                                .width(16.dp)
+                                .height(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "${recipe.readyInMinutes} min",
+                            style = TextStyle(fontWeight = FontWeight.Normal, fontSize = 12.sp)
+                        )
+                    }
+                }
+            }
         }
     }
 }

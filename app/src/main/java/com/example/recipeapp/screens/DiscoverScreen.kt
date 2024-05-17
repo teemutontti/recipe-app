@@ -33,11 +33,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.composables.NavBar
 import com.example.recipeapp.composables.RecipeButton
+import com.example.recipeapp.composables.TopBar
 import com.example.recipeapp.repositories.RecipeRepository
 
 @Composable
 fun HomeScreen(navController: NavController) {
     Scaffold(
+        topBar = { TopBar(title = "Discover") },
         content = {
             HomeScreenContent(navController = navController, paddingValues = it)
         },

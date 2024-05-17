@@ -18,6 +18,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -55,6 +57,7 @@ import kotlinx.coroutines.delay
 fun RecipeScreen(navController: NavController) {
     val context = LocalContext.current
     var loading by remember { mutableStateOf(false) }
+    var isFavourite by remember { mutableStateOf(false) }
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     LaunchedEffect(Unit) {
@@ -66,6 +69,21 @@ fun RecipeScreen(navController: NavController) {
             if (id != null) {
                 recipeViewModel.fetchRecipeById(context, id)
                 loading = false
+            }
+        }
+
+        if (recipeViewModel.selectedRecipe in recipeViewModel.favourites) {
+            isFavourite = true
+        }
+    }
+
+    fun handleFavouriteClick() {
+        if (recipeViewModel.selectedRecipe != null) {
+            isFavourite = !isFavourite
+            if (isFavourite) {
+                recipeViewModel.addFavourite(context, recipeViewModel.selectedRecipe!!)
+            } else {
+                recipeViewModel.deleteFavourite(context, recipeViewModel.selectedRecipe!!)
             }
         }
     }
@@ -88,9 +106,11 @@ fun RecipeScreen(navController: NavController) {
                         fontWeight = FontWeight.Bold,
                     )
                 )
-                IconButton(onClick = {/* TODO */}) {
+                IconButton(onClick = { handleFavouriteClick() }) {
                     Icon(
-                        imageVector = Icons.TwoTone.Star,
+                        imageVector =
+                            if (isFavourite) Icons.Rounded.Favorite
+                            else Icons.Rounded.FavoriteBorder,
                         contentDescription = "star icon",
                         modifier = Modifier
                             .width(32.dp)

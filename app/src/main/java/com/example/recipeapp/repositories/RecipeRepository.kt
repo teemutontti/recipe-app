@@ -16,14 +16,20 @@ import retrofit2.Response
 import retrofit2.http.Query
 
 object RecipeRepository: ViewModel() {
-    private var _specials: SnapshotStateList<Recipe> = mutableStateListOf<Recipe>()
+    private var _specials: SnapshotStateList<Recipe> = mutableStateListOf()
     val specials: List<Recipe> get() = _specials
 
     private var _selectedRecipe: Recipe? = null
     val selectedRecipe: Recipe? get() = _selectedRecipe
 
-    private var _searchResults: SnapshotStateList<Recipe> = mutableStateListOf<Recipe>()
+    private var _searchResults: SnapshotStateList<Recipe> = mutableStateListOf()
     val searchResults: List<Recipe> get() = _searchResults
+
+    private var _favourites: SnapshotStateList<Recipe> = mutableStateListOf()
+    val favourites: List<Recipe> get() = _favourites
+
+    private var _ownRecipes: SnapshotStateList<Recipe> = mutableStateListOf()
+    val ownRecipes: List<Recipe> get() = _ownRecipes
 
     private suspend fun fetchRandomMeal(context: Context, mealType: String): Recipe? {
         val response: Response<SpoonacularResponse> = RetrofitInstance().recipeService
@@ -98,5 +104,45 @@ object RecipeRepository: ViewModel() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun fetchFavourites(context: Context) {
+        _favourites.clear()
+        val favourites = SharedPreferencesManager.getFavourites(context)
+        if (favourites.isNotEmpty()) {
+            for (recipe in favourites) {
+                _favourites.add(recipe)
+            }
+        }
+    }
+
+    fun addFavourite(context: Context, recipe: Recipe) {
+        _favourites.add(recipe)
+        SharedPreferencesManager.updateFavourites(context, _favourites)
+    }
+
+    fun deleteFavourite(context: Context, recipe: Recipe) {
+        val newFavourites = _favourites.filter { it != recipe }
+        _favourites.clear()
+        for (recipe in newFavourites) {
+            _favourites.add(recipe)
+        }
+        SharedPreferencesManager.updateFavourites(context, _favourites)
+    }
+
+    fun fetchOwnRecipes(context: Context) {
+        _ownRecipes.clear()
+        val ownRecipes = SharedPreferencesManager.getOwnRecipes(context)
+        for (recipe in ownRecipes) {
+            _ownRecipes.add(recipe)
+        }
+    }
+
+    fun addOwnRecipe(context: Context, recipe: Recipe) {
+        Log.d("Own Recipe", "Saving new own recipe!")
+        _ownRecipes.add(recipe)
+        Log.d("OwnRecipes", _ownRecipes.toString())
+        for (recipe in _ownRecipes) Log.d("YEah", recipe.toString())
+        SharedPreferencesManager.updateOwnRecipe(context, _ownRecipes)
     }
 }

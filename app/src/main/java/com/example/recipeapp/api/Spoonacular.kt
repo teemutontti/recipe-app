@@ -22,11 +22,8 @@ data class Recipe(
 )
 
 data class Ingredient(
-    val amount: Number,
-    val id: Number,
-    val image: String,
     val measures: Measures,
-    val name: String
+    var name: String
 )
 
 data class Measures(
@@ -35,9 +32,8 @@ data class Measures(
 )
 
 data class SingleMeasure(
-    val amount: Number,
-    val unitLong: String,
-    val unitShort: String
+    var amount: Number,
+    var unitShort: String
 )
 
 data class Instructions(
@@ -46,34 +42,8 @@ data class Instructions(
 )
 
 data class Step(
-    val equipment: List<Equipment>,
-    val ingredients: List<InstructionsIngredient>,
     val number: Number,
-    val step: String,
-    val length: LengthUnit? = null,
-)
-
-data class LengthUnit(
-    val number: Number,
-    val unit: String
-)
-
-data class Equipment(
-    val id: Number,
-    val image: String,
-    val name: String,
-    val temperature: TemperatureUnit? = null
-)
-
-data class TemperatureUnit(
-    val number: Number,
-    val unit: String
-)
-
-data class InstructionsIngredient(
-    val id: Number,
-    val image: String,
-    val name: String
+    var step: String,
 )
 
 data class SearchResponse(

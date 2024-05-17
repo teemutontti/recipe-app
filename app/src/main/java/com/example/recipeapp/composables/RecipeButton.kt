@@ -84,8 +84,7 @@ fun RecipeButton(navController: NavController, recipe: Recipe, showAdditionalInf
                 .border(4.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(15.dp))
             ) {
                 if (loading && !imageError) CircularProgressIndicator()
-                if (imageError) Text("Image Not Found")
-                AsyncImage(
+                if (!imageError) AsyncImage(
                     model = recipe.image,
                     contentDescription = "${recipe.title} picture",
                     onSuccess = { (_) -> loading = false },

@@ -1,6 +1,6 @@
 package com.example.recipeapp.screens
 
-import android.util.Log
+import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,9 +14,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,79 +31,95 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.recipeapp.composables.CustomSearchBar
 import com.example.recipeapp.composables.NavBar
 import com.example.recipeapp.composables.RecipeButton
 import com.example.recipeapp.composables.TopBar
 import com.example.recipeapp.repositories.RecipeRepository
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun DiscoverScreen(navController: NavController) {
     Scaffold(
         topBar = { TopBar(title = "Discover") },
         content = {
-            HomeScreenContent(navController = navController, paddingValues = it)
+            DiscoverScreenContent(navController = navController, paddingValues = it)
         },
         bottomBar = {
-            NavBar(navController = navController, selected = "home")
+            NavBar(navController = navController, selected = "discover")
         }
     )
 }
 
 @Composable
-private fun HomeScreenContent(navController: NavController, paddingValues: PaddingValues) {
+private fun DiscoverScreenContent(navController: NavController, paddingValues: PaddingValues) {
     val context = LocalContext.current
     var loading: Boolean by remember { mutableStateOf(true) }
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
-    LaunchedEffect(key1 = Unit) {
-        recipeViewModel.fetchRandomRecipes(context)
-        Log.d("HomeScreen", "${recipeViewModel.specials.size}")
-        for (item in recipeViewModel.specials) {
-            Log.d("HomeScreen", item.toString())
-        }
-        loading = false
-    }
+
 
     Column(modifier = Modifier
         .padding(paddingValues)
         .verticalScroll(rememberScrollState())) {
-        Column(modifier = Modifier.padding(24.dp)) {
-            if (loading) LinearProgressIndicator()
-            else {
-                Text("Today's Specials:", style = TextStyle(fontSize = 24.sp))
-                Spacer(modifier = Modifier.height(16.dp))
-                LazyRow(modifier = Modifier.fillMaxWidth()) {
-                    itemsIndexed(recipeViewModel.specials) { index, item ->
-                        Column(modifier = Modifier.width(296.dp)) {
-                            Text(
-                                text = when (index) {
-                                    0 -> "Breakfast"
-                                    1 -> "Lunch"
-                                    2 -> "Dinner"
-                                    else -> "Snack"
-                                },
-                                style = TextStyle(
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            RecipeButton(
-                                navController = navController,
-                                recipe = item,
-                                showAdditionalInfo = true
-                            )
-                        }
-                        if (index < recipeViewModel.specials.size - 1) {
-                            Spacer(modifier = Modifier.width(24.dp))
-                        }
-                    }
+        Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+            CustomSearchBar(navController, recipeViewModel)
+            Spacer(modifier = Modifier.height(24.dp))
+            TodaysSpecialsSection(recipeViewModel, navController, context)
+        }
+    }
+
+}
+
+@Composable
+fun TodaysSpecialsSection(
+    recipeViewModel: RecipeRepository,
+    navController: NavController,
+    context: Context
+) {
+    var loading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(key1 = Unit) {
+        recipeViewModel.fetchRandomRecipes(context)
+        loading = false
+    }
+
+    if (loading) LinearProgressIndicator()
+    else {
+        Text(
+            text = "Check out today's specials",
+            style = TextStyle(
+                fontSize = 16.sp,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        )
+        LazyRow(modifier = Modifier.fillMaxWidth()) {
+            itemsIndexed(recipeViewModel.specials) { index, item ->
+                Column(modifier = Modifier.width(296.dp)) {
+                    /* TODO: Move this inside the button
+                    Text(
+                        text = when (index) {
+                            0 -> "Breakfast"
+                            1 -> "Lunch"
+                            2 -> "Dinner"
+                            else -> "Snack"
+                        },
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    )
+                    */
+                    Spacer(modifier = Modifier.height(4.dp))
+                    RecipeButton(
+                        navController = navController,
+                        recipe = item,
+                        showAdditionalInfo = true
+                    )
                 }
-                TextButton(onClick = { navController.navigate("add_recipe") }) {
-                    Text("Add New Recipe")
+                if (index < recipeViewModel.specials.size - 1) {
+                    Spacer(modifier = Modifier.width(24.dp))
                 }
             }
         }
     }
-
 }

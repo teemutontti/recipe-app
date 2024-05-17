@@ -1,30 +1,29 @@
 package com.example.recipeapp
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.recipeapp.composables.NavBar
 import com.example.recipeapp.screens.AddRecipeScreen
-import com.example.recipeapp.screens.HomeScreen
-import com.example.recipeapp.screens.MyRecipesScreen
+import com.example.recipeapp.screens.DiscoverScreen
+import com.example.recipeapp.screens.CookbookScreen
 import com.example.recipeapp.screens.RecipeScreen
-import com.example.recipeapp.screens.SearchScreen
+import com.example.recipeapp.screens.SearchResultsScreen
 
 @Composable
 fun App() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "home") {
-        composable("home") {
-            HomeScreen(navController)
+    NavHost(navController = navController, startDestination = "discover") {
+        composable("discover") {
+            DiscoverScreen(navController)
         }
-        composable("search") {
-            SearchScreen(navController)
+        composable("search_results/{query}") {
+            val query: String? = it.arguments?.getString("query")
+            SearchResultsScreen(navController, query)
         }
-        composable("my_recipes") {
-            MyRecipesScreen(navController)
+        composable("cookbook") {
+            CookbookScreen(navController)
         }
         composable("recipe") {
             RecipeScreen(navController)

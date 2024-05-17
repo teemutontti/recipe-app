@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.recipeapp.composables.NavBar
+import com.example.recipeapp.screens.AddRecipeScreen
 import com.example.recipeapp.screens.HomeScreen
 import com.example.recipeapp.screens.MyRecipesScreen
 import com.example.recipeapp.screens.RecipeScreen
@@ -27,6 +28,9 @@ fun App() {
         }
         composable("recipe") {
             RecipeScreen(navController)
+        }
+        composable("add_recipe") {
+            AddRecipeScreen(navController)
         }
     }
 }

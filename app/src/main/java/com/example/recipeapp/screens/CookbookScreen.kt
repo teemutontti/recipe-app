@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -82,6 +83,9 @@ fun OwnRecipesTab(navController: NavController) {
     }
 
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        Button(onClick = { navController.navigate("add_recipe") }) {
+            Text("Add New Recipe")
+        }
         RecipeList(navController = navController, recipes = recipeViewModel.ownRecipes)
     }
 }

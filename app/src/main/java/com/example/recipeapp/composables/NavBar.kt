@@ -11,7 +11,6 @@ import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,6 +19,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.compose.material.icons.filled.Dashboard
 
 @Composable
 fun NavBar(navController: NavController, selected: String) {
@@ -37,22 +37,16 @@ fun NavBar(navController: NavController, selected: String) {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 NavButton(
-                    selected = selected == "search",
-                    onClick = { navController.navigate("search") },
-                    iconVector = Icons.Rounded.Search,
-                    text = "Search"
+                    selected = selected == "discover",
+                    onClick = { navController.navigate("discover") },
+                    iconVector = Icons.Filled.Dashboard,
+                    text = "Discover"
                 )
                 NavButton(
-                    selected = selected == "home",
-                    onClick = { navController.navigate("home") },
-                    iconVector = Icons.Rounded.Home,
-                    text = "Home"
-                )
-                NavButton(
-                    selected = selected == "my_recipes",
-                    onClick = { navController.navigate("my_recipes") },
+                    selected = selected == "cookbook",
+                    onClick = { navController.navigate("cookbook") },
                     iconVector = Icons.AutoMirrored.Rounded.List,
-                    text = "My Recipes"
+                    text = "Cookbook"
                 )
             }
         }

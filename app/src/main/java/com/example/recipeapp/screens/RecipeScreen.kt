@@ -120,7 +120,9 @@ fun RecipeScreen(navController: NavController) {
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-            AsyncImage(
+            if (recipeViewModel.selectedRecipe?.image != null
+                && recipeViewModel.selectedRecipe?.image != ""
+            ) AsyncImage(
                 model = recipeViewModel.selectedRecipe?.image,
                 contentDescription = "${recipeViewModel.selectedRecipe?.title} image",
                 modifier = Modifier

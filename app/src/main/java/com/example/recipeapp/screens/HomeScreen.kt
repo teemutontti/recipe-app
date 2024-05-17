@@ -17,6 +17,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -80,8 +81,12 @@ private fun HomeScreenContent(navController: NavController, paddingValues: Paddi
                 RecipeList(
                     navController = navController,
                     recipes = recipeViewModel.specials,
-                    onEmptyMessage = "Couldn't find specials"
+                    onEmptyMessage = "Couldn't find specials",
+                    showAdditionalRecipeInfo = true,
                 )
+                TextButton(onClick = { navController.navigate("add_recipe") }) {
+                    Text("Add New Recipe")
+                }
             }
         }
     }

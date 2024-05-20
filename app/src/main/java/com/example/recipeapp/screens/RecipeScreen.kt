@@ -56,13 +56,16 @@ import kotlinx.coroutines.delay
 @Composable
 fun RecipeScreen(navController: NavController, recipeId: Int?) {
     val context = LocalContext.current
-    var loading by remember { mutableStateOf(false) }
+    var loading by remember { mutableStateOf(true) }
     var isFavourite by remember { mutableStateOf(false) }
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     LaunchedEffect(Unit) {
+        Log.d("RecipeScreen", "Recipe id: $recipeId")
         if (recipeId != null) {
             recipeViewModel.fetchRecipeById(context, recipeId)
+            loading = false
+            Log.d("RecipeScreen", "Selected recipe: ${recipeViewModel.selectedRecipe}")
         }
 
         // Fix favourite

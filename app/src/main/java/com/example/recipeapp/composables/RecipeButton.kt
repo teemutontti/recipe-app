@@ -45,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.recipeapp.R
+import com.example.recipeapp.api.CachedRecipe
 import com.example.recipeapp.api.Recipe
 import com.example.recipeapp.repositories.RecipeRepository
 import kotlinx.coroutines.CoroutineScope
@@ -52,15 +53,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
-fun RecipeButton(navController: NavController, recipe: Recipe, showAdditionalInfo: Boolean = false) {
+fun RecipeButton(
+    navController: NavController,
+    recipe: CachedRecipe,
+) {
     val context = LocalContext.current
     var loading by remember { mutableStateOf(true) }
     var imageError by remember { mutableStateOf(false) }
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     fun handleRecipeClick() {
-        recipeViewModel.updateSelectedRecipe(recipe)
-        navController.navigate("recipe")
+        navController.navigate("recipe/${recipe.id}")
     }
 
     TextButton(
@@ -102,24 +105,6 @@ fun RecipeButton(navController: NavController, recipe: Recipe, showAdditionalInf
                         fontSize = 20.sp
                     )
                 )
-                if (showAdditionalInfo) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.schedule),
-                            contentDescription = "Clock icon",
-                            modifier = Modifier
-                                .width(16.dp)
-                                .height(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "${recipe.readyInMinutes} min",
-                            style = TextStyle(fontWeight = FontWeight.Normal, fontSize = 12.sp)
-                        )
-                    }
-                }
             }
         }
     }

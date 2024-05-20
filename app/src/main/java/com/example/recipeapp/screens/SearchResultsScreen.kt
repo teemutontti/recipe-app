@@ -10,7 +10,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -20,9 +19,6 @@ import com.example.recipeapp.composables.CustomSearchBar
 import com.example.recipeapp.composables.RecipeList
 import com.example.recipeapp.composables.TopBar
 import com.example.recipeapp.repositories.RecipeRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun SearchResultsScreen(navController: NavController, query: String?) {

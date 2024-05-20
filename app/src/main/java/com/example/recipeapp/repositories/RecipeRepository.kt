@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import com.example.recipeapp.BuildConfig.API_KEY
+import com.example.recipeapp.api.CachedRecipe
 import com.example.recipeapp.api.Instructions
 import com.example.recipeapp.services.RetrofitInstance
 import com.example.recipeapp.utils.SharedPreferencesManager
@@ -16,32 +17,33 @@ import retrofit2.Response
 import retrofit2.http.Query
 
 object RecipeRepository: ViewModel() {
-    private var _specials: SnapshotStateList<Recipe> = mutableStateListOf()
-    val specials: List<Recipe> get() = _specials
+    private val TODAYS_SPECIALS = listOf("breakfast", "lunch", "dinner", "snack")
+
+    private var _specials: SnapshotStateList<CachedRecipe> = mutableStateListOf()
+    val specials: List<CachedRecipe> get() = _specials
+
+    private var _searchResults: SnapshotStateList<CachedRecipe> = mutableStateListOf()
+    val searchResults: List<CachedRecipe> get() = _searchResults
+
+    private var _favourites: SnapshotStateList<CachedRecipe> = mutableStateListOf()
+    val favourites: List<CachedRecipe> get() = _favourites
 
     private var _selectedRecipe: Recipe? = null
     val selectedRecipe: Recipe? get() = _selectedRecipe
-
-    private var _searchResults: SnapshotStateList<Recipe> = mutableStateListOf()
-    val searchResults: List<Recipe> get() = _searchResults
-
-    private var _favourites: SnapshotStateList<Recipe> = mutableStateListOf()
-    val favourites: List<Recipe> get() = _favourites
 
     private var _ownRecipes: SnapshotStateList<Recipe> = mutableStateListOf()
     val ownRecipes: List<Recipe> get() = _ownRecipes
 
     private suspend fun fetchRandomMeal(context: Context, mealType: String): Recipe? {
-        val response: Response<SpoonacularResponse> = RetrofitInstance().recipeService
-            .getRandomRecipes(apiKey = API_KEY, includeTags = mealType, number = 1)
+        val response = RetrofitInstance().recipeService.getRandomRecipes(
+            apiKey = API_KEY,
+            includeTags = mealType,
+            number = 1
+        )
 
         if (response.isSuccessful) {
-            // Saving to shared prefs
             val recipe: Recipe? = response.body()?.recipes?.get(0)
-            if (recipe != null) {
-                SharedPreferencesManager.saveTodaysSpecial(context, recipe, mealType)
-                return recipe
-            }
+            if (recipe != null) return recipe
         } else {
             Log.d("API", "Error in fetching: ${response.errorBody()?.string()}")
         }
@@ -56,10 +58,20 @@ object RecipeRepository: ViewModel() {
                     _specials.add(it)
                 }
             } else {
-                SharedPreferencesManager.TODAYS_SPECIAL_MEAL_TYPES.map {
+                val newSpecials: List<CachedRecipe?> = TODAYS_SPECIALS.map {
                     val recipe: Recipe? = fetchRandomMeal(context, it)
-                    if (recipe != null) _specials.add(recipe)
+                    if (recipe != null) {
+                        val savableRecipe = CachedRecipe(
+                            id = recipe.id,
+                            image = recipe.image,
+                            title = recipe.title
+                        )
+                        _specials.add(savableRecipe)
+                        savableRecipe
+                    }
+                    null
                 }
+                SharedPreferencesManager.saveTodaysSpecials(context, newSpecials)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -82,10 +94,6 @@ object RecipeRepository: ViewModel() {
         }
     }
 
-    fun updateSelectedRecipe(recipe: Recipe) {
-        _selectedRecipe = recipe
-    }
-
     suspend fun searchRecipes(context: Context, query: String) {
         try {
             _searchResults.clear()
@@ -96,7 +104,13 @@ object RecipeRepository: ViewModel() {
             )
             if (response.isSuccessful) {
                 response.body()?.results?.map {
-                    _searchResults.add(it)
+                    _searchResults.add(
+                        CachedRecipe(
+                            id = it.id,
+                            image = it.image,
+                            title = it.title
+                        )
+                    )
                 }
             } else {
                 Log.d("API", "Error in fetching: ${response.errorBody()?.string()}")
@@ -117,15 +131,21 @@ object RecipeRepository: ViewModel() {
     }
 
     fun addFavourite(context: Context, recipe: Recipe) {
-        _favourites.add(recipe)
+        _favourites.add(
+            CachedRecipe(
+                id = recipe.id,
+                image = recipe.image,
+                title = recipe.title
+            )
+        )
         SharedPreferencesManager.updateFavourites(context, _favourites)
     }
 
     fun deleteFavourite(context: Context, recipe: Recipe) {
-        val newFavourites = _favourites.filter { it != recipe }
+        val newFavourites = _favourites.filter { it.id != recipe.id }
         _favourites.clear()
-        for (recipe in newFavourites) {
-            _favourites.add(recipe)
+        newFavourites.forEach {
+            _favourites.add(it)
         }
         SharedPreferencesManager.updateFavourites(context, _favourites)
     }
@@ -139,10 +159,7 @@ object RecipeRepository: ViewModel() {
     }
 
     fun addOwnRecipe(context: Context, recipe: Recipe) {
-        Log.d("Own Recipe", "Saving new own recipe!")
         _ownRecipes.add(recipe)
-        Log.d("OwnRecipes", _ownRecipes.toString())
-        for (recipe in _ownRecipes) Log.d("YEah", recipe.toString())
         SharedPreferencesManager.updateOwnRecipe(context, _ownRecipes)
     }
 }

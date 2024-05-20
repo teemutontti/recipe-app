@@ -54,27 +54,18 @@ import com.example.recipeapp.repositories.RecipeRepository
 import kotlinx.coroutines.delay
 
 @Composable
-fun RecipeScreen(navController: NavController) {
+fun RecipeScreen(navController: NavController, recipeId: Int?) {
     val context = LocalContext.current
     var loading by remember { mutableStateOf(false) }
     var isFavourite by remember { mutableStateOf(false) }
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     LaunchedEffect(Unit) {
-        // When navigating from search view the result recipe doesn't have ingredients
-        // In that case the info has to be fetched manually
-        if (recipeViewModel.selectedRecipe?.extendedIngredients == null) {
-            loading = true
-            val id: Int? = recipeViewModel.selectedRecipe?.id?.toInt()
-            if (id != null) {
-                recipeViewModel.fetchRecipeById(context, id)
-                loading = false
-            }
+        if (recipeId != null) {
+            recipeViewModel.fetchRecipeById(context, recipeId)
         }
 
-        if (recipeViewModel.selectedRecipe in recipeViewModel.favourites) {
-            isFavourite = true
-        }
+        // Fix favourite
     }
 
     fun handleFavouriteClick() {

@@ -68,7 +68,10 @@ fun RecipeScreen(navController: NavController, recipeId: Int?) {
             Log.d("RecipeScreen", "Selected recipe: ${recipeViewModel.selectedRecipe}")
         }
 
-        // Fix favourite
+        val favouriteIds: List<Int> = recipeViewModel.favourites.map { it.id.toInt() }
+        if (favouriteIds.contains(recipeId)) {
+            isFavourite = true
+        }
     }
 
     fun handleFavouriteClick() {

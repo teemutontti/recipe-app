@@ -68,8 +68,9 @@ object RecipeRepository: ViewModel() {
                         )
                         _specials.add(savableRecipe)
                         savableRecipe
+                    } else {
+                        null
                     }
-                    null
                 }
                 SharedPreferencesManager.saveTodaysSpecials(context, newSpecials)
             }

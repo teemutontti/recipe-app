@@ -49,3 +49,9 @@ data class Step(
 data class SearchResponse(
     val results: List<Recipe>
 )
+
+data class CachedRecipe(
+    val id: Number,
+    val image: String,
+    val title: String,
+)

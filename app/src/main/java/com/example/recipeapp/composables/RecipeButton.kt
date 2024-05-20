@@ -4,12 +4,16 @@ import android.hardware.SensorAdditionalInfo
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,6 +36,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -55,7 +62,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun RecipeButton(
     navController: NavController,
-    recipe: CachedRecipe,
+    recipe: CachedRecipe?,
 ) {
     val context = LocalContext.current
     var loading by remember { mutableStateOf(true) }
@@ -63,48 +70,77 @@ fun RecipeButton(
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     fun handleRecipeClick() {
-        navController.navigate("recipe/${recipe.id}")
+        if (recipe != null) navController.navigate("recipe/${recipe.id}")
     }
 
-    TextButton(
-        shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(2.dp, MaterialTheme.colorScheme.surfaceVariant),
-        onClick = { handleRecipeClick() },
-        modifier = Modifier.padding(0.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onBackground
-        )
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start,
-            modifier = Modifier.fillMaxWidth()
+
+    if (recipe != null) {
+        TextButton(
+            shape = RoundedCornerShape(8.dp),
+            onClick = { handleRecipeClick() },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onBackground
+            )
         ) {
-            Box(contentAlignment = Alignment.Center, modifier = Modifier
-                .padding(8.dp)
-                .clip(RoundedCornerShape(15.dp))
-                .border(4.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(15.dp))
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(15.dp))
+                    .fillMaxSize()
+                    .height(96.dp)
+                    .border(2.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(15.dp))
             ) {
                 if (loading && !imageError) CircularProgressIndicator()
-                if (!imageError) AsyncImage(
-                    model = recipe.image,
-                    contentDescription = "${recipe.title} picture",
-                    onSuccess = { (_) -> loading = false },
-                    onError = { (_) -> imageError = true },
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(width = 96.dp, height = 96.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                )
-            }
-            Column {
-                Text(
-                    text = recipe.title ?: "Loading...",
-                    style = TextStyle(
-                        fontSize = 20.sp
+                if (!imageError) {
+                    AsyncImage(
+                        model = recipe.image,
+                        contentDescription = "${recipe.title} picture",
+                        onSuccess = { (_) -> loading = false },
+                        onError = { (_) -> imageError = true },
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(width = 288.dp, height = 162.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .fillMaxWidth()
                     )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.meal),
+                        contentDescription = "meal",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(width = 288.dp, height = 162.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .fillMaxSize()
+                    )
+                }
+                // Adding shadow with box composable for better text readability
+                Box(
+                    modifier = Modifier.fillMaxSize().background(
+                        Brush.linearGradient(
+                        colors = listOf(
+                            Color.Black.copy(alpha = 0.7f),
+                            Color.Transparent,
+                            Color.Black.copy(alpha = 0.7f),
+                        ),
+                        start = Offset(0f, 0f),
+                        end = Offset(0f, Float.POSITIVE_INFINITY)
+                    ))
                 )
+                Column(
+                    verticalArrangement = Arrangement.Bottom,
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = recipe.title ?: "Loading...",
+                        style = TextStyle(
+                            fontSize = 20.sp
+                        )
+                    )
+                }
             }
         }
     }

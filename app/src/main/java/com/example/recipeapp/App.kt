@@ -17,6 +17,9 @@ fun App() {
         composable("discover") {
             DiscoverScreen(navController)
         }
+        composable("add") {
+            AddRecipeScreen(navController)
+        }
         composable("cookbook") {
             CookbookScreen(navController)
         }

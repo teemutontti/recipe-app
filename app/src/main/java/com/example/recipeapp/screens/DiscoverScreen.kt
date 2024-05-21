@@ -25,10 +25,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -44,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
@@ -87,41 +92,72 @@ private fun DiscoverScreenContent(navController: NavController, paddingValues: P
         loading = false
     }
 
-    Column(
+    Box(
+        contentAlignment = Alignment.BottomEnd,
         modifier = Modifier
-            .padding(paddingValues)
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+            .padding(paddingValues)
     ) {
-        Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-            CustomSearchBar(
-                onSearchAction = { showSearchPanel = true },
-                onBackAction = { showSearchPanel = false }
-            )
-        }
-
-        Box(
+        Column(
             modifier = Modifier
-                .padding(horizontal = 24.dp)
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
-            if (loading) {
-                LinearProgressIndicator()
+            Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+                CustomSearchBar(
+                    onSearchAction = { showSearchPanel = true },
+                    onBackAction = { showSearchPanel = false }
+                )
             }
-            else {
-                Column {
-                    Text(
-                        text = "Check out today's specials",
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.secondary
+
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .fillMaxSize()
+            ) {
+                if (loading) {
+                    LinearProgressIndicator()
+                }
+                else {
+                    Column {
+                        Text(
+                            text = "Check out today's specials",
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
                         )
-                    )
-                    RecipeShelf(navController, recipeViewModel.specials)
+                        RecipeShelf(navController, recipeViewModel.specials)
+                    }
+                }
+                if (showSearchPanel) {
+                    SearchPanel(navController = navController)
                 }
             }
-            if (showSearchPanel) {
-                SearchPanel(navController = navController)
+        }
+        Box(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            TextButton(
+                shape = CircleShape,
+                colors = ButtonDefaults.textButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                ),
+                modifier = Modifier
+                    .width(64.dp)
+                    .height(64.dp)
+                    .clip(CircleShape)
+                    .shadow(2.dp),
+                onClick = { navController.navigate("add") }
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Add,
+                    contentDescription = "add",
+                    modifier = Modifier
+                        .width(56.dp)
+                        .height(56.dp),
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
     }

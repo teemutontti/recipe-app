@@ -95,7 +95,7 @@ object RecipeRepository: ViewModel() {
         }
     }
 
-    fun updateSelectedRecipe(recipe: Recipe) {
+    fun setSelectedRecipe(recipe: Recipe) {
         _selectedRecipe = recipe
     }
 

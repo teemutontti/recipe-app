@@ -74,7 +74,7 @@ fun RecipeButton(
         if (apiRecipe != null) {
             navController.navigate("recipe/${apiRecipe.id}")
         } else if (ownRecipe != null) {
-            recipeViewModel.updateSelectedRecipe(ownRecipe)
+            recipeViewModel.setSelectedRecipe(ownRecipe)
             navController.navigate("recipe/${null}")
         }
     }

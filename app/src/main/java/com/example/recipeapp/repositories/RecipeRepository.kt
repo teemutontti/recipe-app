@@ -95,6 +95,10 @@ object RecipeRepository: ViewModel() {
         }
     }
 
+    fun updateSelectedRecipe(recipe: Recipe) {
+        _selectedRecipe = recipe
+    }
+
     suspend fun searchRecipes(context: Context, query: String) {
         try {
             _searchResults.clear()

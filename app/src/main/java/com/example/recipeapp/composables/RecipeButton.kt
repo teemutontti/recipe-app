@@ -62,7 +62,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun RecipeButton(
     navController: NavController,
-    recipe: CachedRecipe?,
+    apiRecipe: CachedRecipe? = null,
+    ownRecipe: Recipe? = null,
 ) {
     val context = LocalContext.current
     var loading by remember { mutableStateOf(true) }
@@ -70,77 +71,79 @@ fun RecipeButton(
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     fun handleRecipeClick() {
-        if (recipe != null) navController.navigate("recipe/${recipe.id}")
+        if (apiRecipe != null) {
+            navController.navigate("recipe/${apiRecipe.id}")
+        } else if (ownRecipe != null) {
+            recipeViewModel.updateSelectedRecipe(ownRecipe)
+            navController.navigate("recipe/${null}")
+        }
     }
 
-
-    if (recipe != null) {
-        TextButton(
-            shape = RoundedCornerShape(8.dp),
-            onClick = { handleRecipeClick() },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onBackground
-            )
+    TextButton(
+        shape = RoundedCornerShape(8.dp),
+        onClick = { handleRecipeClick() },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onBackground
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(15.dp))
+                .fillMaxSize()
+                .height(96.dp)
+                .border(2.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(15.dp))
         ) {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(15.dp))
-                    .fillMaxSize()
-                    .height(96.dp)
-                    .border(2.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(15.dp))
-            ) {
-                if (loading && !imageError) CircularProgressIndicator()
-                if (!imageError) {
-                    AsyncImage(
-                        model = recipe.image,
-                        contentDescription = "${recipe.title} picture",
-                        onSuccess = { (_) -> loading = false },
-                        onError = { (_) -> imageError = true },
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(width = 288.dp, height = 162.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .fillMaxWidth()
-                    )
-                } else {
-                    Image(
-                        painter = painterResource(id = R.drawable.meal),
-                        contentDescription = "meal",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(width = 288.dp, height = 162.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .fillMaxSize()
-                    )
-                }
-                // Adding shadow with box composable for better text readability
-                Box(
-                    modifier = Modifier.fillMaxSize().background(
-                        Brush.linearGradient(
-                        colors = listOf(
-                            Color.Black.copy(alpha = 0.7f),
-                            Color.Transparent,
-                            Color.Black.copy(alpha = 0.7f),
-                        ),
-                        start = Offset(0f, 0f),
-                        end = Offset(0f, Float.POSITIVE_INFINITY)
-                    ))
-                )
-                Column(
-                    verticalArrangement = Arrangement.Bottom,
-                    horizontalAlignment = Alignment.Start,
+            if (loading && !imageError) CircularProgressIndicator()
+            if (!imageError) {
+                AsyncImage(
+                    model = apiRecipe?.image ?: ownRecipe?.image,
+                    contentDescription = "meal image",
+                    onSuccess = { (_) -> loading = false },
+                    onError = { (_) -> imageError = true },
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        text = recipe.title ?: "Loading...",
-                        style = TextStyle(
-                            fontSize = 20.sp
-                        )
+                        .size(width = 288.dp, height = 162.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .fillMaxWidth()
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.meal),
+                    contentDescription = "meal",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(width = 288.dp, height = 162.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .fillMaxSize()
+                )
+            }
+            // Adding shadow with box composable for better text readability
+            Box(
+                modifier = Modifier.fillMaxSize().background(
+                    Brush.linearGradient(
+                    colors = listOf(
+                        Color.Black.copy(alpha = 0.7f),
+                        Color.Transparent,
+                        Color.Black.copy(alpha = 0.7f),
+                    ),
+                    start = Offset(0f, 0f),
+                    end = Offset(0f, Float.POSITIVE_INFINITY)
+                ))
+            )
+            Column(
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = apiRecipe?.title ?: ownRecipe?.title ?: "Loading...",
+                    style = TextStyle(
+                        fontSize = 20.sp
                     )
-                }
+                )
             }
         }
     }

@@ -15,19 +15,33 @@ import com.example.recipeapp.repositories.RecipeRepository
 @Composable
 fun RecipeList(
     navController: NavController,
-    recipes: List<CachedRecipe>,
+    apiRecipes: List<CachedRecipe>? = null,
+    ownRecipes: List<Recipe>? = null,
     onEmptyMessage: String = "",
-    showAdditionalRecipeInfo: Boolean = false
 ) {
-    if (recipes.isNotEmpty()) {
-        recipes.map {
-            RecipeButton(
-                navController = navController,
-                recipe = it,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+    if (apiRecipes != null) {
+        if (apiRecipes.isNotEmpty()) {
+            apiRecipes.map {
+                RecipeButton(
+                    navController = navController,
+                    apiRecipe = it,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        } else {
+            Text(text = onEmptyMessage)
         }
-    } else {
-        Text(text = onEmptyMessage)
+    } else if (ownRecipes != null) {
+        if (ownRecipes.isNotEmpty()) {
+            ownRecipes.map {
+                RecipeButton(
+                    navController = navController,
+                    ownRecipe = it,
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        } else {
+            Text(text = onEmptyMessage)
+        }
     }
 }

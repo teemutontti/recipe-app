@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.recipeapp.api.CachedRecipe
 import com.example.recipeapp.composables.NavBar
 import com.example.recipeapp.composables.RecipeList
 import com.example.recipeapp.composables.TopBar
@@ -89,13 +88,7 @@ fun OwnRecipesTab(navController: NavController) {
         }
         RecipeList(
             navController = navController,
-            recipes = recipeViewModel.ownRecipes.map {
-                CachedRecipe(
-                    id = it.id,
-                    image = it.image,
-                    title = it.title
-                )
-            }
+            ownRecipes = recipeViewModel.ownRecipes
         )
     }
 }
@@ -112,6 +105,9 @@ fun SavedRecipesTab(navController: NavController) {
     }
 
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-        RecipeList(navController = navController, recipes = recipeViewModel.favourites)
+        RecipeList(
+            navController = navController,
+            apiRecipes = recipeViewModel.favourites
+        )
     }
 }

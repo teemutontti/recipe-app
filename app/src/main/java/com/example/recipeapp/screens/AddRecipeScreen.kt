@@ -158,16 +158,38 @@ fun AddRecipeScreen(navController: NavController) {
                     Text("Next")
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                onClick = { onRecipeSave() }
+        }
+    )
+}
+
+@Composable
+private fun AddRecipeScreenContent(
+    navController: NavController,
+    paddingValues: PaddingValues,
+    currentFormStep: Int,
+    handleAllowNextChange: (Boolean) -> Unit,
+) {
+    Column(modifier = Modifier
+        .padding(paddingValues)
+        .verticalScroll(rememberScrollState())
+    ) {
+        Column(modifier = Modifier.padding(24.dp)) {
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp)
             ) {
-                Text("Save Recipe")
+                Spacer(modifier = Modifier.height(16.dp))
+                StepIndicator(
+                    steps = 0..3,
+                    currentStep = currentFormStep,
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                when (currentFormStep) {
+                    0 -> TitleStep { handleAllowNextChange(it) }
+                    1 -> IngredientsStep { handleAllowNextChange(it) }
+                    2 -> InstructionsStep { handleAllowNextChange(it) }
+                    3 -> PreviewStep { handleAllowNextChange(it) }
+                }
             }
-            */
         }
     }
 }

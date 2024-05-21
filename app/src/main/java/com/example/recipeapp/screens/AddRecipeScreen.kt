@@ -195,14 +195,37 @@ private fun AddRecipeScreenContent(
 }
 
 @Composable
-private fun TitleStep(handleStepChange: (Int) -> Unit) {
+private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit) {
+    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
+    var title by remember { mutableStateOf(recipeViewModel.recipeInAddition?.title ?: "") }
+
+    fun handleTitleChange(newTitle: String) {
+        title = newTitle
+
+        if (recipeViewModel.recipeInAddition == null) {
+            recipeViewModel.setRecipeInAddition(Utils.emptyRecipe)
+        }
+
+        recipeViewModel.recipeInAddition?.let {
+            recipeViewModel.setRecipeInAddition(it.copy(title = newTitle))
+            handleAllowNextChange(true)
+        }
+    }
+
+    LaunchedEffect(key1 = title) {
+        if (title.length > 2) handleAllowNextChange(true)
+    }
+
     Text(
         text = "Title & Image",
         style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
     )
-    TextButton(onClick = { handleStepChange(1) }) {
-        Text("Next")
-    }
+    TextField(
+        value = title,
+        onValueChange = ::handleTitleChange,
+        placeholder = { Text("Insert title...") },
+        label = { Text("Title *") },
+    )
 }
 
 @Composable

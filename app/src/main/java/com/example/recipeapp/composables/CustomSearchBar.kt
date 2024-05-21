@@ -1,7 +1,11 @@
 package com.example.recipeapp.composables
 
+import android.service.autofill.OnClickAction
+import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,12 +20,16 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,6 +48,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.repositories.RecipeRepository
 import kotlinx.coroutines.CoroutineScope
@@ -48,31 +57,22 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CustomSearchBar(
-    navController: NavController,
-    recipeViewModel: RecipeRepository,
-    incomingQuery: String? = null,
-    inSearchResultsScreen: Boolean = false
+    onBackAction: () -> Unit = {},
+    onSearchAction: () -> Unit = {},
 ) {
     val context = LocalContext.current
     var loading by remember { mutableStateOf(false) }
+    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
     var query by remember { mutableStateOf("") }
 
     fun handleSearch() {
         if (query != "") {
             loading = true
+            onSearchAction()
             CoroutineScope(Dispatchers.Default).launch {
                 recipeViewModel.searchRecipes(context, query)
                 loading = false
             }
-            if (!inSearchResultsScreen) {
-                navController.navigate("search_results/${query}")
-            }
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        if (incomingQuery != null) {
-            query = incomingQuery
         }
     }
 
@@ -83,10 +83,25 @@ fun CustomSearchBar(
             .border(2.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surface)
-            .padding(horizontal = 12.dp, vertical = 4.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
             .height(36.dp)
     ) {
-        Icon(Icons.Rounded.Search, "Search icon", tint = MaterialTheme.colorScheme.primary)
+        TextButton(
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier.width(32.dp).height(32.dp),
+            onClick = {
+                if (query != "") {
+                    onBackAction()
+                    query = ""
+                }
+            }
+        ) {
+            if (query != "") {
+                Icon(Icons.AutoMirrored.Rounded.ArrowBack, "back")
+            } else {
+                Icon(Icons.Rounded.Search, "search")
+            }
+        }
         Spacer(modifier = Modifier.width(4.dp))
         Box {
             if (query == "") {
@@ -99,30 +114,9 @@ fun CustomSearchBar(
                 keyboardActions = KeyboardActions(onSearch = { handleSearch() }),
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                textStyle = TextStyle(fontSize = 16.sp),
-                modifier = Modifier
-                    .fillMaxWidth()
+                textStyle = TextStyle(fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface),
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }
-    /* OLD CODE
-    TextField(
-        value = query,
-        onValueChange = { query = it },
-        // TODO: Add search format instructions
-        //supportingText = { Text("Test") },
-        placeholder = { Text("Search...") },
-        leadingIcon = { Icon(Icons.Rounded.Search, "search icon") },
-        singleLine = true,
-        keyboardActions = KeyboardActions(onSearch = { handleSearch() }),
-        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .padding(0.dp),
-        shape = RoundedCornerShape(24.dp),
-        textStyle = TextStyle(fontSize = 16.sp)
-    )
-
-     */
 }

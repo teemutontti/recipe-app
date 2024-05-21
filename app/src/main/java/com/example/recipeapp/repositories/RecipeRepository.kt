@@ -6,15 +6,13 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import com.example.recipeapp.BuildConfig.API_KEY
-import com.example.recipeapp.api.CachedRecipe
-import com.example.recipeapp.api.Instructions
 import com.example.recipeapp.services.RetrofitInstance
 import com.example.recipeapp.utils.SharedPreferencesManager
 import com.example.recipeapp.api.Recipe
 import com.example.recipeapp.api.SearchResponse
-import com.example.recipeapp.api.SpoonacularResponse
+import com.example.recipeapp.utils.AddableIngredient
+import com.example.recipeapp.utils.CachedRecipe
 import retrofit2.Response
-import retrofit2.http.Query
 
 object RecipeRepository: ViewModel() {
     private val TODAYS_SPECIALS = listOf("breakfast", "lunch", "dinner", "snack")
@@ -33,6 +31,12 @@ object RecipeRepository: ViewModel() {
 
     private var _ownRecipes: SnapshotStateList<Recipe> = mutableStateListOf()
     val ownRecipes: List<Recipe> get() = _ownRecipes
+
+    private var _ingredientInAddition: AddableIngredient? = null
+    val ingredientInAddition: AddableIngredient? get() = _ingredientInAddition
+
+    private var _recipeInAddition: Recipe? = null
+    val recipeInAddition: Recipe? get() = _recipeInAddition
 
     private suspend fun fetchRandomMeal(context: Context, mealType: String): Recipe? {
         val response = RetrofitInstance().recipeService.getRandomRecipes(
@@ -166,5 +170,23 @@ object RecipeRepository: ViewModel() {
     fun addOwnRecipe(context: Context, recipe: Recipe) {
         _ownRecipes.add(recipe)
         SharedPreferencesManager.updateOwnRecipe(context, _ownRecipes)
+    }
+
+    fun setIngredientInAddition(newIngredient: AddableIngredient) {
+        _ingredientInAddition = newIngredient
+    }
+
+    fun setRecipeInAddition(newRecipe: Recipe) {
+        _recipeInAddition = newRecipe
+    }
+
+    fun recipeInAdditionIngredientsToAddable(): List<AddableIngredient> {
+        return _recipeInAddition?.extendedIngredients?.map {
+            AddableIngredient(
+                name = it.name,
+                amount = it.measures.metric.amount.toInt(),
+                unit = it.measures.metric.unitShort
+            )
+        } ?: listOf()
     }
 }

@@ -47,6 +47,7 @@ import com.example.recipeapp.api.Measures
 import com.example.recipeapp.api.Recipe
 import com.example.recipeapp.api.SingleMeasure
 import com.example.recipeapp.api.Step
+import com.example.recipeapp.composables.NumberCounter
 import com.example.recipeapp.composables.TopBar
 import com.example.recipeapp.repositories.RecipeRepository
 
@@ -86,7 +87,7 @@ private fun AddRecipeScreenContent(navController: NavController, paddingValues: 
     var title: String by remember { mutableStateOf("") }
     // TODO: Add image picker option
     //var image: String by remember { mutableStateOf("") }
-    var servings: Int by remember { mutableIntStateOf(1) }
+    var servings: Int by remember { mutableIntStateOf(2) }
     val ingredients = remember { mutableStateListOf(emptyIngredient) }
     val instructions = remember { mutableStateListOf(emptyInstructionStep) }
 
@@ -120,26 +121,12 @@ private fun AddRecipeScreenContent(navController: NavController, paddingValues: 
                 label = { Text("Title *") },
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text("Serving size:")
-                TextButton(onClick = { if (servings > 1) servings -= 1 }) {
-                    Text("-")
-                }
-                Text(
-                    text = "$servings",
-                    modifier = Modifier.width(24.dp),
-                    textAlign = TextAlign.Center
-                )
-                TextButton(onClick = { if (servings < 99) servings += 1 }) {
-                    Text("+")
-                }
-                TextButton(onClick = { servings = 1 }) {
-                    Text("Reset")
-                }
-            }
+            NumberCounter(
+                defaultValue = servings,
+                onNumberChange = { servings = it },
+                prefix = "Serving size:",
+                max = 20
+            )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Ingredients",

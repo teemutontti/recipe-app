@@ -28,7 +28,7 @@ fun NavBar(navController: NavController, selected: String) {
         modifier = Modifier.fillMaxWidth().height(80.dp)
     ) {
         BottomAppBar(
-            containerColor = MaterialTheme.colorScheme.background,
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
             modifier = Modifier.fillMaxWidth().shadow(24.dp)
         ) {
             Row(

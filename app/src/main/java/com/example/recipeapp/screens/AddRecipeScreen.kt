@@ -229,34 +229,85 @@ private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit) {
 }
 
 @Composable
-private fun IngredientsStep(handleStepChange: (Int) -> Unit) {
-    Text(
-        text = "Ingredients",
-        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
-    )
-    TextButton(onClick = { handleStepChange(1) }) {
-        Text("Next")
+private fun IngredientsStep(handleAllowNextChange: (Boolean) -> Unit) {
+    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
+    val ingredients = remember { mutableStateOf(
+        recipeViewModel.recipeInAddition?.extendedIngredients ?: listOf()
+    )}
+
+    fun addIngredient() {
+        recipeViewModel.ingredientInAddition?.let {
+            val newIngredient: Ingredient = Utils.emptyIngredient.copy(
+                name = it.name,
+                measures = Utils.emptyIngredient.measures.copy(
+                    metric = Utils.emptyIngredient.measures.metric.copy(
+                        amount = it.amount,
+                        unitShort = it.unit
+                    )
+                )
+            )
+            val newIngredients = ingredients.value.toMutableList()
+            newIngredients.add(newIngredient)
+            ingredients.value = newIngredients
+
+            recipeViewModel.recipeInAddition?.let { recipe ->
+                recipeViewModel.setRecipeInAddition(
+                    recipe.copy(extendedIngredients = newIngredients)
+                )
+            }
+        }
+    }
+
+    fun handleIngredientDelete(index: Int) {
+        val newIngredients = ingredients.value.toMutableList()
+        newIngredients.removeAt(index)
+        ingredients.value = newIngredients
+    }
+
+    IngredientForm( {handleAllowNextChange(it) }, ::addIngredient)
+
+    Spacer(modifier = Modifier.height(16.dp))
+    if (ingredients.value.isNotEmpty()) {
+        Text("Current ingredients:", style = TextStyle(fontWeight = FontWeight.SemiBold))
+        ingredients.value.forEachIndexed { index, it ->
+            key("$index-${it}") {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (it != null) {
+                        Text("${it.measures.metric.amount} ${it.measures.metric.unitShort}   ${it.name}")
+                        IconButton(
+                            modifier = Modifier.padding(0.dp).height(32.dp).width(32.dp),
+                            onClick = { handleIngredientDelete(index) }
+                        ) {
+                            Icon(
+                                Icons.Rounded.Clear,
+                                "delete",
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.height(24.dp).width(24.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
 @Composable
-private fun InstructionsStep(handleStepChange: (Int) -> Unit) {
+private fun InstructionsStep(handleAllowNextChange: (Boolean) -> Unit) {
     Text(
         text = "Instructions",
         style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
     )
-    TextButton(onClick = { handleStepChange(1) }) {
-        Text("Next")
-    }
 }
 
 @Composable
-private fun PreviewStep(handleStepChange: (Int) -> Unit) {
+private fun PreviewStep(handleAllowNextChange: (Boolean) -> Unit) {
     Text(
         text = "Preview & Save",
         style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
     )
-    TextButton(onClick = { handleStepChange(1) }) {
-        Text("Save")
-    }
 }

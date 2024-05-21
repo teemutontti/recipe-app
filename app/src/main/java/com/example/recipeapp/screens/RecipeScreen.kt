@@ -33,9 +33,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,9 +55,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.recipeapp.R
+import com.example.recipeapp.api.Ingredient
 import com.example.recipeapp.api.Instructions
+import com.example.recipeapp.api.Measures
 import com.example.recipeapp.api.Recipe
+import com.example.recipeapp.api.SingleMeasure
 import com.example.recipeapp.composables.IngredientLine
+import com.example.recipeapp.composables.NumberCounter
 import com.example.recipeapp.repositories.RecipeRepository
 import kotlinx.coroutines.delay
 
@@ -68,6 +74,7 @@ fun RecipeScreen(
     var showFavourite by remember { mutableStateOf(true) }
     var loading by remember { mutableStateOf(true) }
     var isFavourite by remember { mutableStateOf(false) }
+    var ingredients = remember { mutableStateListOf<Ingredient>() }
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     LaunchedEffect(Unit) {
@@ -77,6 +84,11 @@ fun RecipeScreen(
         } else {
             loading = false
             showFavourite = false
+        }
+
+        // Setting ingredients state
+        recipeViewModel.selectedRecipe?.extendedIngredients?.map {
+            ingredients.add(it)
         }
 
         val favouriteIds: List<Int> = recipeViewModel.favourites.map { it.id.toInt() }
@@ -92,6 +104,31 @@ fun RecipeScreen(
                 recipeViewModel.addFavourite(context, recipeViewModel.selectedRecipe!!)
             } else {
                 recipeViewModel.deleteFavourite(context, recipeViewModel.selectedRecipe!!)
+            }
+        }
+    }
+
+    fun calculateIngredients(newServings: Int) {
+        val ingredientsPerServing = recipeViewModel.selectedRecipe?.extendedIngredients?.map {
+            it.measures.metric.amount.toFloat() / recipeViewModel.selectedRecipe!!.servings.toInt()
+        }
+
+        val newIngredientAmounts = ingredientsPerServing?.map { it * newServings }
+
+        val newIngredients = recipeViewModel.selectedRecipe?.extendedIngredients?.mapIndexed { index: Int, item: Ingredient ->
+            item.copy(
+                measures = item.measures.copy(
+                    metric = item.measures.metric.copy(
+                        amount = newIngredientAmounts?.get(index) ?: -1
+                    )
+                )
+            )
+        }
+
+        if (newIngredients != null) {
+            ingredients.clear()
+            newIngredients.map {
+                ingredients.add(it)
             }
         }
     }
@@ -157,7 +194,14 @@ fun RecipeScreen(
             Spacer(modifier = Modifier.height(24.dp))
             Column {
                 // TODO: Add functionality to change the serving size
-                Text(text = "${recipeViewModel.selectedRecipe?.servings} servings")
+                if (recipeViewModel.selectedRecipe?.servings != null) {
+                    NumberCounter(
+                        defaultValue = recipeViewModel.selectedRecipe?.servings!!.toInt(),
+                        suffix = "servings",
+                        onNumberChange = ::calculateIngredients,
+                        max = 20
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Ingredients",
@@ -165,7 +209,7 @@ fun RecipeScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Column {
-                    recipeViewModel.selectedRecipe?.extendedIngredients?.forEach {
+                    ingredients.forEach {
                         IngredientLine(ingredient = it)
                     }
                 }

@@ -83,8 +83,8 @@ fun RecipeButton(
         shape = RoundedCornerShape(8.dp),
         onClick = { handleRecipeClick() },
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onBackground
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.scrim
         )
     ) {
         Box(
@@ -123,7 +123,6 @@ fun RecipeButton(
                 modifier = Modifier.fillMaxSize().background(
                     Brush.linearGradient(
                     colors = listOf(
-                        Color.Black.copy(alpha = 0.7f),
                         Color.Transparent,
                         Color.Black.copy(alpha = 0.7f),
                     ),

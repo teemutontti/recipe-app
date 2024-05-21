@@ -79,8 +79,8 @@ fun TodaysSpecialButton(
             shape = RoundedCornerShape(8.dp),
             onClick = { handleRecipeClick() },
             colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onBackground
+                containerColor = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.scrim
             )
         ) {
             Box(

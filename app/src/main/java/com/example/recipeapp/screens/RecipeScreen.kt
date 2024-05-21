@@ -2,6 +2,7 @@ package com.example.recipeapp.screens
 
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -10,9 +11,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,7 +40,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -47,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.recipeapp.R
 import com.example.recipeapp.api.Instructions
 import com.example.recipeapp.api.Recipe
 import com.example.recipeapp.composables.IngredientLine
@@ -54,18 +60,23 @@ import com.example.recipeapp.repositories.RecipeRepository
 import kotlinx.coroutines.delay
 
 @Composable
-fun RecipeScreen(navController: NavController, recipeId: Int?) {
+fun RecipeScreen(
+    navController: NavController,
+    recipeId: Int?
+) {
     val context = LocalContext.current
+    var showFavourite by remember { mutableStateOf(true) }
     var loading by remember { mutableStateOf(true) }
     var isFavourite by remember { mutableStateOf(false) }
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     LaunchedEffect(Unit) {
-        Log.d("RecipeScreen", "Recipe id: $recipeId")
         if (recipeId != null) {
             recipeViewModel.fetchRecipeById(context, recipeId)
             loading = false
-            Log.d("RecipeScreen", "Selected recipe: ${recipeViewModel.selectedRecipe}")
+        } else {
+            loading = false
+            showFavourite = false
         }
 
         val favouriteIds: List<Int> = recipeViewModel.favourites.map { it.id.toInt() }
@@ -103,35 +114,46 @@ fun RecipeScreen(navController: NavController, recipeId: Int?) {
                         fontWeight = FontWeight.Bold,
                     )
                 )
-                IconButton(onClick = { handleFavouriteClick() }) {
-                    Icon(
-                        imageVector =
+                if (showFavourite) {
+                    IconButton(onClick = { handleFavouriteClick() }) {
+                        Icon(
+                            imageVector =
                             if (isFavourite) Icons.Rounded.Favorite
                             else Icons.Rounded.FavoriteBorder,
-                        contentDescription = "star icon",
-                        modifier = Modifier
-                            .width(32.dp)
-                            .height(32.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                            contentDescription = "star icon",
+                            modifier = Modifier
+                                .width(32.dp)
+                                .height(32.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
+
             if (recipeViewModel.selectedRecipe?.image != null
                 && recipeViewModel.selectedRecipe?.image != ""
-            ) AsyncImage(
-                model = recipeViewModel.selectedRecipe?.image,
-                contentDescription = "${recipeViewModel.selectedRecipe?.title} image",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1.5f)
-                    .clip(RoundedCornerShape(15.dp))
-                    .border(
-                        4.dp,
-                        MaterialTheme.colorScheme.surfaceVariant,
-                        RoundedCornerShape(15.dp)
-                    )
-            )
+            ) {
+                AsyncImage(
+                    model = recipeViewModel.selectedRecipe?.image,
+                    contentDescription = "${recipeViewModel.selectedRecipe?.title} image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .aspectRatio(1.5f)
+                        .fillMaxSize()
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.meal),
+                    contentDescription = "meal",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .aspectRatio(1.5f)
+                        .fillMaxSize()
+                )
+            }
             Spacer(modifier = Modifier.height(24.dp))
             Column {
                 // TODO: Add functionality to change the serving size

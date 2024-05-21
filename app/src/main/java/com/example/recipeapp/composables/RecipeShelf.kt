@@ -28,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.recipeapp.api.CachedRecipe
+import com.example.recipeapp.utils.CachedRecipe
 
 @Composable
 fun RecipeShelf(navController: NavController, recipes: List<CachedRecipe>) {

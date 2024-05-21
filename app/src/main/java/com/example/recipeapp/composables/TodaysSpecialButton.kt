@@ -54,9 +54,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.recipeapp.R
-import com.example.recipeapp.api.CachedRecipe
 import com.example.recipeapp.api.Recipe
 import com.example.recipeapp.repositories.RecipeRepository
+import com.example.recipeapp.utils.CachedRecipe
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

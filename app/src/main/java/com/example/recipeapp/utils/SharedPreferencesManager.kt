@@ -3,7 +3,6 @@ package com.example.recipeapp.utils
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
-import com.example.recipeapp.api.CachedRecipe
 import com.example.recipeapp.api.Recipe
 import com.google.gson.Gson
 import java.time.LocalDate

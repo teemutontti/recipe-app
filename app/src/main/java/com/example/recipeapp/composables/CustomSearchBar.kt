@@ -113,7 +113,7 @@ fun CustomSearchBar(
                 singleLine = true,
                 keyboardActions = KeyboardActions(onSearch = { handleSearch() }),
                 keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                 textStyle = TextStyle(fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface),
                 modifier = Modifier.fillMaxWidth(),
             )

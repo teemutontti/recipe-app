@@ -196,7 +196,7 @@ fun RecipeScreen(
                 // TODO: Add functionality to change the serving size
                 if (recipeViewModel.selectedRecipe?.servings != null) {
                     NumberCounter(
-                        defaultValue = recipeViewModel.selectedRecipe?.servings!!.toInt(),
+                        value = recipeViewModel.selectedRecipe?.servings!!.toInt(),
                         suffix = "servings",
                         onNumberChange = ::calculateIngredients,
                         max = 20

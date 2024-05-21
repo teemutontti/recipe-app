@@ -48,8 +48,8 @@ fun StepIndicator(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .clip(CircleShape)
-                    .height(16.dp)
-                    .width(16.dp)
+                    .height(24.dp)
+                    .width(24.dp)
                     .background(
                         if (currentStep >= it) {
                             MaterialTheme.colorScheme.tertiary
@@ -58,13 +58,13 @@ fun StepIndicator(
                         }
                     )
                     .border(
-                        1.dp,
-                        if (currentStep < it) {
+                        width = 1.dp,
+                        color = if (currentStep < it) {
                             MaterialTheme.colorScheme.outline
                         } else {
                             Color.Transparent
                         },
-                        CircleShape
+                        shape = CircleShape
                     )
             ) {
                 if (currentStep > it) {
@@ -78,7 +78,7 @@ fun StepIndicator(
                     Text(
                         text = "${it + 1}",
                         style = TextStyle(
-                            fontSize = 10.sp,
+                            fontSize = 12.sp,
                             textAlign = TextAlign.Center,
                             fontWeight =
                                 if (currentStep >= it) {
@@ -100,7 +100,7 @@ fun StepIndicator(
             if (it < steps.last) Box(
                 modifier = Modifier
                     .height(2.dp)
-                    .width(56.dp)
+                    .weight(1f)
                     .background(
                         if (currentStep > it) {
                             MaterialTheme.colorScheme.tertiary

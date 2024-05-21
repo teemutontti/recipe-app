@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.Button
@@ -48,13 +49,13 @@ import com.example.recipeapp.api.Recipe
 import com.example.recipeapp.api.SingleMeasure
 import com.example.recipeapp.api.Step
 import com.example.recipeapp.composables.NumberCounter
+import com.example.recipeapp.composables.StepIndicator
 import com.example.recipeapp.composables.TopBar
 import com.example.recipeapp.repositories.RecipeRepository
 
 @Composable
 fun AddRecipeScreen(navController: NavController) {
     Scaffold(
-        topBar = { TopBar(title = "Add New Recipe") },
         content = {
             AddRecipeScreenContent(navController = navController, paddingValues = it)
         },
@@ -90,6 +91,7 @@ private fun AddRecipeScreenContent(navController: NavController, paddingValues: 
     var servings: Int by remember { mutableIntStateOf(2) }
     val ingredients = remember { mutableStateListOf(emptyIngredient) }
     val instructions = remember { mutableStateListOf(emptyInstructionStep) }
+    var currentFormStep by remember { mutableIntStateOf(0) }
 
     fun onRecipeSave() {
         // TODO: Add data validation
@@ -109,11 +111,53 @@ private fun AddRecipeScreenContent(navController: NavController, paddingValues: 
         recipeViewModel.addOwnRecipe(context, newRecipe)
     }
 
+    fun handleStepChange(direction: Int) {
+        val newCurrentFormStep = currentFormStep + direction
+        if (newCurrentFormStep in 0..3) {
+            currentFormStep = newCurrentFormStep
+        }
+    }
+
+    fun handleBackClick() {
+        if (currentFormStep == 0) {
+            navController.navigateUp()
+        } else {
+            handleStepChange(-1)
+        }
+    }
+
+
+
     Column(modifier = Modifier
         .padding(paddingValues)
         .verticalScroll(rememberScrollState())
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
+            TextButton(onClick = ::handleBackClick) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = "back",
+                        modifier = Modifier
+                            .height(16.dp)
+                            .width(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Back")
+                }
+            }
+            StepIndicator(
+                steps = 0..3,
+                currentStep = currentFormStep,
+            )
+            when (currentFormStep) {
+                0 -> TitleStep(::handleStepChange)
+                1 -> IngredientsStep(::handleStepChange)
+                2 -> InstructionsStep(::handleStepChange)
+                3 -> PreviewStep(::handleStepChange)
+            }
+
+            /*
             TextField(
                 value = title,
                 onValueChange = { title = it },
@@ -234,6 +278,51 @@ private fun AddRecipeScreenContent(navController: NavController, paddingValues: 
             ) {
                 Text("Save Recipe")
             }
+            */
         }
+    }
+}
+
+@Composable
+private fun TitleStep(handleStepChange: (Int) -> Unit) {
+    Text(
+        text = "Title & Image",
+        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
+    )
+    TextButton(onClick = { handleStepChange(1) }) {
+        Text("Next")
+    }
+}
+
+@Composable
+private fun IngredientsStep(handleStepChange: (Int) -> Unit) {
+    Text(
+        text = "Ingredients",
+        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
+    )
+    TextButton(onClick = { handleStepChange(1) }) {
+        Text("Next")
+    }
+}
+
+@Composable
+private fun InstructionsStep(handleStepChange: (Int) -> Unit) {
+    Text(
+        text = "Instructions",
+        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
+    )
+    TextButton(onClick = { handleStepChange(1) }) {
+        Text("Next")
+    }
+}
+
+@Composable
+private fun PreviewStep(handleStepChange: (Int) -> Unit) {
+    Text(
+        text = "Preview & Save",
+        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
+    )
+    TextButton(onClick = { handleStepChange(1) }) {
+        Text("Save")
     }
 }

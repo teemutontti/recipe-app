@@ -468,9 +468,108 @@ private fun InstructionsStep(handleAllowNextChange: (Boolean) -> Unit) {
 }
 
 @Composable
-private fun PreviewStep(handleAllowNextChange: (Boolean) -> Unit) {
+private fun PreviewStep(handleAllowNextChange: (Boolean) -> Unit, navController: NavController) {
+    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
+    var showPreview by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        recipeViewModel.recipeInAddition?.let {
+            recipeViewModel.setSelectedRecipe(it)
+            handleAllowNextChange(true)
+        }
+    }
+
     Text(
         text = "Preview & Save",
         style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
     )
+    Spacer(modifier = Modifier.height(16.dp))
+
+    Column {
+        Text(
+            text = "Title:",
+            style = TextStyle(
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Gray.copy(alpha = 0.8f)
+            )
+        )
+        Text("${recipeViewModel.recipeInAddition?.title}")
+    }
+    Spacer(modifier = Modifier.height(8.dp))
+    Column {
+        Text(
+            text = "Image:",
+            style = TextStyle(
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Gray.copy(alpha = 0.8f)
+            )
+        )
+        Text("${recipeViewModel.recipeInAddition?.image}")
+    }
+    Spacer(modifier = Modifier.height(8.dp))
+    Column {
+        Text(
+            text = "Servings:",
+            style = TextStyle(
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Gray.copy(alpha = 0.8f)
+            )
+        )
+        Text("${recipeViewModel.recipeInAddition?.servings}")
+    }
+    Spacer(modifier = Modifier.height(8.dp))
+    Column {
+        Text(
+            text = "Ingredients:",
+            style = TextStyle(
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Gray.copy(alpha = 0.8f)
+            )
+        )
+        Column {
+            recipeViewModel.recipeInAddition?.extendedIngredients?.forEach {
+                Text("${it.measures.metric.amount} ${it.measures.metric.unitShort}  ${it.name}")
+            }
+        }
+    }
+    Spacer(modifier = Modifier.height(8.dp))
+    Column {
+        Text(
+            text = "Instructions:",
+            style = TextStyle(
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Gray.copy(alpha = 0.8f)
+            )
+        )
+        Column {
+            recipeViewModel.recipeInAddition?.analyzedInstructions?.forEach { it1 ->
+                it1.steps.forEach { it2 ->
+                    Row {
+                        Text("${it2.number}")
+                        Text(it2.step)
+                    }
+                }
+            }
+        }
+    }
+    Spacer(modifier = Modifier.height(8.dp))
+    TextButton(
+        shape = RoundedCornerShape(8.dp),
+        contentPadding = PaddingValues(vertical = 0.dp, horizontal = 8.dp),
+        onClick = { showPreview = !showPreview }
+    ) {
+        Text("Toggle Show Preview")
+    }
+    Spacer(modifier = Modifier.height(16.dp))
+    if (showPreview) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .shadow(4.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
+        ) {
+            RecipeScreen(navController = navController, recipeId = null, preview = true)
+        }
+    }
 }

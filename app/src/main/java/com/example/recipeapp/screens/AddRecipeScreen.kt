@@ -5,6 +5,7 @@ import android.widget.Spinner
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -62,7 +63,9 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -88,19 +91,21 @@ import com.example.recipeapp.utils.Utils
 
 @Composable
 fun AddRecipeScreen(navController: NavController) {
+    val context = LocalContext.current
+    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
     var currentFormStep by remember { mutableIntStateOf(0) }
     var allowNext by remember { mutableStateOf(false) }
 
     fun handleStepChange(direction: Int) {
         val newCurrentFormStep = currentFormStep + direction
-        if (newCurrentFormStep in 0..3) {
+        if (newCurrentFormStep in 0..4) {
             currentFormStep = newCurrentFormStep
+            if (newCurrentFormStep == 4) {
+                recipeViewModel.recipeInAddition?.let { recipeViewModel.addOwnRecipe(context, it) }
+                navController.navigate("cookbook")
+            }
         }
-        if (direction < 0) {
-            allowNext = true
-        } else {
-            allowNext = false
-        }
+        allowNext = direction < 0
     }
 
     fun handleAllowNextChange(newValue: Boolean) {
@@ -163,7 +168,7 @@ fun AddRecipeScreen(navController: NavController) {
                         .height(44.dp),
                     onClick = { handleStepChange(1) }
                 ) {
-                    Text("Next")
+                    Text(if (currentFormStep == 3) "Save" else "Next")
                 }
             }
         }
@@ -195,7 +200,7 @@ private fun AddRecipeScreenContent(
                     0 -> TitleStep(handleAllowNextChange, handleStepChange)
                     1 -> IngredientsStep { handleAllowNextChange(it) }
                     2 -> InstructionsStep { handleAllowNextChange(it) }
-                    3 -> PreviewStep { handleAllowNextChange(it) }
+                    3 -> PreviewStep(handleAllowNextChange, navController)
                 }
             }
         }

@@ -95,6 +95,7 @@ fun NumberCounter(
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                 modifier = Modifier.width(44.dp),
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+                readOnly = !editable,
                 textStyle = TextStyle(
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurface

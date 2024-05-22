@@ -296,14 +296,19 @@ private fun IngredientsStep(handleAllowNextChange: (Boolean) -> Unit) {
                     if (it != null) {
                         Text("${it.measures.metric.amount} ${it.measures.metric.unitShort}   ${it.name}")
                         IconButton(
-                            modifier = Modifier.padding(0.dp).height(32.dp).width(32.dp),
+                            modifier = Modifier
+                                .padding(0.dp)
+                                .height(32.dp)
+                                .width(32.dp),
                             onClick = { handleIngredientDelete(index) }
                         ) {
                             Icon(
                                 Icons.Rounded.Clear,
                                 "delete",
                                 tint = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.height(24.dp).width(24.dp)
+                                modifier = Modifier
+                                    .height(24.dp)
+                                    .width(24.dp)
                             )
                         }
                     }
@@ -315,6 +320,62 @@ private fun IngredientsStep(handleAllowNextChange: (Boolean) -> Unit) {
 
 @Composable
 private fun InstructionsStep(handleAllowNextChange: (Boolean) -> Unit) {
+    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
+    var text by remember { mutableStateOf("") }
+    val instructions = remember { mutableStateOf(
+        recipeViewModel.recipeInAddition?.analyzedInstructions ?: listOf()
+    )}
+
+    LaunchedEffect(key1 = instructions.value) {
+        if (instructions.value.isNotEmpty()) {
+            if (instructions.value.last().steps.isNotEmpty()) {
+                handleAllowNextChange(true)
+            }
+        }
+    }
+
+    fun addInstruction() {
+        if (text.isNotEmpty()) {
+            // Cleaning up line breaks
+            text = text.replace("\n", "")
+
+            // Generating the next steps number
+            val nextNumber =
+                if (instructions.value.isEmpty()) 1
+                else instructions.value.last().steps.lastIndex + 2
+
+            val newInstructions: MutableList<Instructions> = instructions.value.toMutableList()
+
+            // If instructions are found we have to do some more complex logic for adding
+            // instruction steps.
+            if (newInstructions.size > 0) {
+                val lastIndex = newInstructions.lastIndex
+                val newSteps: MutableList<Step> = newInstructions[lastIndex].steps.toMutableList()
+                newSteps.add(Step(number = nextNumber, step = text))
+                newInstructions[lastIndex] = newInstructions[lastIndex].copy(steps = newSteps)
+            } else {
+                newInstructions.add(
+                    Instructions(name = "", steps = listOf(Step(number = nextNumber, step = text)))
+                )
+            }
+
+            // Setting instructions state
+            instructions.value = newInstructions
+
+            // Saving analyzedInstructions in viewModel to persist the data on step navigations
+            recipeViewModel.recipeInAddition?.let {
+                recipeViewModel.setRecipeInAddition(it.copy(analyzedInstructions = newInstructions))
+            }
+
+            // Setting the text-field text state to null
+            text = ""
+        }
+    }
+
+    fun handleIngredientDelete(index: Int) {
+        // TODO: Add delete functionality
+    }
+
     Text(
         text = "Instructions",
         style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)

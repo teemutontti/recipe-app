@@ -41,7 +41,6 @@ fun AddRecipeButton(navController: NavController) {
                 .shadow(2.dp),
             onClick = {
                 recipeViewModel.setRecipeInAddition(null)
-                recipeViewModel.setIngredientInAddition(null)
                 navController.navigate("add")
             }
         ) {

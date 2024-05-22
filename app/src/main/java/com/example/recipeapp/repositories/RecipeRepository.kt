@@ -32,9 +32,6 @@ object RecipeRepository: ViewModel() {
     private var _ownRecipes: SnapshotStateList<Recipe> = mutableStateListOf()
     val ownRecipes: List<Recipe> get() = _ownRecipes
 
-    private var _ingredientInAddition: AddableIngredient? = null
-    val ingredientInAddition: AddableIngredient? get() = _ingredientInAddition
-
     private var _recipeInAddition: Recipe? = null
     val recipeInAddition: Recipe? get() = _recipeInAddition
 
@@ -170,21 +167,7 @@ object RecipeRepository: ViewModel() {
         SharedPreferencesManager.updateOwnRecipe(context, _ownRecipes)
     }
 
-    fun setIngredientInAddition(newIngredient: AddableIngredient?) {
-        _ingredientInAddition = newIngredient
-    }
-
     fun setRecipeInAddition(newRecipe: Recipe?) {
         _recipeInAddition = newRecipe
-    }
-
-    fun recipeInAdditionIngredientsToAddable(): List<AddableIngredient> {
-        return _recipeInAddition?.extendedIngredients?.map {
-            AddableIngredient(
-                name = it.name,
-                amount = it.measures.metric.amount.toInt(),
-                unit = it.measures.metric.unitShort
-            )
-        } ?: listOf()
     }
 }

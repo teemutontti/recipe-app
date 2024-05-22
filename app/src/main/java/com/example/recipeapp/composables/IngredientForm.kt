@@ -40,6 +40,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.recipeapp.api.Ingredient
+import com.example.recipeapp.api.Recipe
 import com.example.recipeapp.repositories.RecipeRepository
 import com.example.recipeapp.utils.AddableIngredient
 import com.example.recipeapp.utils.Utils
@@ -49,32 +51,48 @@ import com.example.recipeapp.utils.Utils
 fun IngredientForm(addIngredient: () -> Unit) {
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
-    var name: String by remember { mutableStateOf(recipeViewModel.ingredientInAddition?.name ?: "") }
-    var amount: Int by remember { mutableIntStateOf(recipeViewModel.ingredientInAddition?.amount ?: 1) }
-    var unit: String by remember { mutableStateOf(recipeViewModel.ingredientInAddition?.unit ?: "") }
+    var name: String by remember { mutableStateOf("") }
+    var amount: Int by remember { mutableIntStateOf(1) }
+    var unit: String by remember { mutableStateOf("") }
 
     var nameError by remember { mutableStateOf(false) }
     var amountError by remember { mutableStateOf(false) }
     var unitError by remember { mutableStateOf(false) }
 
     fun handleIngredientSave() {
-        if (recipeViewModel.ingredientInAddition == null) {
-            recipeViewModel.setIngredientInAddition(Utils.emptyAddableIngredient)
-        }
-
+        // Validating inputs
         nameError = !Utils.Validator.ingredientName(name)
         amountError = !Utils.Validator.ingredientAmount(amount)
         unitError = !Utils.Validator.ingredientUnit(unit)
 
         if (!nameError && !amountError && !unitError) {
-            recipeViewModel.ingredientInAddition?.let {
-                recipeViewModel.setIngredientInAddition(it.copy(
+            recipeViewModel.recipeInAddition?.let {
+
+                // Forming a new Ingredient object when valid inputs are given
+                val newIngredient: Ingredient = Utils.emptyIngredient.copy(
                     name = name,
-                    amount = amount,
-                    unit = unit,
-                ))
+                    measures = Utils.emptyIngredient.measures.copy(
+                        metric = Utils.emptyIngredient.measures.metric.copy(
+                            amount = amount,
+                            unitShort = unit
+                        )
+                    )
+                )
+
+                // Copying the ingredient list and adding the new one to the copy
+                val newIngredients: MutableList<Ingredient> = it.extendedIngredients.toMutableList()
+                newIngredients.add(newIngredient)
+
+                // Copying the current recipe and setting the ingredient to the new list
+                val newRecipe: Recipe = it.copy(extendedIngredients = newIngredients)
+
+                // Setting the recipe in addition to the new recipe
+                // which includes the new ingredients
+                recipeViewModel.setRecipeInAddition(newRecipe)
+
+                // Handles the state change in parent and allows next click
+                addIngredient()
             }
-            addIngredient()
         }
     }
 

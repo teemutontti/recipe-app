@@ -68,7 +68,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun RecipeScreen(
     navController: NavController,
-    recipeId: Int?
+    recipeId: Int?,
+    preview: Boolean = false
 ) {
     val context = LocalContext.current
     var showFavourite by remember { mutableStateOf(true) }
@@ -133,9 +134,9 @@ fun RecipeScreen(
         }
     }
 
-    Column(modifier = Modifier
-        .padding(32.dp)
-        .verticalScroll(rememberScrollState())
+    Column(modifier =
+        if (preview) Modifier.padding(32.dp)
+        else Modifier.padding(32.dp).verticalScroll(rememberScrollState())
     ) {
         if (loading) LinearProgressIndicator()
         else {

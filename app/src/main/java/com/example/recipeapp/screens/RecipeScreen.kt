@@ -2,8 +2,9 @@ package com.example.recipeapp.screens
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -11,13 +12,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -54,34 +61,33 @@ import com.example.recipeapp.utils.Utils
 @Composable
 fun RecipeScreen(
     navController: NavController,
-    recipeId: Int?,
+    apiRecipeId: Int? = null,
     preview: Boolean = false
 ) {
+    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
     val context = LocalContext.current
-    var showFavourite by remember { mutableStateOf(true) }
+
+    // State declarations
     var loading by remember { mutableStateOf(true) }
     var isFavourite by remember { mutableStateOf(false) }
+    var showMore by remember { mutableStateOf(false) }
     var ingredients = remember { mutableStateListOf<Ingredient>() }
-    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     LaunchedEffect(Unit) {
-        if (recipeId != null) {
-            recipeViewModel.fetchRecipeById(context, recipeId)
-            loading = false
-        } else {
-            loading = false
-            showFavourite = false
-        }
+        if (apiRecipeId != null) {
+            // Fetching recipe from API
+            recipeViewModel.fetchRecipeById(context, apiRecipeId)
 
-        // Setting ingredients state
-        recipeViewModel.selectedRecipe?.extendedIngredients?.map {
+            // Checking if the recipe is a favourite and updating state based on it
+            if (recipeViewModel.favourites.map { it.id.toInt() }.contains(apiRecipeId)) {
+                isFavourite = true
+            }
+        }
+        // Setting ingredients state so that servings size can be modified
+        recipeViewModel.selectedRecipe?.extendedIngredients?.forEach {
             ingredients.add(it)
         }
-
-        val favouriteIds: List<Int> = recipeViewModel.favourites.map { it.id.toInt() }
-        if (favouriteIds.contains(recipeId)) {
-            isFavourite = true
-        }
+        loading = false
     }
 
     fun handleFavouriteClick() {
@@ -140,7 +146,7 @@ fun RecipeScreen(
                     ),
                     modifier = Modifier.weight(1f)
                 )
-                if (showFavourite) {
+                if (apiRecipeId != null) {
                     IconButton(onClick = { handleFavouriteClick() }) {
                         Icon(
                             imageVector =

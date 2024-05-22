@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.recipeapp.composables.AddRecipeButton
 import com.example.recipeapp.composables.CustomSearchBar
 import com.example.recipeapp.composables.NavBar
 import com.example.recipeapp.composables.RecipeButton
@@ -135,30 +136,6 @@ private fun DiscoverScreenContent(navController: NavController, paddingValues: P
                 }
             }
         }
-        Box(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            TextButton(
-                shape = CircleShape,
-                colors = ButtonDefaults.textButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                ),
-                modifier = Modifier
-                    .width(64.dp)
-                    .height(64.dp)
-                    .clip(CircleShape)
-                    .shadow(2.dp),
-                onClick = { navController.navigate("add") }
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Add,
-                    contentDescription = "add",
-                    modifier = Modifier
-                        .width(56.dp)
-                        .height(56.dp),
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-        }
+        AddRecipeButton(navController)
     }
 }

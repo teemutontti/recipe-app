@@ -13,6 +13,7 @@ import com.example.recipeapp.api.SearchResponse
 import com.example.recipeapp.utils.AddableIngredient
 import com.example.recipeapp.utils.CachedRecipe
 import retrofit2.Response
+import kotlin.math.max
 
 object RecipeRepository: ViewModel() {
     private val TODAYS_SPECIALS = listOf("breakfast", "lunch", "dinner", "snack")
@@ -167,10 +168,16 @@ object RecipeRepository: ViewModel() {
         SharedPreferencesManager.updateOwnRecipe(context, _ownRecipes)
     }
 
-    fun deleteOwnRecipe(context: Context): Boolean {
+    fun deleteOwnRecipe(context: Context) {
         val indexOfDeletable = _ownRecipes.indexOf(_selectedRecipe)
         _ownRecipes.removeAt(indexOfDeletable)
-        return SharedPreferencesManager.updateOwnRecipe(context, _ownRecipes)
+        SharedPreferencesManager.updateOwnRecipe(context, _ownRecipes)
+    }
+
+    fun getOwnRecipesMaxId(context: Context): Int? {
+        val ownRecipes = SharedPreferencesManager.getOwnRecipes(context)
+        val ids = ownRecipes.map { it.id.toInt() }
+        return ids.maxOrNull()
     }
 
     fun setRecipeInAddition(newRecipe: Recipe?) {

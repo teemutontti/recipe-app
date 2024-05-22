@@ -23,6 +23,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material.icons.twotone.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,6 +43,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -136,7 +139,9 @@ fun RecipeScreen(
 
     Column(modifier =
         if (preview) Modifier.padding(32.dp)
-        else Modifier.padding(32.dp).verticalScroll(rememberScrollState())
+        else Modifier
+            .padding(32.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         if (loading) LinearProgressIndicator()
         else {
@@ -146,18 +151,18 @@ fun RecipeScreen(
                 Text(
                     text = recipeViewModel.selectedRecipe?.title ?: "Error",
                     overflow = TextOverflow.Visible,
-                    modifier = Modifier.weight(1f),
                     style = TextStyle(
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
-                    )
+                    ),
+                    modifier = Modifier.weight(1f)
                 )
                 if (showFavourite) {
                     IconButton(onClick = { handleFavouriteClick() }) {
                         Icon(
                             imageVector =
-                            if (isFavourite) Icons.Rounded.Favorite
-                            else Icons.Rounded.FavoriteBorder,
+                            if (isFavourite) Icons.Rounded.Star
+                            else Icons.Rounded.StarBorder,
                             contentDescription = "star icon",
                             modifier = Modifier
                                 .width(32.dp)

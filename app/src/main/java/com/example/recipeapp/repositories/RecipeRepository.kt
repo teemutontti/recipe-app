@@ -130,7 +130,6 @@ object RecipeRepository: ViewModel() {
     }
 
     fun fetchFavourites(context: Context) {
-        _favourites.clear()
         val favourites = SharedPreferencesManager.getFavourites(context)
         if (favourites.isNotEmpty()) {
             for (recipe in favourites) {
@@ -160,7 +159,6 @@ object RecipeRepository: ViewModel() {
     }
 
     fun fetchOwnRecipes(context: Context) {
-        _ownRecipes.clear()
         val ownRecipes = SharedPreferencesManager.getOwnRecipes(context)
         for (recipe in ownRecipes) {
             _ownRecipes.add(recipe)
@@ -172,11 +170,11 @@ object RecipeRepository: ViewModel() {
         SharedPreferencesManager.updateOwnRecipe(context, _ownRecipes)
     }
 
-    fun setIngredientInAddition(newIngredient: AddableIngredient) {
+    fun setIngredientInAddition(newIngredient: AddableIngredient?) {
         _ingredientInAddition = newIngredient
     }
 
-    fun setRecipeInAddition(newRecipe: Recipe) {
+    fun setRecipeInAddition(newRecipe: Recipe?) {
         _recipeInAddition = newRecipe
     }
 

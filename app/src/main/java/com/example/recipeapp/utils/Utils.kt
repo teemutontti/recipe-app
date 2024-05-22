@@ -1,7 +1,9 @@
 package com.example.recipeapp.utils
 
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import com.example.recipeapp.api.Ingredient
-import com.example.recipeapp.api.Instructions
 import com.example.recipeapp.api.Measures
 import com.example.recipeapp.api.Recipe
 import com.example.recipeapp.api.SingleMeasure
@@ -64,9 +66,32 @@ object Utils {
         unit = ""
     )
 
-    data class CachedRecipe(
-        val id: Number,
-        val image: String,
-        val title: String,
-    )
+    fun formatFloatToString(number: Float): String {
+        val fractionStr = convertToFraction(number)
+        if (number < 1) {
+            if (fractionStr != null) return ""
+            return String.format("%.1f", number).replace(",", ".")
+        } else {
+            return String.format("%.0f", number)
+        }
+    }
+
+    fun convertToFraction(number: Float): String? {
+        val decimal = number - number.toInt()
+        val fractionRanges = listOf(
+            Fraction(0.24f..0.26f, "1/4"),
+            Fraction(0.49f..0.51f, "1/2"),
+            Fraction(0.74f..0.76f, "3/4"),
+            Fraction(0.32f..0.34f, "1/3"),
+            Fraction(0.65f..0.67f, "2/3")
+        )
+        if (number < 100) {
+            fractionRanges.forEach {
+                if (decimal in it.range) {
+                    return it.fraction
+                }
+            }
+        }
+        return null
+    }
 }

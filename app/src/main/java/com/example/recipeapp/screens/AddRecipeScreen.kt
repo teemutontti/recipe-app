@@ -250,6 +250,14 @@ private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int
             onDone = { toNextStep(1) }
         )
     )
+    Spacer(modifier = Modifier.height(24.dp))
+    Text("Set serving size:", style = TextStyle(fontWeight = FontWeight.SemiBold))
+    Spacer(modifier = Modifier.height(8.dp))
+    NumberCounter(
+        value = servings,
+        onNumberChange = { servings = it },
+        max = 40
+    )
 }
 
 @Composable

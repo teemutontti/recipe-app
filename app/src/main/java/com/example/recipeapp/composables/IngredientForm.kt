@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Save
@@ -22,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +57,15 @@ fun IngredientForm(handleAllowNextChange: (Boolean) -> Unit, addIngredient: () -
     var amountError by remember { mutableStateOf(false) }
     var unitError by remember { mutableStateOf(false) }
 
+    LaunchedEffect(key1 = name, key2 = amount, key3 = unit) {
+        if (Utils.Validator.Ingredient.name(name)
+            && Utils.Validator.Ingredient.amount(amount)
+            && Utils.Validator.Ingredient.unit(unit)
+        ) {
+            handleAllowNextChange(true)
+        }
+    }
+
     fun handleIngredientSave() {
         if (recipeViewModel.ingredientInAddition == null) {
             recipeViewModel.setIngredientInAddition(Utils.emptyAddableIngredient)
@@ -69,7 +82,6 @@ fun IngredientForm(handleAllowNextChange: (Boolean) -> Unit, addIngredient: () -
                     amount = amount,
                     unit = unit,
                 ))
-                handleAllowNextChange(true)
             }
             addIngredient()
         }
@@ -77,18 +89,29 @@ fun IngredientForm(handleAllowNextChange: (Boolean) -> Unit, addIngredient: () -
 
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Bottom,
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
             text = "Ingredients",
             style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
         )
-        Button(onClick = { handleIngredientSave() }) {
-            Icon(Icons.Rounded.Save, "save")
-            Text("Save")
+        TextButton(
+            contentPadding = PaddingValues(horizontal = 8.dp),
+            modifier = Modifier.fillMaxHeight(),
+            onClick = { handleIngredientSave() }
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(Icons.Rounded.Save, "save")
+                Spacer(modifier = Modifier.width(4.dp))
+                Text("Save")
+            }
         }
     }
+
+    Spacer(modifier = Modifier.height(16.dp))
     TextField(
         value = name,
         label = { Text("Name") },

@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.recipeapp.api.Ingredient
 import com.example.recipeapp.api.Instructions
 import com.example.recipeapp.api.Step
 import com.example.recipeapp.composables.IngredientForm
@@ -64,7 +63,7 @@ import com.example.recipeapp.repositories.RecipeRepository
 import com.example.recipeapp.utils.Utils
 
 @Composable
-fun AddRecipeScreen(navController: NavController) {
+fun RecipeEditorScreen(navController: NavController) {
     val context = LocalContext.current
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
     var currentFormStep by remember { mutableIntStateOf(0) }
@@ -103,7 +102,7 @@ fun AddRecipeScreen(navController: NavController) {
             }
         },
         content = {
-            AddRecipeScreenContent(
+            RecipeEditorContent(
                 navController = navController,
                 paddingValues = it,
                 currentFormStep = currentFormStep,
@@ -150,7 +149,7 @@ fun AddRecipeScreen(navController: NavController) {
 }
 
 @Composable
-private fun AddRecipeScreenContent(
+private fun RecipeEditorContent(
     navController: NavController,
     paddingValues: PaddingValues,
     currentFormStep: Int,

@@ -41,7 +41,7 @@ fun AddRecipeButton(navController: NavController) {
                 .shadow(2.dp),
             onClick = {
                 recipeViewModel.setRecipeInAddition(null)
-                navController.navigate("add")
+                navController.navigate("recipe_editor")
             }
         ) {
             Icon(

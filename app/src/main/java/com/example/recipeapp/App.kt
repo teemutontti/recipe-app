@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.recipeapp.screens.AddRecipeScreen
+import com.example.recipeapp.screens.RecipeEditorScreen
 import com.example.recipeapp.screens.DiscoverScreen
 import com.example.recipeapp.screens.CookbookScreen
 import com.example.recipeapp.screens.RecipeScreen
@@ -17,9 +17,6 @@ fun App() {
         composable("discover") {
             DiscoverScreen(navController)
         }
-        composable("add") {
-            AddRecipeScreen(navController)
-        }
         composable("cookbook") {
             CookbookScreen(navController)
         }
@@ -27,8 +24,8 @@ fun App() {
             val recipeId: Int? = it.arguments?.getString("id")?.toIntOrNull()
             RecipeScreen(navController, recipeId)
         }
-        composable("add_recipe") {
-            AddRecipeScreen(navController)
+        composable("recipe_editor") {
+            RecipeEditorScreen(navController)
         }
     }
 }

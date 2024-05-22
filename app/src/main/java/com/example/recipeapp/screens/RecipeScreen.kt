@@ -103,7 +103,7 @@ fun RecipeScreen(
 
     fun handleEditClick() {
         recipeViewModel.setRecipeInAddition(recipeViewModel.selectedRecipe)
-        navController.navigate("add")
+        navController.navigate("recipe_editor")
     }
 
     fun handleDeleteClick() {

@@ -211,22 +211,24 @@ private fun AddRecipeScreenContent(
 private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int) -> Unit) {
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
     var title by remember { mutableStateOf(recipeViewModel.recipeInAddition?.title ?: "") }
+    var servings by remember { mutableIntStateOf(recipeViewModel.recipeInAddition?.servings?.toInt() ?: 1) }
 
-    fun handleTitleChange(newTitle: String) {
-        title = newTitle
+    LaunchedEffect(key1 = title, key2 = servings) {
+        if (Utils.Validator.recipeTitle(title) && Utils.Validator.recipeServings(servings)) {
+            if (recipeViewModel.recipeInAddition == null) {
+                recipeViewModel.setRecipeInAddition(Utils.emptyRecipe)
+            }
 
-        if (recipeViewModel.recipeInAddition == null) {
-            recipeViewModel.setRecipeInAddition(Utils.emptyRecipe)
-        }
-
-        recipeViewModel.recipeInAddition?.let {
-            recipeViewModel.setRecipeInAddition(it.copy(title = newTitle))
+            recipeViewModel.recipeInAddition?.let {
+                recipeViewModel.setRecipeInAddition(
+                    it.copy(
+                        title = title,
+                        servings = servings,
+                    )
+                )
+            }
             handleAllowNextChange(true)
         }
-    }
-
-    LaunchedEffect(key1 = title) {
-        if (title.length > 2) handleAllowNextChange(true)
     }
 
     Text(
@@ -237,7 +239,7 @@ private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int
     Spacer(modifier = Modifier.height(16.dp))
     TextField(
         value = title,
-        onValueChange = ::handleTitleChange,
+        onValueChange = { title = it },
         placeholder = { Text("Insert title...") },
         label = { Text("Title *") },
         singleLine = true,

@@ -174,6 +174,22 @@ object RecipeRepository: ViewModel() {
         SharedPreferencesManager.updateOwnRecipe(context, _ownRecipes)
     }
 
+    fun updateOwnRecipe(context: Context, recipeId: Int) {
+        Log.d("SharedPrefs", "index of updatable: $recipeId")
+
+        // On not found returns -1
+        val indexOfUpdatable = _ownRecipes.indexOf(
+            _ownRecipes.find { it.id.toInt() == recipeId }
+        )
+
+        _recipeInAddition?.let {
+            if (indexOfUpdatable != -1) {
+                _ownRecipes[indexOfUpdatable] = it
+                SharedPreferencesManager.updateOwnRecipe(context, _ownRecipes)
+            }
+        }
+    }
+
     fun getOwnRecipesMaxId(context: Context): Int? {
         val ownRecipes = SharedPreferencesManager.getOwnRecipes(context)
         val ids = ownRecipes.map { it.id.toInt() }

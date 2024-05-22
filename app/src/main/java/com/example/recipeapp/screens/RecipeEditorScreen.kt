@@ -71,12 +71,15 @@ fun RecipeEditorScreen(navController: NavController) {
     var allowNext by remember { mutableStateOf(false) }
 
     fun onSave() {
-        val newId = Utils.getNextId()
+        // TODO: Move id generation to preview step!!
         recipeViewModel.recipeInAddition?.let {
-            recipeViewModel.addOwnRecipe(
-                context = context,
-                recipe = if (it.id == -1) it.copy(id = newId) else it
-            )
+            // If id is -1 we know that we are editing an existing recipe
+            if (it.id == -1) {
+                val newId = Utils.getNextId()
+                recipeViewModel.addOwnRecipe(context, it.copy(id = newId))
+            } else {
+                recipeViewModel.updateOwnRecipe(context, it.id.toInt())
+            }
         }
         navController.navigate("cookbook")
     }

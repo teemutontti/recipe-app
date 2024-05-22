@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.utils.CachedRecipe
+import kotlinx.coroutines.delay
 
 @Composable
 fun RecipeShelf(navController: NavController, recipes: List<CachedRecipe>) {
@@ -37,6 +38,18 @@ fun RecipeShelf(navController: NavController, recipes: List<CachedRecipe>) {
 
     LaunchedEffect(key1 = specialInView) {
         lazyRowState.animateScrollToItem(specialInView)
+    }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(5000)
+            val newSpecialInView = specialInView + 1
+            if (newSpecialInView in 0..3) {
+                specialInView = newSpecialInView
+            } else {
+                specialInView = 0
+            }
+        }
     }
 
     LazyRow(

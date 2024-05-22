@@ -2,6 +2,7 @@ package com.example.recipeapp.screens
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -48,6 +49,7 @@ import com.example.recipeapp.R
 import com.example.recipeapp.api.Ingredient
 import com.example.recipeapp.composables.NumberCounter
 import com.example.recipeapp.repositories.RecipeRepository
+import com.example.recipeapp.utils.Utils
 
 @Composable
 fun RecipeScreen(
@@ -197,8 +199,7 @@ fun RecipeScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 Column {
                     ingredients.forEach {
-                        Text(text = "${it.measures.metric.amount} ${it.measures.metric.unitShort}   ${it.name}")
-                        Spacer(modifier = Modifier.width(8.dp))
+                        IngredientRow(it)
                     }
                 }
                 Spacer(modifier = Modifier.height(24.dp))
@@ -231,4 +232,41 @@ fun RecipeScreen(
             }
         }
     }
+}
+
+@Composable
+fun IngredientRow(ingredient: Ingredient) {
+    val fractionStr = Utils.convertToFraction(ingredient.measures.metric.amount.toFloat())
+
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.Bottom,
+            modifier = Modifier.width(104.dp)
+        ) {
+            if (fractionStr != null) {
+                if (ingredient.measures.metric.amount.toInt() != 0) {
+                    Text(text = "${ingredient.measures.metric.amount.toInt()}")
+                    Spacer(modifier = Modifier.width(4.dp))
+                }
+            } else {
+                Text(text = Utils.formatFloatToString(ingredient.measures.metric.amount.toFloat()))
+                Spacer(modifier = Modifier.width(4.dp))
+            }
+            if (fractionStr != null) {
+                Text(
+                    text = fractionStr,
+                    style = TextStyle(fontSize = 12.sp),
+                    modifier = Modifier.padding(bottom = 1.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+            }
+            Text(ingredient.measures.metric.unitShort)
+        }
+        Text(
+            text = ingredient.name,
+            modifier = Modifier.weight(1f),
+            style = TextStyle(lineHeight = 16.sp, fontSize = 16.sp)
+        )
+    }
+    Spacer(modifier = Modifier.height(6.dp))
 }

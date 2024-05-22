@@ -11,16 +11,20 @@ object Utils {
     val INGREDIENT_UNITS = listOf("ml", "l", "tsp", "tbsp", "mg", "g", "kg", "pinch", "piece")
 
     object Validator {
-        object Ingredient {
-            fun name(name: String): Boolean {
-                return name.length > 2
-            }
-            fun amount(amount: Int): Boolean {
-                return amount in 1..999
-            }
-            fun unit(unit: String): Boolean {
-                return unit in INGREDIENT_UNITS
-            }
+        fun recipeTitle(title: String): Boolean {
+            return title.length > 2
+        }
+        fun recipeServings(servings: Int): Boolean {
+            return servings in 1..40
+        }
+        fun ingredientName(name: String): Boolean {
+            return name.length > 2
+        }
+        fun ingredientAmount(amount: Int): Boolean {
+            return amount in 1..999
+        }
+        fun ingredientUnit(unit: String): Boolean {
+            return unit in INGREDIENT_UNITS
         }
     }
 

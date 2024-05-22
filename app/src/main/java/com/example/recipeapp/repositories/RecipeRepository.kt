@@ -167,6 +167,12 @@ object RecipeRepository: ViewModel() {
         SharedPreferencesManager.updateOwnRecipe(context, _ownRecipes)
     }
 
+    fun deleteOwnRecipe(context: Context): Boolean {
+        val indexOfDeletable = _ownRecipes.indexOf(_selectedRecipe)
+        _ownRecipes.removeAt(indexOfDeletable)
+        return SharedPreferencesManager.updateOwnRecipe(context, _ownRecipes)
+    }
+
     fun setRecipeInAddition(newRecipe: Recipe?) {
         _recipeInAddition = newRecipe
     }

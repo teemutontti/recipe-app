@@ -11,3 +11,8 @@ data class AddableIngredient(
     val amount: Int,
     val unit: String
 )
+
+data class Fraction(
+    val range: ClosedFloatingPointRange<Float>,
+    val fraction: String
+)

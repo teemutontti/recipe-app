@@ -10,6 +10,17 @@ import com.example.recipeapp.api.SingleMeasure
 import com.example.recipeapp.api.Step
 
 object Utils {
+    private var _id: Int = 0
+
+    fun setId(newId: Int) {
+        _id = newId
+    }
+
+    fun getNextId(): Int {
+        _id += 1
+        return _id
+    }
+
     val INGREDIENT_UNITS = listOf("ml", "l", "tsp", "tbsp", "mg", "g", "kg", "pinch", "piece")
 
     object Validator {

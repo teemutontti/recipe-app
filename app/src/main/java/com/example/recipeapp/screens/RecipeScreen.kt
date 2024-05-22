@@ -2,6 +2,7 @@ package com.example.recipeapp.screens
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -42,13 +43,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.ParagraphStyle
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -76,7 +83,19 @@ fun RecipeScreen(
     var isFavourite by remember { mutableStateOf(false) }
     var showMore by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
-    var ingredients = remember { mutableStateListOf<Ingredient>() }
+    val ingredients = remember { mutableStateListOf<Ingredient>() }
+    var showServingsChangedNotice by remember { mutableStateOf(false) }
+
+    val titleStyle = SpanStyle(
+        fontSize = 32.sp,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onBackground
+    )
+    val subtitleStyle = SpanStyle(
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Normal,
+        color = Color.Gray,
+    )
 
     LaunchedEffect(Unit) {
         if (apiRecipeId != null) {
@@ -116,6 +135,8 @@ fun RecipeScreen(
     }
 
     fun calculateIngredients(newServings: Int) {
+        showServingsChangedNotice = newServings != recipeViewModel.selectedRecipe?.servings?.toInt()
+
         val ingredientsPerServing = recipeViewModel.selectedRecipe?.extendedIngredients?.map {
             it.measures.metric.amount.toFloat() / recipeViewModel.selectedRecipe!!.servings.toInt()
         }
@@ -150,15 +171,21 @@ fun RecipeScreen(
         else {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()) {
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Text(
-                    text = recipeViewModel.selectedRecipe?.title ?: "Error",
                     overflow = TextOverflow.Visible,
-                    style = TextStyle(
-                        fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
-                    ),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    style = TextStyle(lineHeight = 32.sp),
+                    // Building annotated string for heading text with different styles
+                    text = buildAnnotatedString {
+                        withStyle(style = titleStyle) {
+                            append("${recipeViewModel.selectedRecipe?.title}")
+                        }
+                        withStyle(style = subtitleStyle) {
+                            append(" #${recipeViewModel.selectedRecipe?.id}")
+                        }
+                    },
                 )
                 if (apiRecipeId != null) {
                     IconButton(onClick = { handleFavouriteClick() }) {
@@ -269,10 +296,23 @@ fun RecipeScreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(24.dp))
-                Text(
-                    text = "Instructions",
-                    style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Instructions",
+                        style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+                    )
+                    if (showServingsChangedNotice) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Serving size changed",
+                            style = TextStyle(color = MaterialTheme.colorScheme.onPrimaryContainer),
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .padding(horizontal = 6.dp, vertical = 4.dp)
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 recipeViewModel.selectedRecipe?.analyzedInstructions?.map { instruction ->
                     instruction.steps.map { step ->

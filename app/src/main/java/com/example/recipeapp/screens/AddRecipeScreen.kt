@@ -267,6 +267,14 @@ private fun IngredientsStep(handleAllowNextChange: (Boolean) -> Unit) {
         recipeViewModel.recipeInAddition?.extendedIngredients ?: listOf()
     )}
 
+    LaunchedEffect(key1 = ingredients.value) {
+        if (ingredients.value.isNotEmpty()) {
+            handleAllowNextChange(true)
+        } else {
+            handleAllowNextChange(false)
+        }
+    }
+
     fun addIngredient() {
         recipeViewModel.ingredientInAddition?.let {
             val newIngredient: Ingredient = Utils.emptyIngredient.copy(
@@ -294,9 +302,15 @@ private fun IngredientsStep(handleAllowNextChange: (Boolean) -> Unit) {
         val newIngredients = ingredients.value.toMutableList()
         newIngredients.removeAt(index)
         ingredients.value = newIngredients
+
+        recipeViewModel.recipeInAddition?.let { recipe ->
+            recipeViewModel.setRecipeInAddition(
+                recipe.copy(extendedIngredients = newIngredients)
+            )
+        }
     }
 
-    IngredientForm( {handleAllowNextChange(it) }, ::addIngredient)
+    IngredientForm(::addIngredient)
 
     Spacer(modifier = Modifier.height(16.dp))
     if (ingredients.value.isNotEmpty()) {

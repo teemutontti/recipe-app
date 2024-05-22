@@ -101,6 +101,15 @@ fun RecipeScreen(
         }
     }
 
+    fun handleEditClick() {
+        recipeViewModel.setRecipeInAddition(recipeViewModel.selectedRecipe)
+        navController.navigate("add")
+    }
+
+    fun handleDeleteClick() {
+
+    }
+
     fun calculateIngredients(newServings: Int) {
         val ingredientsPerServing = recipeViewModel.selectedRecipe?.extendedIngredients?.map {
             it.measures.metric.amount.toFloat() / recipeViewModel.selectedRecipe!!.servings.toInt()
@@ -159,6 +168,50 @@ fun RecipeScreen(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
+                } else {
+                    Column {
+                        IconButton(onClick = { showMore = !showMore }) {
+                            Icon(Icons.Default.MoreVert, "more")
+                        }
+                        DropdownMenu(expanded = showMore, onDismissRequest = { showMore = false }) {
+                            DropdownMenuItem(
+                                modifier = Modifier.height(44.dp),
+                                text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Edit,
+                                            contentDescription = "edit",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(text = "Edit")
+                                    }
+                                },
+                                onClick = { handleEditClick() }
+                            )
+                            DropdownMenuItem(
+                                modifier = Modifier.height(44.dp),
+                                text = {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Rounded.Delete,
+                                            contentDescription = "delete",
+                                            tint = MaterialTheme.colorScheme.error,
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = "Delete",
+                                            style = TextStyle(color = MaterialTheme.colorScheme.error)
+                                        )
+                                    }
+                                },
+                                onClick = { handleDeleteClick() }
+                            )
+                        }
+                    }
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -194,7 +247,6 @@ fun RecipeScreen(
                         value = recipeViewModel.selectedRecipe?.servings!!.toInt(),
                         suffix = "servings",
                         onNumberChange = ::calculateIngredients,
-                        max = 20
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))

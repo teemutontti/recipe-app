@@ -17,7 +17,7 @@ fun RecipeList(
     navController: NavController,
     apiRecipes: List<CachedRecipe>? = null,
     ownRecipes: List<Recipe>? = null,
-    onEmptyMessage: String = "",
+    onEmpty: @Composable () -> Unit = {},
 ) {
     if (apiRecipes != null) {
         if (apiRecipes.isNotEmpty()) {
@@ -29,7 +29,7 @@ fun RecipeList(
                 Spacer(modifier = Modifier.height(8.dp))
             }
         } else {
-            Text(text = onEmptyMessage)
+            onEmpty()
         }
     } else if (ownRecipes != null) {
         if (ownRecipes.isNotEmpty()) {
@@ -41,7 +41,7 @@ fun RecipeList(
                 Spacer(modifier = Modifier.height(8.dp))
             }
         } else {
-            Text(text = onEmptyMessage)
+            onEmpty()
         }
     }
 }

@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -100,7 +101,18 @@ fun OwnRecipesTab(navController: NavController) {
         ) {
             RecipeList(
                 navController = navController,
-                ownRecipes = recipeViewModel.ownRecipes
+                ownRecipes = recipeViewModel.ownRecipes,
+                onEmpty = { 
+                    Column {
+                        Text(text = "You have no recipes yet...")
+                        Button(onClick = {
+                            recipeViewModel.setRecipeInAddition(null)
+                            navController.navigate("recipe_editor")
+                        }) {
+                            Text(text = "Let's change that!")
+                        }
+                    }
+                }
             )
         }
         AddRecipeButton(navController = navController)

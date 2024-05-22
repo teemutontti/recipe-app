@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,6 +24,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -38,6 +41,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -56,10 +61,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -121,7 +128,8 @@ fun AddRecipeScreen(navController: NavController) {
                 navController = navController,
                 paddingValues = it,
                 currentFormStep = currentFormStep,
-                handleAllowNextChange = ::handleAllowNextChange
+                handleAllowNextChange = ::handleAllowNextChange,
+                handleStepChange = ::handleStepChange,
             )
         },
         bottomBar = {
@@ -168,6 +176,7 @@ private fun AddRecipeScreenContent(
     paddingValues: PaddingValues,
     currentFormStep: Int,
     handleAllowNextChange: (Boolean) -> Unit,
+    handleStepChange: (Int) -> Unit,
 ) {
     Column(modifier = Modifier
         .padding(paddingValues)
@@ -177,14 +186,13 @@ private fun AddRecipeScreenContent(
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
                 StepIndicator(
                     steps = 0..3,
                     currentStep = currentFormStep,
                 )
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(32.dp))
                 when (currentFormStep) {
-                    0 -> TitleStep { handleAllowNextChange(it) }
+                    0 -> TitleStep(handleAllowNextChange, handleStepChange)
                     1 -> IngredientsStep { handleAllowNextChange(it) }
                     2 -> InstructionsStep { handleAllowNextChange(it) }
                     3 -> PreviewStep { handleAllowNextChange(it) }
@@ -195,7 +203,7 @@ private fun AddRecipeScreenContent(
 }
 
 @Composable
-private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit) {
+private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int) -> Unit) {
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
     var title by remember { mutableStateOf(recipeViewModel.recipeInAddition?.title ?: "") }
 
@@ -220,11 +228,20 @@ private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit) {
         text = "Title & Image",
         style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
     )
+
+    Spacer(modifier = Modifier.height(16.dp))
     TextField(
         value = title,
         onValueChange = ::handleTitleChange,
         placeholder = { Text("Insert title...") },
         label = { Text("Title *") },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = { toNextStep(1) }
+        )
     )
 }
 

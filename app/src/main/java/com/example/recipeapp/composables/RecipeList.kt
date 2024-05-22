@@ -21,7 +21,7 @@ fun RecipeList(
 ) {
     if (apiRecipes != null) {
         if (apiRecipes.isNotEmpty()) {
-            apiRecipes.map {
+            apiRecipes.reversed().map {
                 RecipeButton(
                     navController = navController,
                     apiRecipe = it,
@@ -33,7 +33,7 @@ fun RecipeList(
         }
     } else if (ownRecipes != null) {
         if (ownRecipes.isNotEmpty()) {
-            ownRecipes.map {
+            ownRecipes.reversed().map {
                 RecipeButton(
                     navController = navController,
                     ownRecipe = it,

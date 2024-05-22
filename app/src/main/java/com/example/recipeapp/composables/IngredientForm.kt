@@ -46,7 +46,7 @@ import com.example.recipeapp.utils.Utils
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun IngredientForm(handleAllowNextChange: (Boolean) -> Unit, addIngredient: () -> Unit) {
+fun IngredientForm(addIngredient: () -> Unit) {
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
     var name: String by remember { mutableStateOf(recipeViewModel.ingredientInAddition?.name ?: "") }
@@ -57,23 +57,14 @@ fun IngredientForm(handleAllowNextChange: (Boolean) -> Unit, addIngredient: () -
     var amountError by remember { mutableStateOf(false) }
     var unitError by remember { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = name, key2 = amount, key3 = unit) {
-        if (Utils.Validator.Ingredient.name(name)
-            && Utils.Validator.Ingredient.amount(amount)
-            && Utils.Validator.Ingredient.unit(unit)
-        ) {
-            handleAllowNextChange(true)
-        }
-    }
-
     fun handleIngredientSave() {
         if (recipeViewModel.ingredientInAddition == null) {
             recipeViewModel.setIngredientInAddition(Utils.emptyAddableIngredient)
         }
 
-        nameError = !Utils.Validator.Ingredient.name(name)
-        amountError = !Utils.Validator.Ingredient.amount(amount)
-        unitError = !Utils.Validator.Ingredient.unit(unit)
+        nameError = !Utils.Validator.ingredientName(name)
+        amountError = !Utils.Validator.ingredientAmount(amount)
+        unitError = !Utils.Validator.ingredientUnit(unit)
 
         if (!nameError && !amountError && !unitError) {
             recipeViewModel.ingredientInAddition?.let {
@@ -132,6 +123,7 @@ fun IngredientForm(handleAllowNextChange: (Boolean) -> Unit, addIngredient: () -
             }
         )
     )
+    Spacer(modifier = Modifier.height(8.dp))
     NumberCounter(
         value = amount,
         max = 1000,
@@ -150,6 +142,7 @@ fun IngredientForm(handleAllowNextChange: (Boolean) -> Unit, addIngredient: () -
         }
         )
     )
+    Spacer(modifier = Modifier.height(8.dp))
     // Using FlowRow to wrap larger list to separate lines
     FlowRow(
         horizontalArrangement = Arrangement.Start,

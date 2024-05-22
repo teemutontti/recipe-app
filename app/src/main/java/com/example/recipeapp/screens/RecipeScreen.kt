@@ -23,8 +23,10 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -49,11 +51,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.recipeapp.R
 import com.example.recipeapp.api.Ingredient
+import com.example.recipeapp.composables.DeleteDialog
 import com.example.recipeapp.composables.NumberCounter
 import com.example.recipeapp.repositories.RecipeRepository
 import com.example.recipeapp.utils.Utils
@@ -71,6 +75,7 @@ fun RecipeScreen(
     var loading by remember { mutableStateOf(true) }
     var isFavourite by remember { mutableStateOf(false) }
     var showMore by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
     var ingredients = remember { mutableStateListOf<Ingredient>() }
 
     LaunchedEffect(Unit) {
@@ -107,7 +112,7 @@ fun RecipeScreen(
     }
 
     fun handleDeleteClick() {
-
+        showDeleteDialog = true
     }
 
     fun calculateIngredients(newServings: Int) {
@@ -210,6 +215,9 @@ fun RecipeScreen(
                                 },
                                 onClick = { handleDeleteClick() }
                             )
+                        }
+                        if (showDeleteDialog) {
+                            DeleteDialog(navController = navController) { showDeleteDialog = false }
                         }
                     }
                 }

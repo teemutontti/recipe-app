@@ -1,5 +1,6 @@
 package com.example.recipeapp.screens
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
@@ -69,13 +70,23 @@ fun RecipeEditorScreen(navController: NavController) {
     var currentFormStep by remember { mutableIntStateOf(0) }
     var allowNext by remember { mutableStateOf(false) }
 
+    fun onSave() {
+        val newId = Utils.getNextId()
+        recipeViewModel.recipeInAddition?.let {
+            recipeViewModel.addOwnRecipe(
+                context = context,
+                recipe = if (it.id == -1) it.copy(id = newId) else it
+            )
+        }
+        navController.navigate("cookbook")
+    }
+
     fun handleStepChange(direction: Int) {
         val newCurrentFormStep = currentFormStep + direction
         if (newCurrentFormStep in 0..4) {
             currentFormStep = newCurrentFormStep
             if (newCurrentFormStep == 4) {
-                recipeViewModel.recipeInAddition?.let { recipeViewModel.addOwnRecipe(context, it) }
-                navController.navigate("cookbook")
+                onSave()
             }
         }
         allowNext = direction < 0

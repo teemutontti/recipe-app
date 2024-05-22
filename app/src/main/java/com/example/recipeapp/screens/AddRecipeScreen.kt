@@ -380,6 +380,62 @@ private fun InstructionsStep(handleAllowNextChange: (Boolean) -> Unit) {
         text = "Instructions",
         style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
     )
+
+    Spacer(modifier = Modifier.height(16.dp))
+    Row(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        TextField(
+            value = text,
+            shape = RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp, bottomEnd = 4.dp),
+            onValueChange = { text = it },
+            label = { Text("Text") },
+            modifier = Modifier
+                .weight(0.9f)
+                .padding(0.dp)
+        )
+        Button(
+            onClick = ::addInstruction,
+            shape = RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp),
+            contentPadding = PaddingValues(vertical = 16.dp),
+            modifier = Modifier.fillMaxHeight(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+            ),
+        ) {
+            Icon(Icons.Rounded.Add, "add")
+        }
+    }
+
+    Spacer(modifier = Modifier.height(24.dp))
+    instructions.value.forEachIndexed { index1, instruction ->
+        Column {
+            Text(
+                text = "Current instructions${if (instruction.name.isNotEmpty()) " (${instruction.name}):" else ":"}",
+                style = TextStyle(fontWeight = FontWeight.SemiBold)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            instruction.steps.forEachIndexed { index2, step ->
+                Row {
+                    Text(
+                        text = "${step.number}",
+                        modifier = Modifier
+                            .width(24.dp)
+                            .height(24.dp),
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(text = step.step, modifier = Modifier.padding(top = 2.dp))
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+    }
 }
 
 @Composable

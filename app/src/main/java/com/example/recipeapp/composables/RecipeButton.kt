@@ -104,7 +104,10 @@ fun RecipeButton(
                     }
                 )
             } else {
-                RecipeImage(painter = painterResource(id = R.drawable.meal))
+                RecipeImage(
+                    painter = painterResource(id = R.drawable.meal),
+                    isPreview = true
+                )
             }
             // Adding shadow with box composable for better text readability
             Box(

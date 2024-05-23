@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,11 +25,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.utils.CachedRecipe
+import com.example.recipeapp.utils.Utils
 import kotlinx.coroutines.delay
 
 @Composable
@@ -52,41 +55,43 @@ fun RecipeShelf(navController: NavController, recipes: List<CachedRecipe>) {
         }
     }
 
-    LazyRow(
-        state = lazyRowState,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        itemsIndexed(recipes) { index, recipe ->
-            Column(modifier = Modifier.fillParentMaxWidth()) {
-                Spacer(modifier = Modifier.height(4.dp))
-                TodaysSpecialButton(
-                    navController = navController,
-                    recipe = recipe,
-                    index = index
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        LazyRow(
+            state = lazyRowState,
+            modifier = Modifier.width(Utils.IMAGE_WIDTH.dp)
+        ) {
+            itemsIndexed(recipes) { index, recipe ->
+                Column(modifier = Modifier.fillParentMaxWidth()) {
+                    TodaysSpecialButton(
+                        navController = navController,
+                        recipe = recipe,
+                        index = index
+                    )
+                }
+                if (index < recipes.size - 1) Spacer(modifier = Modifier.width(32.dp))
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            repeat(times = recipes.size) {
+                Box(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .clickable { specialInView = it }
+                        .background(
+                            if (lazyRowState.firstVisibleItemIndex == it) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.surfaceVariant
+                            }
+                        )
                 )
             }
-            if (index < recipes.size - 1) Spacer(modifier = Modifier.width(24.dp))
-        }
-    }
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        repeat(times = recipes.size) {
-            Box(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .clickable { specialInView = it }
-                    .background(
-                        if (lazyRowState.firstVisibleItemIndex == it) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.surfaceVariant
-                        }
-                    )
-            )
         }
     }
 }

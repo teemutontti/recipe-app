@@ -12,6 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -77,54 +78,40 @@ fun TodaysSpecialButton(
     if (recipe != null) {
         TextButton(
             shape = RoundedCornerShape(8.dp),
+            contentPadding = PaddingValues(0.dp),
             onClick = { handleRecipeClick() },
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent,
                 contentColor = MaterialTheme.colorScheme.scrim
             )
         ) {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(15.dp))
-                    .fillMaxSize()
-                    .height(162.dp)
-                    .border(2.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(15.dp))
-            ) {
-                if (loading && !imageError) CircularProgressIndicator()
+            Box(modifier = Modifier.height(162.dp)) {
                 if (!imageError) {
-                    AsyncImage(
+                    RecipeImage(
                         model = recipe.image,
-                        contentDescription = "${recipe.title} picture",
-                        onSuccess = { (_) -> loading = false },
-                        onError = { (_) -> imageError = true },
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(width = 288.dp, height = 162.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .fillMaxWidth()
+                        onLoadError = { imageError = true },
+                        onLoadSuccess = { loading = false },
                     )
                 } else {
-                    Image(
-                        painter = painterResource(id = R.drawable.meal),
-                        contentDescription = "meal",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(width = 288.dp, height = 162.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .fillMaxSize()
-                    )
+                    RecipeImage(painter = painterResource(id = R.drawable.meal))
                 }
+
                 // Adding shadow with box composable for better text readability
                 Box(
-                    modifier = Modifier.fillMaxSize().background(Brush.linearGradient(
-                        colors = listOf(
-                            Color.Black.copy(alpha = 0.7f),
-                            Color.Transparent,
-                            Color.Black.copy(alpha = 0.7f),
-                        ),
-                        start = Offset(0f, 0f),
-                        end = Offset(0f, Float.POSITIVE_INFINITY)
-                    ))
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(
+                            Brush.linearGradient(
+                                colors = listOf(
+                                    Color.Black.copy(alpha = 0.7f),
+                                    Color.Transparent,
+                                    Color.Black.copy(alpha = 0.7f),
+                                ),
+                                start = Offset(0f, 0f),
+                                end = Offset(0f, Float.POSITIVE_INFINITY)
+                            )
+                        )
                 )
                 Column(
                     verticalArrangement = Arrangement.SpaceBetween,
@@ -148,6 +135,14 @@ fun TodaysSpecialButton(
                             fontSize = 20.sp
                         )
                     )
+                }
+                if (loading && !imageError) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
             }
         }

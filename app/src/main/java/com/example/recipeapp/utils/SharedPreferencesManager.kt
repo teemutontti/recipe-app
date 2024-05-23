@@ -3,6 +3,7 @@ package com.example.recipeapp.utils
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.core.content.edit
 import com.example.recipeapp.api.Recipe
 import com.google.gson.Gson
 import java.time.LocalDate
@@ -27,12 +28,8 @@ object SharedPreferencesManager {
         Log.d("RecipeRepository", "Saving recipes to shared prefs: $recipes")
 
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val prefEditor: SharedPreferences.Editor = prefs.edit()
-
-        prefEditor.putString(TODAYS_SPECIALS_KEY, Gson().toJson(recipes))
-        prefEditor.putString(TODAYS_SPECIALS_LAST_LOAD_KEY, LocalDate.now().toString())
-
-        prefEditor.commit()
+        prefs.edit().putString(TODAYS_SPECIALS_KEY, Gson().toJson(recipes)).apply()
+        prefs.edit().putString(TODAYS_SPECIALS_KEY, LocalDate.now().toString()).apply()
     }
 
     fun getTodaysSpecials(context: Context): List<CachedRecipe> {
@@ -57,13 +54,9 @@ object SharedPreferencesManager {
         return favourites
     }
 
-    fun updateFavourites(context: Context, newFavourites: List<CachedRecipe>) {
+    fun setFavourites(context: Context, newFavourites: List<CachedRecipe>) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val prefEditor: SharedPreferences.Editor = prefs.edit()
-
-        prefEditor.putString(FAVOURITES_KEY, Gson().toJson(newFavourites))
-
-        prefEditor.commit()
+        prefs.edit().putString(FAVOURITES_KEY, Gson().toJson(newFavourites)).apply()
     }
 
     fun getOwnRecipes(context: Context): List<Recipe> {
@@ -75,11 +68,8 @@ object SharedPreferencesManager {
         return ownRecipes
     }
 
-    fun updateOwnRecipe(context: Context, newOwnRecipe: List<Recipe>) {
+    fun setOwnRecipes(context: Context, newRecipes: List<Recipe>) {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val prefEditor: SharedPreferences.Editor = prefs.edit()
-
-        prefEditor.putString(OWN_RECIPES_KEY, Gson().toJson(newOwnRecipe))
-        prefEditor.commit()
+        prefs.edit().putString(OWN_RECIPES_KEY, Gson().toJson(newRecipes)).apply()
     }
 }

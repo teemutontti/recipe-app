@@ -25,6 +25,7 @@ import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -81,6 +82,7 @@ fun RecipeScreen(
 
     // State declarations
     var loading by remember { mutableStateOf(true) }
+    var imageLoading by remember { mutableStateOf(true) }
     var isFavourite by remember { mutableStateOf(false) }
     var showMore by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -251,11 +253,14 @@ fun RecipeScreen(
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-
             if (recipeViewModel.selectedRecipe?.image != null
                 && recipeViewModel.selectedRecipe?.image != ""
             ) {
-                RecipeImage(model = recipeViewModel.selectedRecipe?.image)
+                if (imageLoading) CircularProgressIndicator()
+                RecipeImage(
+                    model = recipeViewModel.selectedRecipe?.image,
+                    onLoadSuccess = { imageLoading = false }
+                )
             } else {
                 RecipeImage(painter = painterResource(id = R.drawable.meal))
             }

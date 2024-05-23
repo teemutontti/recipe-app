@@ -1,5 +1,6 @@
 package com.example.recipeapp.screens
 
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -254,8 +255,10 @@ fun RecipeScreen(
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
+            // TODO: This looks stupid! Fix it!
             if (recipeViewModel.selectedRecipe?.image != null
                 && recipeViewModel.selectedRecipe?.image != ""
+                && recipeViewModel.selectedRecipe?.image != "null"
             ) {
                 if (imageLoading) CircularProgressIndicator()
                 RecipeImage(

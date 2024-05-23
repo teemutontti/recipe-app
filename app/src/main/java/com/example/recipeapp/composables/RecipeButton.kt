@@ -94,41 +94,33 @@ fun RecipeButton(
                 .height(96.dp)
                 .border(2.dp, MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(15.dp))
         ) {
-            if (loading && !imageError) CircularProgressIndicator()
             if (!imageError) {
-                AsyncImage(
+                RecipeImage(
                     model = apiRecipe?.image ?: ownRecipe?.image,
-                    contentDescription = "meal image",
-                    onSuccess = { (_) -> loading = false },
-                    onError = { (_) -> imageError = true },
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(width = 288.dp, height = 162.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .fillMaxWidth()
+                    isPreview = true,
+                    onLoadError = { imageError = true },
+                    onLoadSuccess = {
+                        imageError = false
+                        loading = false
+                    }
                 )
             } else {
-                Image(
-                    painter = painterResource(id = R.drawable.meal),
-                    contentDescription = "meal",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(width = 288.dp, height = 162.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .fillMaxSize()
-                )
+                RecipeImage(painter = painterResource(id = R.drawable.meal))
             }
             // Adding shadow with box composable for better text readability
             Box(
-                modifier = Modifier.fillMaxSize().background(
-                    Brush.linearGradient(
-                    colors = listOf(
-                        Color.Transparent,
-                        Color.Black.copy(alpha = 0.7f),
-                    ),
-                    start = Offset(0f, 0f),
-                    end = Offset(0f, Float.POSITIVE_INFINITY)
-                ))
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.linearGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.7f),
+                            ),
+                            start = Offset(0f, 0f),
+                            end = Offset(0f, Float.POSITIVE_INFINITY)
+                        )
+                    )
             )
             Column(
                 verticalArrangement = Arrangement.Bottom,
@@ -143,6 +135,14 @@ fun RecipeButton(
                         fontSize = 20.sp
                     )
                 )
+            }
+            if (loading && !imageError) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
             }
         }
     }

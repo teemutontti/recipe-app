@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.composables.AddRecipeButton
 import com.example.recipeapp.composables.CustomSearchBar
 import com.example.recipeapp.composables.NavBar
@@ -83,7 +84,7 @@ fun DiscoverScreen(navController: NavController) {
 
 @Composable
 private fun DiscoverScreenContent(navController: NavController, paddingValues: PaddingValues) {
-    val context = LocalContext.current
+    val context = ApplicationContext.current
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
     var loading by remember { mutableStateOf(true) }
     var showSearchPanel by remember { mutableStateOf(false) }

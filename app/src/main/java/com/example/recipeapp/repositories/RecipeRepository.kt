@@ -5,15 +5,14 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
+import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.BuildConfig.API_KEY
 import com.example.recipeapp.services.RetrofitInstance
 import com.example.recipeapp.utils.SharedPreferencesManager
 import com.example.recipeapp.api.Recipe
 import com.example.recipeapp.api.SearchResponse
-import com.example.recipeapp.utils.AddableIngredient
 import com.example.recipeapp.utils.CachedRecipe
 import retrofit2.Response
-import kotlin.math.max
 
 object RecipeRepository: ViewModel() {
     private val TODAYS_SPECIALS = listOf("breakfast", "lunch", "dinner", "snack")

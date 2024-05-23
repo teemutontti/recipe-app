@@ -65,7 +65,6 @@ fun RecipeButton(
     apiRecipe: CachedRecipe? = null,
     ownRecipe: Recipe? = null,
 ) {
-    val context = LocalContext.current
     var loading by remember { mutableStateOf(true) }
     var imageError by remember { mutableStateOf(false) }
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)

@@ -3,7 +3,9 @@ package com.example.recipeapp.utils
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.edit
+import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.api.Recipe
 import com.google.gson.Gson
 import java.time.LocalDate

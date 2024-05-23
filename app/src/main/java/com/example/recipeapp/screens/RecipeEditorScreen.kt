@@ -66,6 +66,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.R
 import com.example.recipeapp.api.Instructions
 import com.example.recipeapp.api.Step
@@ -78,7 +79,7 @@ import com.example.recipeapp.utils.Utils
 
 @Composable
 fun RecipeEditorScreen(navController: NavController) {
-    val context = LocalContext.current
+    val context = ApplicationContext.current
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
     var currentFormStep by remember { mutableIntStateOf(0) }
     var allowNext by remember { mutableStateOf(false) }
@@ -209,7 +210,7 @@ private fun RecipeEditorContent(
 
 @Composable
 private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int) -> Unit) {
-    val context = LocalContext.current
+    val context = ApplicationContext.current
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
     var title by remember { mutableStateOf(recipeViewModel.recipeInAddition?.title ?: "") }
     var servings by remember { mutableIntStateOf(recipeViewModel.recipeInAddition?.servings?.toInt() ?: 1) }

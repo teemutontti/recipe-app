@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.composables.AddRecipeButton
 import com.example.recipeapp.composables.NavBar
 import com.example.recipeapp.composables.RecipeList
@@ -79,7 +80,7 @@ fun CookbookScreenContent(navController: NavController, paddingValues: PaddingVa
 
 @Composable
 fun OwnRecipesTab(navController: NavController) {
-    val context = LocalContext.current
+    val context = ApplicationContext.current
     var loading: Boolean by remember { mutableStateOf(true) }
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 
@@ -121,7 +122,7 @@ fun OwnRecipesTab(navController: NavController) {
 
 @Composable
 fun SavedRecipesTab(navController: NavController) {
-    val context = LocalContext.current
+    val context = ApplicationContext.current
     var loading: Boolean by remember { mutableStateOf(true) }
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
 

@@ -63,6 +63,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.R
 import com.example.recipeapp.api.Ingredient
 import com.example.recipeapp.composables.DeleteDialog
@@ -77,8 +78,8 @@ fun RecipeScreen(
     apiRecipeId: Int? = null,
     preview: Boolean = false
 ) {
+    val context = ApplicationContext.current
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
-    val context = LocalContext.current
 
     // State declarations
     var loading by remember { mutableStateOf(true) }

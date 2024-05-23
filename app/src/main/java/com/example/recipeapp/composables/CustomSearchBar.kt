@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.repositories.RecipeRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,7 +61,7 @@ fun CustomSearchBar(
     onBackAction: () -> Unit = {},
     onSearchAction: () -> Unit = {},
 ) {
-    val context = LocalContext.current
+    val context = ApplicationContext.current
     var loading by remember { mutableStateOf(false) }
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
     var query by remember { mutableStateOf("") }

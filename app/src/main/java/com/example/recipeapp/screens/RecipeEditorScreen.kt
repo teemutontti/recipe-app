@@ -1,6 +1,8 @@
 package com.example.recipeapp.screens
 
+import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -207,6 +209,7 @@ private fun RecipeEditorContent(
 
 @Composable
 private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int) -> Unit) {
+    val context = LocalContext.current
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
     var title by remember { mutableStateOf(recipeViewModel.recipeInAddition?.title ?: "") }
     var servings by remember { mutableIntStateOf(recipeViewModel.recipeInAddition?.servings?.toInt() ?: 1) }
@@ -214,7 +217,18 @@ private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
-        onResult = { imageUri = it },
+        onResult = {
+            if (it != null) {
+                // Persist access to the uri even after app restarts
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+
+                // Update state
+                imageUri = it
+            }
+       },
     )
 
     fun handlePickImage() {
@@ -225,7 +239,7 @@ private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int
         // TODO: Add functionality
     }
 
-    LaunchedEffect(key1 = title, key2 = servings) {
+    LaunchedEffect(key1 = title, key2 = servings, key3 = imageUri) {
         if (Utils.Validator.recipeTitle(title) && Utils.Validator.recipeServings(servings)) {
             if (recipeViewModel.recipeInAddition == null) {
                 recipeViewModel.setRecipeInAddition(Utils.emptyRecipe)
@@ -236,11 +250,14 @@ private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int
                     it.copy(
                         title = title,
                         servings = servings,
+                        image = imageUri.toString()
                     )
                 )
             }
             handleAllowNextChange(true)
         }
+        Log.d("RecipeEditor", "Image uri: ${imageUri}")
+        Log.d("RecipeEditor", "Image uri: ${imageUri.toString()}")
     }
 
     Text(
@@ -289,7 +306,7 @@ private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.height(187.dp)
+            modifier = Modifier.height(Utils.IMAGE_HEIGHT.dp)
         ) {
             if (imageUri == null) RecipeImage(painter = painterResource(id = R.drawable.meal))
             else RecipeImage(model = imageUri)

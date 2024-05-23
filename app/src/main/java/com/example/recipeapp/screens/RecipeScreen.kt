@@ -66,6 +66,7 @@ import com.example.recipeapp.R
 import com.example.recipeapp.api.Ingredient
 import com.example.recipeapp.composables.DeleteDialog
 import com.example.recipeapp.composables.NumberCounter
+import com.example.recipeapp.composables.RecipeImage
 import com.example.recipeapp.repositories.RecipeRepository
 import com.example.recipeapp.utils.Utils
 
@@ -254,25 +255,9 @@ fun RecipeScreen(
             if (recipeViewModel.selectedRecipe?.image != null
                 && recipeViewModel.selectedRecipe?.image != ""
             ) {
-                AsyncImage(
-                    model = recipeViewModel.selectedRecipe?.image,
-                    contentDescription = "${recipeViewModel.selectedRecipe?.title} image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .aspectRatio(1.5f)
-                        .fillMaxSize()
-                )
+                RecipeImage(model = recipeViewModel.selectedRecipe?.image)
             } else {
-                Image(
-                    painter = painterResource(id = R.drawable.meal),
-                    contentDescription = "meal",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .aspectRatio(1.5f)
-                        .fillMaxSize()
-                )
+                RecipeImage(painter = painterResource(id = R.drawable.meal))
             }
             Spacer(modifier = Modifier.height(24.dp))
             Column {

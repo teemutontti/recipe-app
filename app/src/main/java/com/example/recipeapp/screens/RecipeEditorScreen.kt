@@ -1,10 +1,14 @@
 package com.example.recipeapp.screens
 
-import android.util.Log
+import android.net.Uri
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -24,11 +28,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -45,8 +51,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -55,10 +64,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.recipeapp.R
 import com.example.recipeapp.api.Instructions
 import com.example.recipeapp.api.Step
 import com.example.recipeapp.composables.IngredientForm
 import com.example.recipeapp.composables.NumberCounter
+import com.example.recipeapp.composables.RecipeImage
 import com.example.recipeapp.composables.StepIndicator
 import com.example.recipeapp.repositories.RecipeRepository
 import com.example.recipeapp.utils.Utils
@@ -199,6 +210,20 @@ private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int
     val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
     var title by remember { mutableStateOf(recipeViewModel.recipeInAddition?.title ?: "") }
     var servings by remember { mutableIntStateOf(recipeViewModel.recipeInAddition?.servings?.toInt() ?: 1) }
+    var imageUri: Uri? by remember { mutableStateOf(null) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { imageUri = it },
+    )
+
+    fun handlePickImage() {
+        launcher.launch("image/*")
+    }
+    
+    fun handleTakePhoto() {
+        // TODO: Add functionality
+    }
 
     LaunchedEffect(key1 = title, key2 = servings) {
         if (Utils.Validator.recipeTitle(title) && Utils.Validator.recipeServings(servings)) {
@@ -222,7 +247,6 @@ private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int
         text = "Title & Image",
         style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
     )
-
     Spacer(modifier = Modifier.height(16.dp))
     TextField(
         value = title,
@@ -245,6 +269,49 @@ private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int
         onNumberChange = { servings = it },
         max = 40
     )
+    Spacer(modifier = Modifier.height(16.dp))
+    Text("Change image:", style = TextStyle(fontWeight = FontWeight.SemiBold))
+    Spacer(modifier = Modifier.height(8.dp))
+    /* TODO: Add take a photo functionality
+    Button(
+        contentPadding = PaddingValues(horizontal = 8.dp),
+        onClick = { handleTakePhoto() }
+    ) {
+        Icon(Icons.Rounded.CameraAlt, "camera")
+        Text("Take a Photo")
+    }
+     */
+    Spacer(modifier = Modifier.height(8.dp))
+    OutlinedButton(
+        shape = RoundedCornerShape(16.dp),
+        contentPadding = PaddingValues(0.dp),
+        onClick = { handlePickImage() }
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.height(187.dp)
+        ) {
+            if (imageUri == null) RecipeImage(painter = painterResource(id = R.drawable.meal))
+            else RecipeImage(model = imageUri)
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .fillMaxSize()
+                    .background(
+                        Brush.linearGradient(
+                            colors = listOf(
+                                Color.Black.copy(alpha = 0.7f),
+                                Color.Black.copy(alpha = 0.3f),
+                                Color.Black.copy(alpha = 0.7f),
+                            ),
+                            start = Offset(0f, 0f),
+                            end = Offset(0f, Float.POSITIVE_INFINITY)
+                        )
+                    )
+            )
+            Icon(Icons.Rounded.Image, "image")
+        }
+    }
 }
 
 @Composable

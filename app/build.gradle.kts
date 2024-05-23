@@ -1,4 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import java.util.Properties
 
 plugins {
@@ -14,8 +13,8 @@ android {
         applicationId = "com.example.recipeapp"
         minSdk = 26
         targetSdk = 34
-        versionCode = 2
-        versionName = "0.2-beta1"
+        versionCode = 3
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

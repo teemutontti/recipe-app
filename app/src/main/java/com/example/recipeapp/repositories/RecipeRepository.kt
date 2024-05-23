@@ -144,7 +144,7 @@ object RecipeRepository: ViewModel() {
                 title = recipe.title
             )
         )
-        SharedPreferencesManager.updateFavourites(context, _favourites)
+        SharedPreferencesManager.setFavourites(context, _favourites)
     }
 
     fun deleteFavourite(context: Context, recipe: Recipe) {
@@ -153,25 +153,23 @@ object RecipeRepository: ViewModel() {
         newFavourites.forEach {
             _favourites.add(it)
         }
-        SharedPreferencesManager.updateFavourites(context, _favourites)
+        SharedPreferencesManager.setFavourites(context, _favourites)
     }
 
     fun fetchOwnRecipes(context: Context) {
-        val ownRecipes = SharedPreferencesManager.getOwnRecipes(context)
-        for (recipe in ownRecipes) {
-            _ownRecipes.add(recipe)
-        }
+        val newOwnRecipes = SharedPreferencesManager.getOwnRecipes(context)
+        _ownRecipes.addAll(newOwnRecipes)
     }
 
     fun addOwnRecipe(context: Context, recipe: Recipe) {
         _ownRecipes.add(recipe)
-        SharedPreferencesManager.updateOwnRecipe(context, _ownRecipes)
+        SharedPreferencesManager.setOwnRecipes(context, _ownRecipes)
     }
 
     fun deleteOwnRecipe(context: Context) {
         val indexOfDeletable = _ownRecipes.indexOf(_selectedRecipe)
         _ownRecipes.removeAt(indexOfDeletable)
-        SharedPreferencesManager.updateOwnRecipe(context, _ownRecipes)
+        SharedPreferencesManager.setOwnRecipes(context, _ownRecipes)
     }
 
     fun updateOwnRecipe(context: Context, recipeId: Int) {
@@ -185,7 +183,7 @@ object RecipeRepository: ViewModel() {
         _recipeInAddition?.let {
             if (indexOfUpdatable != -1) {
                 _ownRecipes[indexOfUpdatable] = it
-                SharedPreferencesManager.updateOwnRecipe(context, _ownRecipes)
+                SharedPreferencesManager.setOwnRecipes(context, _ownRecipes)
             }
         }
     }

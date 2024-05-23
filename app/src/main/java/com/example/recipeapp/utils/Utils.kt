@@ -22,6 +22,9 @@ object Utils {
     }
 
     val INGREDIENT_UNITS = listOf("ml", "l", "tsp", "tbsp", "mg", "g", "kg", "pinch", "piece")
+    const val LANDSCAPE_ASPECT_RATIO: Float = 1.7777778f
+    const val IMAGE_WIDTH: Int = 288
+    const val IMAGE_HEIGHT: Int = 162
 
     object Validator {
         fun recipeTitle(title: String): Boolean {

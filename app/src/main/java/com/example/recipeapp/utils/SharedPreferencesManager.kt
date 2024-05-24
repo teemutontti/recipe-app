@@ -31,7 +31,7 @@ object SharedPreferencesManager {
 
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putString(TODAYS_SPECIALS_KEY, Gson().toJson(recipes)).apply()
-        prefs.edit().putString(TODAYS_SPECIALS_KEY, LocalDate.now().toString()).apply()
+        prefs.edit().putString(TODAYS_SPECIALS_LAST_LOAD_KEY, LocalDate.now().toString()).apply()
     }
 
     fun getTodaysSpecials(context: Context): List<CachedRecipe> {
@@ -71,6 +71,7 @@ object SharedPreferencesManager {
     }
 
     fun setOwnRecipes(context: Context, newRecipes: List<Recipe>) {
+        Log.d("Adding Own", "newRecipes: $newRecipes")
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         prefs.edit().putString(OWN_RECIPES_KEY, Gson().toJson(newRecipes)).apply()
     }

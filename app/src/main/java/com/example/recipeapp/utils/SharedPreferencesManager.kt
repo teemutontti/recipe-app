@@ -1,11 +1,7 @@
 package com.example.recipeapp.utils
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.edit
-import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.api.Recipe
 import com.google.gson.Gson
 import java.time.LocalDate
@@ -34,17 +30,15 @@ object SharedPreferencesManager {
         prefs.edit().putString(TODAYS_SPECIALS_LAST_LOAD_KEY, LocalDate.now().toString()).apply()
     }
 
-    fun getTodaysSpecials(context: Context): List<CachedRecipe> {
-        Log.d("RecipeRepository", "Getting todays specials from shared prefs")
-
-        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-
-        val json: String = prefs.getString(TODAYS_SPECIALS_KEY, null) ?: return listOf()
-        val specials = Gson().fromJson(json, Array<CachedRecipe>::class.java).toList()
-
-        Log.d("SharedPrefs", "Getting specials: $specials")
-
-        return specials
+    fun getTodaysSpecials(context: Context): List<CachedRecipe>? {
+        try {
+            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val json: String? = prefs.getString(TODAYS_SPECIALS_KEY, null)
+            if (json != null) return Gson().fromJson(json, Array<CachedRecipe>::class.java).toList()
+        } catch (e: Exception) {
+            Log.d("ERROR", "Error in getTodaysSpecials: ${e.printStackTrace()}")
+        }
+        return null
     }
 
     fun getFavourites(context: Context): List<CachedRecipe> {

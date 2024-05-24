@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
-import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.BuildConfig.API_KEY
 import com.example.recipeapp.services.RetrofitInstance
 import com.example.recipeapp.utils.SharedPreferencesManager
@@ -36,47 +35,63 @@ object RecipeRepository: ViewModel() {
     val recipeInAddition: Recipe? get() = _recipeInAddition
 
     private suspend fun fetchRandomMeal(context: Context, mealType: String): Recipe? {
-        val response = RetrofitInstance().recipeService.getRandomRecipes(
-            apiKey = API_KEY,
-            includeTags = mealType,
-            number = 1
-        )
+        try {
+            val response = RetrofitInstance().recipeService.getRandomRecipes(
+                apiKey = API_KEY,
+                includeTags = mealType,
+                number = 1
+            )
 
-        if (response.isSuccessful) {
-            val recipe: Recipe? = response.body()?.recipes?.get(0)
-            if (recipe != null) return recipe
-        } else {
-            Log.d("API", "Error in fetching: ${response.errorBody()?.string()}")
+            if (response.isSuccessful) {
+                val recipe: Recipe? = response.body()?.recipes?.get(0)
+                if (recipe != null) return recipe
+            }
+        } catch (e: Exception) {
+            Log.d("ERROR", "Error in fetchRandomMeal: ${e.printStackTrace()}")
         }
         return null
     }
 
-    suspend fun fetchRandomRecipes(context: Context) {
+    suspend fun fetchNewTodaysSpecials(context: Context): List<CachedRecipe>? {
+        val newSpecials: List<CachedRecipe> = TODAYS_SPECIALS.map {
+            // If even one recipe fetch result is null return null
+            val recipe: Recipe = fetchRandomMeal(context, it) ?: return null
+
+            // Return a CachedRecipe object for the map function
+            CachedRecipe(recipe.id, recipe.image, recipe.title)
+        }
+        SharedPreferencesManager.saveTodaysSpecials(context, newSpecials)
+        return newSpecials
+    }
+
+    suspend fun fetchTodaysSpecials(context: Context) {
         try {
             _specials.clear()
-            if (SharedPreferencesManager.isTodaysSpecialsLoaded(context)) {
-                SharedPreferencesManager.getTodaysSpecials(context).forEach {
-                    _specials.add(it)
+
+            // Check if specials are already loaded for today
+            val isSpecialsLoaded = SharedPreferencesManager.isTodaysSpecialsLoaded(context)
+
+            var newSpecials: List<CachedRecipe>?
+            if (isSpecialsLoaded) {
+                // Trying to get specials from SharedPrefs
+                newSpecials = SharedPreferencesManager.getTodaysSpecials(context)
+
+                // If specials are not found in SharedPrefs, fetch new ones from API
+                // This can happen if old version of the app is updated to more recent one
+                // and user has some SharedPrefs saved
+                if (newSpecials == null) {
+                    newSpecials = fetchNewTodaysSpecials(context)
                 }
             } else {
-                val newSpecials: List<CachedRecipe?> = TODAYS_SPECIALS.map {
-                    val recipe: Recipe? = fetchRandomMeal(context, it)
-                    if (recipe != null) {
-                        val savableRecipe = CachedRecipe(
-                            id = recipe.id,
-                            image = recipe.image,
-                            title = recipe.title
-                        )
-                        _specials.add(savableRecipe)
-                        savableRecipe
-                    } else {
-                        null
-                    }
-                }
-                SharedPreferencesManager.saveTodaysSpecials(context, newSpecials)
+                // Fetch new specials form API
+                newSpecials = fetchNewTodaysSpecials(context)
+            }
+
+            if (newSpecials != null) {
+                _specials.addAll(newSpecials)
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.d("ERROR", "Error in fetchRandomRecipes: ${e.printStackTrace()}")
         }
     }
 
@@ -92,7 +107,7 @@ object RecipeRepository: ViewModel() {
                 Log.d("API", "Error in fetching: ${response.errorBody()?.string()}")
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.d("ERROR", "Error in fetchRecipeById: ${e.printStackTrace()}")
         }
     }
 
@@ -118,79 +133,110 @@ object RecipeRepository: ViewModel() {
                         )
                     )
                 }
-            } else {
-                Log.d("API", "Error in fetching: ${response.errorBody()?.string()}")
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.d("ERROR", "Error in searchRecipes: ${e.printStackTrace()}")
         }
     }
 
     fun fetchFavourites(context: Context) {
-        val favourites = SharedPreferencesManager.getFavourites(context)
-        if (favourites.isNotEmpty()) {
-            for (recipe in favourites) {
-                _favourites.add(recipe)
+        try {
+            val favourites = SharedPreferencesManager.getFavourites(context)
+            if (favourites.isNotEmpty()) {
+                for (recipe in favourites) {
+                    _favourites.add(recipe)
+                }
             }
+        } catch (e: Exception) {
+            Log.d("ERROR", "Error in fetchFavourites: ${e.printStackTrace()}")
         }
     }
 
     fun addFavourite(context: Context, recipe: Recipe) {
-        _favourites.add(
-            CachedRecipe(
-                id = recipe.id,
-                image = recipe.image,
-                title = recipe.title
+        try {
+            _favourites.add(
+                CachedRecipe(
+                    id = recipe.id,
+                    image = recipe.image,
+                    title = recipe.title
+                )
             )
-        )
-        SharedPreferencesManager.setFavourites(context, _favourites)
+            SharedPreferencesManager.setFavourites(context, _favourites)
+        } catch (e: Exception) {
+            Log.d("ERROR", "Error in addFavourite: ${e.printStackTrace()}")
+        }
     }
 
     fun deleteFavourite(context: Context, recipe: Recipe) {
-        val newFavourites = _favourites.filter { it.id != recipe.id }
-        _favourites.clear()
-        newFavourites.forEach {
-            _favourites.add(it)
+        try {
+            val newFavourites = _favourites.filter { it.id != recipe.id }
+            _favourites.clear()
+            newFavourites.forEach {
+                _favourites.add(it)
+            }
+            SharedPreferencesManager.setFavourites(context, _favourites)
+        } catch (e: Exception) {
+            Log.d("ERROR", "Error in deleteFavourite: ${e.printStackTrace()}")
         }
-        SharedPreferencesManager.setFavourites(context, _favourites)
     }
 
     fun fetchOwnRecipes(context: Context) {
-        val newOwnRecipes = SharedPreferencesManager.getOwnRecipes(context)
-        _ownRecipes.addAll(newOwnRecipes)
+        try {
+            val newOwnRecipes = SharedPreferencesManager.getOwnRecipes(context)
+            _ownRecipes.addAll(newOwnRecipes)
+        } catch (e: Exception) {
+            Log.d("ERROR", "Error in fetchOwnRecipes: ${e.printStackTrace()}")
+        }
     }
 
     fun addOwnRecipe(context: Context, recipe: Recipe) {
-        _ownRecipes.add(recipe)
-        SharedPreferencesManager.setOwnRecipes(context, _ownRecipes)
+        try {
+            _ownRecipes.add(recipe)
+            SharedPreferencesManager.setOwnRecipes(context, _ownRecipes)
+        } catch (e: Exception) {
+            Log.d("ERROR", "Error in addOwnRecipe: ${e.printStackTrace()}")
+        }
     }
 
     fun deleteOwnRecipe(context: Context) {
-        val indexOfDeletable = _ownRecipes.indexOf(_selectedRecipe)
-        _ownRecipes.removeAt(indexOfDeletable)
-        SharedPreferencesManager.setOwnRecipes(context, _ownRecipes)
+        try {
+            val indexOfDeletable = _ownRecipes.indexOf(_selectedRecipe)
+            _ownRecipes.removeAt(indexOfDeletable)
+            SharedPreferencesManager.setOwnRecipes(context, _ownRecipes)
+        } catch (e: Exception) {
+            Log.d("ERROR", "Error in deleteOwnRecipe: ${e.printStackTrace()}")
+        }
     }
 
     fun updateOwnRecipe(context: Context, recipeId: Int) {
-        Log.d("SharedPrefs", "index of updatable: $recipeId")
+        try {
+            Log.d("SharedPrefs", "index of updatable: $recipeId")
 
-        // On not found returns -1
-        val indexOfUpdatable = _ownRecipes.indexOf(
-            _ownRecipes.find { it.id.toInt() == recipeId }
-        )
+            // On not found returns -1
+            val indexOfUpdatable = _ownRecipes.indexOf(
+                _ownRecipes.find { it.id.toInt() == recipeId }
+            )
 
-        _recipeInAddition?.let {
-            if (indexOfUpdatable != -1) {
-                _ownRecipes[indexOfUpdatable] = it
-                SharedPreferencesManager.setOwnRecipes(context, _ownRecipes)
+            _recipeInAddition?.let {
+                if (indexOfUpdatable != -1) {
+                    _ownRecipes[indexOfUpdatable] = it
+                    SharedPreferencesManager.setOwnRecipes(context, _ownRecipes)
+                }
             }
+        } catch (e: Exception) {
+            Log.d("ERROR", "Error in updateOwnRecipe: ${e.printStackTrace()}")
         }
     }
 
     fun getOwnRecipesMaxId(context: Context): Int? {
-        val ownRecipes = SharedPreferencesManager.getOwnRecipes(context)
-        val ids = ownRecipes.map { it.id.toInt() }
-        return ids.maxOrNull()
+        try {
+            val ownRecipes = SharedPreferencesManager.getOwnRecipes(context)
+            val ids = ownRecipes.map { it.id.toInt() }
+            return ids.maxOrNull()
+        } catch (e: Exception) {
+            Log.d("ERROR", "Error in getOwnRecipesMaxId: ${e.printStackTrace()}")
+        }
+        return null
     }
 
     fun setRecipeInAddition(newRecipe: Recipe?) {

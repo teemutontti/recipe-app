@@ -70,6 +70,7 @@ import com.example.recipeapp.api.Ingredient
 import com.example.recipeapp.composables.DeleteDialog
 import com.example.recipeapp.composables.NumberCounter
 import com.example.recipeapp.composables.RecipeImage
+import com.example.recipeapp.composables.UserFeedbackMessage
 import com.example.recipeapp.repositories.RecipeRepository
 import com.example.recipeapp.utils.Utils
 
@@ -290,21 +291,14 @@ fun RecipeScreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(24.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.Bottom) {
                     Text(
                         text = "Instructions",
                         style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
                     )
                     if (showServingsChangedNotice) {
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "Serving size changed",
-                            style = TextStyle(color = MaterialTheme.colorScheme.onPrimaryContainer),
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(MaterialTheme.colorScheme.primaryContainer)
-                                .padding(horizontal = 6.dp, vertical = 4.dp)
-                        )
+                        UserFeedbackMessage("Serving size changed", type = "warning")
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))

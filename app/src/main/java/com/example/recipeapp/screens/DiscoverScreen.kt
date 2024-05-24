@@ -32,11 +32,11 @@ import androidx.navigation.NavController
 import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.composables.AddRecipeButton
 import com.example.recipeapp.composables.CustomSearchBar
-import com.example.recipeapp.composables.ErrorMessage
 import com.example.recipeapp.composables.NavBar
 import com.example.recipeapp.composables.RecipeShelf
 import com.example.recipeapp.composables.SearchPanel
 import com.example.recipeapp.composables.TopBar
+import com.example.recipeapp.composables.UserFeedbackMessage
 import com.example.recipeapp.repositories.RecipeRepository
 
 @Composable
@@ -93,7 +93,7 @@ private fun DiscoverScreenContent(navController: NavController, paddingValues: P
                 }
                 else {
                     if (recipeViewModel.specials.isEmpty()) {
-                        ErrorMessage(message = "Error with displaying Today's Specials")
+                        UserFeedbackMessage("Error with displaying Today's Specials")
                     } else {
                         Column {
                             Text(

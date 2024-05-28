@@ -3,6 +3,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("kotlin-kapt")
 }
 
 android {
@@ -93,5 +94,9 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material.icons.core)
     implementation(libs.coil.compose.v260)
-    implementation(libs.androidx.material.icons.extended.v143)
+    implementation(libs.androidx.material.icons.extended.v167)
+    implementation(libs.androidx.room.runtime)
+    //noinspection KaptUsageInsteadOfKsp
+    kapt(libs.androidx.room.compiler) // Room annotation processor
+    implementation(libs.androidx.room.ktx) // Needed for coroutine support
 }

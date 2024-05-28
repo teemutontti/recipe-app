@@ -1,10 +1,8 @@
 [versions]
-activity = "1.9.0"
 agp = "8.3.1"
-coilCompose = "1.4.0"
+androidxMaterialIconsExtended = "1.6.7"
 coilComposeVersion = "2.6.0"
 converterJson = "2.9.0"
-glide = "4.12.0"
 kotlin = "1.9.0"
 coreKtx = "1.13.0"
 junit = "4.13.2"
@@ -14,24 +12,20 @@ lifecycleRuntimeKtx = "2.7.0"
 activityCompose = "1.9.0"
 composeBom = "2023.08.00"
 materialIconsCore = "1.6.7"
-materialIconsExtended = "1.9.0"
-materialIconsExtendedVersion = "1.4.3"
 retrofit = "2.9.0"
 navigationCompose = "2.7.7"
+roomRuntime = "2.6.1"
 
 [libraries]
-androidx-activity = { module = "androidx.activity:activity", version.ref = "activity" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
-androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
-androidx-material-icons-extended-v143 = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtendedVersion" }
-coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+androidx-material-icons-extended-v167 = { module = "androidx.compose.material:material-icons-extended", version.ref = "androidxMaterialIconsExtended" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 coil-compose-v260 = { module = "io.coil-kt:coil-compose", version.ref = "coilComposeVersion" }
-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterJson" }
-converter-json = { module = "com.squareup.retrofit2:converter-json", version.ref = "converterJson" }
-glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

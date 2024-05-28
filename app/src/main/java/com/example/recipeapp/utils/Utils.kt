@@ -58,16 +58,15 @@ object Utils {
     )
 
     fun formatFloatToString(number: Float): String {
-        val fractionStr = convertToFraction(number)
         if (number < 1) {
-            if (fractionStr != null) return ""
             return String.format("%.1f", number).replace(",", ".")
         } else {
             return String.format("%.0f", number)
         }
     }
 
-    fun convertToFraction(number: Float): String? {
+    fun convertToFraction(number: Float): String {
+        Log.d("FractionCreation", "Creating fraction for: $number")
         val decimal = number - number.toInt()
         val fractionRanges = listOf(
             Fraction(0.24f..0.26f, "1/4"),
@@ -79,11 +78,15 @@ object Utils {
         if (number < 100) {
             fractionRanges.forEach {
                 if (decimal in it.range) {
-                    return it.fraction
+                    if (number.toInt() >= 1) {
+                        return "${number.toInt()} ${it.fraction}"
+                    } else {
+                        return it.fraction
+                    }
                 }
             }
         }
-        return null
+        return formatFloatToString(number)
     }
 
     fun checkInternetConnection(context: Context): Boolean {

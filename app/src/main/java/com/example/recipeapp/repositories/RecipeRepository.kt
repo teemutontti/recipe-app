@@ -1,18 +1,12 @@
 package com.example.recipeapp.repositories
 
-import android.content.Context
-import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.lifecycle.ViewModel
-import com.example.recipeapp.BuildConfig.API_KEY
-import com.example.recipeapp.services.RetrofitInstance
-import com.example.recipeapp.utils.SharedPreferencesManager
-import com.example.recipeapp.api.Recipe
-import com.example.recipeapp.api.SearchResponse
-import com.example.recipeapp.utils.CachedRecipe
-import retrofit2.Response
+interface RecipeRepository<T> {
+    suspend fun add(recipe: T)
+    suspend fun update(recipe: T)
+    suspend fun delete(recipe: T)
+}
 
+/*
 object RecipeRepository: ViewModel() {
     private val TODAYS_SPECIALS = listOf("breakfast", "lunch", "dinner", "snack")
 
@@ -243,3 +237,4 @@ object RecipeRepository: ViewModel() {
         _recipeInAddition = newRecipe
     }
 }
+*/

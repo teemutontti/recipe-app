@@ -3,6 +3,10 @@ package com.example.recipeapp.utils
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.util.Log
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.example.recipeapp.models.room.PersonalRecipe
 
 object Utils {
@@ -19,6 +23,9 @@ object Utils {
 
     val INGREDIENT_UNITS = listOf("ml", "l", "tsp", "tbsp", "mg", "g", "kg", "pinch", "piece")
     val SPECIAL_MEAL_TYPES = listOf("breakfast", "lunch", "dinner", "snack")
+    val DEFAULT_TEXT_STYLE = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal)
+    val SMALL_HEADING_STYLE = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+    val LARGE_HEADING_STYLE = TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Bold, )
     const val LANDSCAPE_ASPECT_RATIO: Float = 1.7777778f
     const val IMAGE_WIDTH: Int = 288
     const val IMAGE_HEIGHT: Int = 162

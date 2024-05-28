@@ -3,15 +3,7 @@ package com.example.recipeapp.utils
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
-import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import com.example.recipeapp.api.Ingredient
-import com.example.recipeapp.api.Measures
-import com.example.recipeapp.api.Recipe
-import com.example.recipeapp.api.SingleMeasure
-import com.example.recipeapp.api.Step
+import com.example.recipeapp.models.room.PersonalRecipe
 
 object Utils {
     private var _id: Int = 0
@@ -26,6 +18,7 @@ object Utils {
     }
 
     val INGREDIENT_UNITS = listOf("ml", "l", "tsp", "tbsp", "mg", "g", "kg", "pinch", "piece")
+    val SPECIAL_MEAL_TYPES = listOf("breakfast", "lunch", "dinner", "snack")
     const val LANDSCAPE_ASPECT_RATIO: Float = 1.7777778f
     const val IMAGE_WIDTH: Int = 288
     const val IMAGE_HEIGHT: Int = 162
@@ -48,40 +41,13 @@ object Utils {
         }
     }
 
-    val emptyRecipe = Recipe(
+    val emptyRecipe = PersonalRecipe(
         id = -1,
         title = "",
         image = "",
-        servings = -1,
-        readyInMinutes = -1,
-        license = "",
-        sourceName = "",
-        sourceUrl = "",
-        extendedIngredients = listOf(),
-        instructions = "",
-        analyzedInstructions = listOf()
-    )
-    val emptyIngredient = Ingredient(
-        name = "",
-        measures = Measures(
-            metric = SingleMeasure(
-                amount = 1.0,
-                unitShort = ""
-            ),
-            us = SingleMeasure(
-                amount = 1.0,
-                unitShort = "",
-            )
-        ),
-    )
-    val emptyInstructionStep = Step(
-        number = 1,
-        step = ""
-    )
-    val emptyAddableIngredient = AddableIngredient(
-        name = "",
-        amount = 1,
-        unit = ""
+        servings = 1,
+        ingredients = emptyList(),
+        instructions = emptyList(),
     )
 
     fun formatFloatToString(number: Float): String {
@@ -131,3 +97,8 @@ object Utils {
         return false
     }
 }
+
+data class Fraction(
+    val range: ClosedFloatingPointRange<Float>,
+    val fraction: String
+)

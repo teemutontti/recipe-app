@@ -1,11 +1,8 @@
-package com.example.recipeapp.utils
+package com.example.recipeapp.models
 
 import android.content.SharedPreferences
-import com.example.recipeapp.models.CachedRecipe
-import com.example.recipeapp.models.SharedPreferencesKeys.RECIPE_IN_EDITING
 import com.example.recipeapp.models.SharedPreferencesKeys.TODAYS_SPECIALS
 import com.example.recipeapp.models.SharedPreferencesKeys.TODAYS_SPECIALS_LAST_LOAD
-import com.example.recipeapp.models.room.PersonalRecipe
 import com.google.gson.Gson
 import java.time.LocalDate
 
@@ -24,18 +21,6 @@ object SharedPreferencesManager {
         val json: String? = prefs.getString(TODAYS_SPECIALS, null)
         if (json != null) {
             return Gson().fromJson(json, Array<CachedRecipe>::class.java).toList()
-        }
-        return null
-    }
-
-    fun saveRecipeInEditing(prefs: SharedPreferences, recipe: PersonalRecipe) {
-        prefs.edit().putString(RECIPE_IN_EDITING, Gson().toJson(recipe)).apply()
-    }
-
-    fun getRecipeInEditing(prefs: SharedPreferences): PersonalRecipe? {
-        val json: String? = prefs.getString(RECIPE_IN_EDITING, null)
-        if (json != null) {
-            return Gson().fromJson(json, PersonalRecipe::class.java)
         }
         return null
     }

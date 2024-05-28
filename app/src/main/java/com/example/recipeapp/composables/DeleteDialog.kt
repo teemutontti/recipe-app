@@ -33,15 +33,19 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.repositories.RecipeRepository
+import com.example.recipeapp.viewmodels.PersonalRecipesViewModel
+import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 
 @Composable
 fun DeleteDialog(navController: NavController, exitDialog: () -> Unit) {
-    val context = ApplicationContext.current
-    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
+    val personalRecipesViewModel: PersonalRecipesViewModel = viewModel(LocalContext.current as ComponentActivity)
+    val recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel = viewModel(LocalContext.current as ComponentActivity)
 
     fun handleDelete() {
         exitDialog()
-        recipeViewModel.deleteOwnRecipe(context)
+        recipeUnderInspectionViewModel.recipe?.let {
+            personalRecipesViewModel.delete(recipeUnderInspectionViewModel.recipe!!)
+        }
         navController.navigate("cookbook")
     }
 

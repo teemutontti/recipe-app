@@ -1,29 +1,20 @@
 package com.example.recipeapp.composables
 
-import android.hardware.SensorAdditionalInfo
+import android.content.Context
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -39,41 +30,42 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
+import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.R
-import com.example.recipeapp.api.Recipe
-import com.example.recipeapp.repositories.RecipeRepository
-import com.example.recipeapp.utils.CachedRecipe
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.recipeapp.models.CachedRecipe
+import com.example.recipeapp.models.SharedPreferencesKeys.PREFS_NAME
+import com.example.recipeapp.models.room.FavouriteRecipe
+import com.example.recipeapp.models.room.PersonalRecipe
+import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 
 @Composable
 fun RecipeButton(
     navController: NavController,
     apiRecipe: CachedRecipe? = null,
-    ownRecipe: Recipe? = null,
+    ownRecipe: PersonalRecipe? = null,
 ) {
+    val recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel = viewModel()
+
     var loading by remember { mutableStateOf(true) }
     var imageError by remember { mutableStateOf(false) }
-    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
+
+    LaunchedEffect(Unit) {
+        Log.d("RecipeButton", "apiRecipe: $apiRecipe")
+        Log.d("RecipeButton", "ownRecipe: $ownRecipe")
+    }
 
     fun handleRecipeClick() {
         if (apiRecipe != null) {
             navController.navigate("recipe/${apiRecipe.id}")
         } else if (ownRecipe != null) {
-            recipeViewModel.setSelectedRecipe(ownRecipe)
+            recipeUnderInspectionViewModel.setRecipe(ownRecipe)
             navController.navigate("recipe/${null}")
         }
     }

@@ -1,5 +1,6 @@
 package com.example.recipeapp.composables
 
+import android.content.Context
 import android.service.autofill.OnClickAction
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -51,7 +52,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.ApplicationContext
+import com.example.recipeapp.models.SharedPreferencesKeys.PREFS_NAME
 import com.example.recipeapp.repositories.RecipeRepository
+import com.example.recipeapp.viewmodels.SearchViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,19 +64,17 @@ fun CustomSearchBar(
     onBackAction: () -> Unit = {},
     onSearchAction: () -> Unit = {},
 ) {
-    val context = ApplicationContext.current
+    val searchViewModel: SearchViewModel = viewModel()
+
     var loading by remember { mutableStateOf(false) }
-    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
     var query by remember { mutableStateOf("") }
 
     fun handleSearch() {
         if (query != "") {
             loading = true
             onSearchAction()
-            CoroutineScope(Dispatchers.Default).launch {
-                recipeViewModel.searchRecipes(context, query)
-                loading = false
-            }
+            searchViewModel.search(query)
+            loading = false
         }
     }
 
@@ -89,7 +90,9 @@ fun CustomSearchBar(
     ) {
         TextButton(
             contentPadding = PaddingValues(0.dp),
-            modifier = Modifier.width(32.dp).height(32.dp),
+            modifier = Modifier
+                .width(32.dp)
+                .height(32.dp),
             onClick = {
                 if (query != "") {
                     onBackAction()

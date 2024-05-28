@@ -23,14 +23,6 @@ import com.example.recipeapp.utils.Utils
 @Composable
 fun App(applicationContext: Context) {
     val navController = rememberNavController()
-    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
-
-    LaunchedEffect(Unit) {
-        val maxId = recipeViewModel.getOwnRecipesMaxId(applicationContext)
-        if (maxId != null) {
-            Utils.setId(maxId)
-        }
-    }
 
     CompositionLocalProvider(ApplicationContext provides applicationContext) {
         NavHost(navController = navController, startDestination = "discover") {

@@ -2,21 +2,21 @@ package com.example.recipeapp.composables
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
-import com.example.recipeapp.api.Recipe
-import com.example.recipeapp.repositories.RecipeRepository
-import com.example.recipeapp.utils.CachedRecipe
+import com.example.recipeapp.models.CachedRecipe
+import com.example.recipeapp.models.SpoonacularRecipe
+import com.example.recipeapp.models.room.FavouriteRecipe
+import com.example.recipeapp.models.room.PersonalRecipe
 
 @Composable
 fun RecipeList(
     navController: NavController,
     apiRecipes: List<CachedRecipe>? = null,
-    ownRecipes: List<Recipe>? = null,
+    ownRecipes: List<PersonalRecipe>? = null,
     onEmpty: @Composable () -> Unit = {},
 ) {
     if (apiRecipes != null) {

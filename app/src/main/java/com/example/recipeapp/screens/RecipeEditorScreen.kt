@@ -1,9 +1,6 @@
 package com.example.recipeapp.screens
 
 import android.content.Intent
-import android.net.Uri
-import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -44,8 +41,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,7 +53,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -68,31 +64,31 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.R
-import com.example.recipeapp.api.Instructions
-import com.example.recipeapp.api.Step
 import com.example.recipeapp.composables.IngredientForm
 import com.example.recipeapp.composables.NumberCounter
 import com.example.recipeapp.composables.RecipeImage
 import com.example.recipeapp.composables.StepIndicator
-import com.example.recipeapp.repositories.RecipeRepository
+import com.example.recipeapp.models.room.PersonalIngredient
+import com.example.recipeapp.models.room.PersonalInstruction
 import com.example.recipeapp.utils.Utils
+import com.example.recipeapp.viewmodels.PersonalRecipesViewModel
+import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 
 @Composable
 fun RecipeEditorScreen(navController: NavController) {
-    val context = ApplicationContext.current
-    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
+    val personalRecipesViewModel: PersonalRecipesViewModel = viewModel()
+    val recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel = viewModel()
+
     var currentFormStep by remember { mutableIntStateOf(0) }
     var allowNext by remember { mutableStateOf(false) }
 
     fun onSave() {
         // TODO: Move id generation to preview step!!
-        recipeViewModel.recipeInAddition?.let {
-            // If id is -1 we know that we are editing an existing recipe
+        recipeUnderInspectionViewModel.recipe?.let {
             if (it.id == -1) {
-                val newId = Utils.getNextId()
-                recipeViewModel.addOwnRecipe(context, it.copy(id = newId))
+                personalRecipesViewModel.add(it)
             } else {
-                recipeViewModel.updateOwnRecipe(context, it.id.toInt())
+                personalRecipesViewModel.edit(it)
             }
         }
         navController.navigate("cookbook")
@@ -184,6 +180,8 @@ private fun RecipeEditorContent(
     handleAllowNextChange: (Boolean) -> Unit,
     handleStepChange: (Int) -> Unit,
 ) {
+    val viewModel: RecipeUnderInspectionViewModel = viewModel()
+
     Column(modifier = Modifier
         .padding(paddingValues)
         .verticalScroll(rememberScrollState())
@@ -198,10 +196,10 @@ private fun RecipeEditorContent(
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 when (currentFormStep) {
-                    0 -> TitleStep(handleAllowNextChange, handleStepChange)
-                    1 -> IngredientsStep { handleAllowNextChange(it) }
-                    2 -> InstructionsStep { handleAllowNextChange(it) }
-                    3 -> PreviewStep(handleAllowNextChange, navController)
+                    0 -> TitleStep(viewModel, handleAllowNextChange, handleStepChange)
+                    1 -> IngredientsStep(viewModel, handleAllowNextChange)
+                    2 -> InstructionsStep(viewModel, handleAllowNextChange)
+                    3 -> PreviewStep(viewModel, handleAllowNextChange, navController)
                 }
             }
         }
@@ -209,13 +207,38 @@ private fun RecipeEditorContent(
 }
 
 @Composable
-private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int) -> Unit) {
-    val context = ApplicationContext.current
-    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
-    var title by remember { mutableStateOf(recipeViewModel.recipeInAddition?.title ?: "") }
-    var servings by remember { mutableIntStateOf(recipeViewModel.recipeInAddition?.servings?.toInt() ?: 1) }
-    var imageUri: Uri? by remember { mutableStateOf(null) }
+private fun TitleStep(
+    recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel,
+    handleAllowNextChange: (Boolean) -> Unit,
+    toNextStep: (Int) -> Unit
+) {
+    var title: String by remember {
+        mutableStateOf(recipeUnderInspectionViewModel.recipe.title)
+    }
+    var servings by remember {
+        mutableIntStateOf(recipeUnderInspectionViewModel.recipe.servings)
+    }
+    var image by remember {
+        mutableStateOf(recipeUnderInspectionViewModel.recipe.image)
+    }
 
+    LaunchedEffect(title, servings) {
+        val titleOk = Utils.Validator.recipeTitle(title)
+        val servingsOk = Utils.Validator.recipeServings(servings)
+
+        if (titleOk && servingsOk) {
+            val newRecipe = recipeUnderInspectionViewModel.recipe.copy(
+                title = title,
+                servings = servings
+            )
+            recipeUnderInspectionViewModel.setRecipe(newRecipe)
+            handleAllowNextChange(true)
+        } else {
+            handleAllowNextChange(false)
+        }
+    }
+
+    val context = ApplicationContext.current
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = {
@@ -225,9 +248,8 @@ private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int
                     it,
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
-
-                // Update state
-                imageUri = it
+                // Saving image uri string
+                image = it.toString()
             }
        },
     )
@@ -238,27 +260,6 @@ private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int
     
     fun handleTakePhoto() {
         // TODO: Add functionality
-    }
-
-    LaunchedEffect(key1 = title, key2 = servings, key3 = imageUri) {
-        if (Utils.Validator.recipeTitle(title) && Utils.Validator.recipeServings(servings)) {
-            if (recipeViewModel.recipeInAddition == null) {
-                recipeViewModel.setRecipeInAddition(Utils.emptyRecipe)
-            }
-
-            recipeViewModel.recipeInAddition?.let {
-                recipeViewModel.setRecipeInAddition(
-                    it.copy(
-                        title = title,
-                        servings = servings,
-                        image = imageUri.toString()
-                    )
-                )
-            }
-            handleAllowNextChange(true)
-        }
-        Log.d("RecipeEditor", "Image uri: ${imageUri}")
-        Log.d("RecipeEditor", "Image uri: ${imageUri.toString()}")
     }
 
     Text(
@@ -309,8 +310,11 @@ private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int
             contentAlignment = Alignment.Center,
             modifier = Modifier.height(Utils.IMAGE_HEIGHT.dp)
         ) {
-            if (imageUri == null) RecipeImage(painter = painterResource(id = R.drawable.meal))
-            else RecipeImage(model = imageUri)
+            if (image == "") {
+                RecipeImage(painter = painterResource(id = R.drawable.meal))
+            } else {
+                RecipeImage(model = image)
+            }
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
@@ -333,88 +337,77 @@ private fun TitleStep(handleAllowNextChange: (Boolean) -> Unit, toNextStep: (Int
 }
 
 @Composable
-private fun IngredientsStep(handleAllowNextChange: (Boolean) -> Unit) {
-    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
-    val ingredients = remember { mutableStateOf(
-        recipeViewModel.recipeInAddition?.extendedIngredients ?: listOf()
-    )}
-
-    LaunchedEffect(key1 = ingredients.value) {
-        if (ingredients.value.isNotEmpty()) {
-            handleAllowNextChange(true)
-        } else {
+private fun IngredientsStep(
+    recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel,
+    handleAllowNextChange: (Boolean) -> Unit
+) {
+    LaunchedEffect(recipeUnderInspectionViewModel.recipe) {
+        if (recipeUnderInspectionViewModel.recipe.ingredients.isEmpty()) {
             handleAllowNextChange(false)
+        } else {
+            handleAllowNextChange(true)
         }
     }
 
-    fun addIngredient() {
-        recipeViewModel.recipeInAddition?.extendedIngredients?.let {
-            ingredients.value = it
-        }
+    fun handleIngredientAdd(ingredient: PersonalIngredient) {
+        recipeUnderInspectionViewModel.addIngredient(ingredient)
     }
 
     fun handleIngredientDelete(index: Int) {
-        val newIngredients = ingredients.value.toMutableList()
-        newIngredients.removeAt(index)
-        ingredients.value = newIngredients
-
-        recipeViewModel.recipeInAddition?.let { recipe ->
-            recipeViewModel.setRecipeInAddition(
-                recipe.copy(extendedIngredients = newIngredients)
-            )
-        }
+        recipeUnderInspectionViewModel.deleteIngredient(index)
     }
 
-    IngredientForm(::addIngredient)
+    IngredientForm { handleIngredientAdd(it) }
 
     Spacer(modifier = Modifier.height(16.dp))
-    if (ingredients.value.isNotEmpty()) {
-        Text("Current ingredients:", style = TextStyle(fontWeight = FontWeight.SemiBold))
-        ingredients.value.forEachIndexed { index, it ->
-            key("$index-${it}") {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    if (it != null) {
-                        Text("${it.measures.metric.amount} ${it.measures.metric.unitShort}   ${it.name}")
-                        IconButton(
-                            modifier = Modifier
-                                .padding(0.dp)
-                                .height(32.dp)
-                                .width(32.dp),
-                            onClick = { handleIngredientDelete(index) }
-                        ) {
-                            Icon(
-                                Icons.Rounded.Clear,
-                                "delete",
-                                tint = MaterialTheme.colorScheme.error,
-                                modifier = Modifier
-                                    .height(24.dp)
-                                    .width(24.dp)
-                            )
-                        }
-                    }
-                }
+    Text(
+        text = "Current ingredients (${recipeUnderInspectionViewModel.recipe.ingredients.size}):",
+        style = TextStyle(fontWeight = FontWeight.SemiBold)
+    )
+    recipeUnderInspectionViewModel.recipe.ingredients.mapIndexed { index, ingredient ->
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("${ingredient.amount} ${ingredient.unit}   ${ingredient.name}")
+            IconButton(
+                modifier = Modifier
+                    .padding(0.dp)
+                    .height(32.dp)
+                    .width(32.dp),
+                onClick = { handleIngredientDelete(index) }
+            ) {
+                Icon(
+                    Icons.Rounded.Clear,
+                    "delete",
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier
+                        .height(24.dp)
+                        .width(24.dp)
+                )
             }
         }
     }
 }
 
 @Composable
-private fun InstructionsStep(handleAllowNextChange: (Boolean) -> Unit) {
-    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
+private fun InstructionsStep(
+    recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel,
+    handleAllowNextChange: (Boolean) -> Unit
+) {
     var text by remember { mutableStateOf("") }
-    val instructions = remember { mutableStateOf(
-        recipeViewModel.recipeInAddition?.analyzedInstructions ?: listOf()
-    )}
+    val instructions = remember { mutableStateListOf<PersonalInstruction>() }
 
-    LaunchedEffect(key1 = instructions.value) {
-        if (instructions.value.isNotEmpty()) {
-            if (instructions.value.last().steps.isNotEmpty()) {
-                handleAllowNextChange(true)
-            }
+    LaunchedEffect(Unit) {
+        instructions.addAll(recipeUnderInspectionViewModel.recipe.instructions)
+    }
+
+    LaunchedEffect(instructions) {
+        if (instructions.size > 0) {
+            handleAllowNextChange(true)
+        } else {
+            handleAllowNextChange(false)
         }
     }
 
@@ -425,31 +418,19 @@ private fun InstructionsStep(handleAllowNextChange: (Boolean) -> Unit) {
 
             // Generating the next steps number
             val nextNumber =
-                if (instructions.value.isEmpty()) 1
-                else instructions.value.last().steps.lastIndex + 2
+                if (instructions.isEmpty()) 1
+                else instructions.size + 1
 
-            val newInstructions: MutableList<Instructions> = instructions.value.toMutableList()
-
-            // If instructions are found we have to do some more complex logic for adding
-            // instruction steps.
-            if (newInstructions.size > 0) {
-                val lastIndex = newInstructions.lastIndex
-                val newSteps: MutableList<Step> = newInstructions[lastIndex].steps.toMutableList()
-                newSteps.add(Step(number = nextNumber, step = text))
-                newInstructions[lastIndex] = newInstructions[lastIndex].copy(steps = newSteps)
-            } else {
-                newInstructions.add(
-                    Instructions(name = "", steps = listOf(Step(number = nextNumber, step = text)))
-                )
-            }
+            val newInstruction = PersonalInstruction(
+                number = nextNumber,
+                step = text
+            )
 
             // Setting instructions state
-            instructions.value = newInstructions
+            instructions.add(newInstruction)
 
-            // Saving analyzedInstructions in viewModel to persist the data on step navigations
-            recipeViewModel.recipeInAddition?.let {
-                recipeViewModel.setRecipeInAddition(it.copy(analyzedInstructions = newInstructions))
-            }
+            // Setting state in viewModel
+            recipeUnderInspectionViewModel.addInstruction(newInstruction)
 
             // Setting the text-field text state to null
             text = ""
@@ -492,46 +473,45 @@ private fun InstructionsStep(handleAllowNextChange: (Boolean) -> Unit) {
     }
 
     Spacer(modifier = Modifier.height(24.dp))
-    instructions.value.forEachIndexed { index1, instruction ->
+    Text(
+        text = "Current instructions",
+        style = TextStyle(fontWeight = FontWeight.SemiBold)
+    )
+    instructions.forEach { instruction ->
         Column {
-            Text(
-                text = "Current instructions${if (instruction.name.isNotEmpty()) " (${instruction.name}):" else ":"}",
-                style = TextStyle(fontWeight = FontWeight.SemiBold)
-            )
             Spacer(modifier = Modifier.height(8.dp))
-            instruction.steps.forEachIndexed { index2, step ->
-                Row {
-                    Text(
-                        text = "${step.number}",
-                        modifier = Modifier
-                            .width(24.dp)
-                            .height(24.dp),
-                        style = TextStyle(
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
+            Row {
+                Text(
+                    text = "${instruction.number}",
+                    modifier = Modifier
+                        .width(24.dp)
+                        .height(24.dp),
+                    style = TextStyle(
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.secondary
                     )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(text = step.step, modifier = Modifier.padding(top = 2.dp))
-                }
-                Spacer(modifier = Modifier.height(16.dp))
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(text = instruction.step, modifier = Modifier.padding(top = 2.dp))
             }
+            Spacer(modifier = Modifier.height(16.dp))
+
         }
     }
 }
 
 @Composable
-private fun PreviewStep(handleAllowNextChange: (Boolean) -> Unit, navController: NavController) {
-    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
+private fun PreviewStep(
+    recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel,
+    handleAllowNextChange: (Boolean) -> Unit,
+    navController: NavController
+) {
     var showPreview by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        recipeViewModel.recipeInAddition?.let {
-            recipeViewModel.setSelectedRecipe(it)
-            handleAllowNextChange(true)
-        }
+        handleAllowNextChange(true)
     }
 
     Text(
@@ -548,7 +528,7 @@ private fun PreviewStep(handleAllowNextChange: (Boolean) -> Unit, navController:
                 color = Color.Gray.copy(alpha = 0.8f)
             )
         )
-        Text("${recipeViewModel.recipeInAddition?.title}")
+        Text(recipeUnderInspectionViewModel.recipe.title)
     }
     Spacer(modifier = Modifier.height(8.dp))
     Column {
@@ -559,7 +539,7 @@ private fun PreviewStep(handleAllowNextChange: (Boolean) -> Unit, navController:
                 color = Color.Gray.copy(alpha = 0.8f)
             )
         )
-        Text("${recipeViewModel.recipeInAddition?.image}")
+        Text(recipeUnderInspectionViewModel.recipe.image)
     }
     Spacer(modifier = Modifier.height(8.dp))
     Column {
@@ -570,7 +550,7 @@ private fun PreviewStep(handleAllowNextChange: (Boolean) -> Unit, navController:
                 color = Color.Gray.copy(alpha = 0.8f)
             )
         )
-        Text("${recipeViewModel.recipeInAddition?.servings}")
+        Text("${recipeUnderInspectionViewModel.recipe.servings}")
     }
     Spacer(modifier = Modifier.height(8.dp))
     Column {
@@ -582,8 +562,8 @@ private fun PreviewStep(handleAllowNextChange: (Boolean) -> Unit, navController:
             )
         )
         Column {
-            recipeViewModel.recipeInAddition?.extendedIngredients?.forEach {
-                Text("${it.measures.metric.amount} ${it.measures.metric.unitShort}  ${it.name}")
+            recipeUnderInspectionViewModel.recipe.ingredients.forEach {
+                Text("${it.amount} ${it.unit}  ${it.name}")
             }
         }
     }
@@ -597,12 +577,10 @@ private fun PreviewStep(handleAllowNextChange: (Boolean) -> Unit, navController:
             )
         )
         Column {
-            recipeViewModel.recipeInAddition?.analyzedInstructions?.forEach { it1 ->
-                it1.steps.forEach { it2 ->
-                    Row {
-                        Text("${it2.number}")
-                        Text(it2.step)
-                    }
+            recipeUnderInspectionViewModel.recipe.instructions.forEach { instruction ->
+                Row {
+                    Text("${instruction.number}")
+                    Text(instruction.step)
                 }
             }
         }

@@ -1,23 +1,17 @@
 package com.example.recipeapp.screens
 
+import android.content.Context
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -25,11 +19,9 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarBorder
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -44,35 +36,36 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
+import androidx.room.Room
 import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.R
-import com.example.recipeapp.api.Ingredient
 import com.example.recipeapp.composables.DeleteDialog
 import com.example.recipeapp.composables.NumberCounter
 import com.example.recipeapp.composables.RecipeImage
 import com.example.recipeapp.composables.UserFeedbackMessage
+import com.example.recipeapp.models.SharedPreferencesKeys.PREFS_NAME
+import com.example.recipeapp.models.room.AppDatabase
+import com.example.recipeapp.models.room.DatabaseProvider
+import com.example.recipeapp.models.room.PersonalIngredient
+import com.example.recipeapp.models.room.PersonalRecipe
 import com.example.recipeapp.repositories.RecipeRepository
 import com.example.recipeapp.utils.Utils
+import com.example.recipeapp.viewmodels.FavouriteRecipesViewModel
+import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 
 @Composable
 fun RecipeScreen(
@@ -80,16 +73,15 @@ fun RecipeScreen(
     apiRecipeId: Int? = null,
     preview: Boolean = false
 ) {
-    val context = ApplicationContext.current
-    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
+    val recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel = viewModel()
+    val favouriteRecipesViewModel: FavouriteRecipesViewModel = viewModel()
 
     // State declarations
-    var loading by remember { mutableStateOf(true) }
     var imageLoading by remember { mutableStateOf(true) }
     var isFavourite by remember { mutableStateOf(false) }
     var showMore by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
-    val ingredients = remember { mutableStateListOf<Ingredient>() }
+    val ingredients = remember { mutableStateListOf<PersonalIngredient>() }
     var showServingsChangedNotice by remember { mutableStateOf(false) }
 
     val titleStyle = SpanStyle(
@@ -106,33 +98,30 @@ fun RecipeScreen(
     LaunchedEffect(Unit) {
         if (apiRecipeId != null) {
             // Fetching recipe from API
-            recipeViewModel.fetchRecipeById(context, apiRecipeId)
+            recipeUnderInspectionViewModel.fetch(apiRecipeId)
 
             // Checking if the recipe is a favourite and updating state based on it
-            if (recipeViewModel.favourites.map { it.id.toInt() }.contains(apiRecipeId)) {
-                isFavourite = true
-            }
+            val recipeIds = favouriteRecipesViewModel.recipes.map { it.id }
+            isFavourite = recipeIds.contains(apiRecipeId)
+        } else {
+            recipeUnderInspectionViewModel.setLoadingDone()
         }
+
         // Setting ingredients state so that servings size can be modified
-        recipeViewModel.selectedRecipe?.extendedIngredients?.forEach {
-            ingredients.add(it)
-        }
-        loading = false
+        ingredients.addAll(recipeUnderInspectionViewModel.recipe.ingredients)
     }
 
     fun handleFavouriteClick() {
-        if (recipeViewModel.selectedRecipe != null) {
-            isFavourite = !isFavourite
-            if (isFavourite) {
-                recipeViewModel.addFavourite(context, recipeViewModel.selectedRecipe!!)
-            } else {
-                recipeViewModel.deleteFavourite(context, recipeViewModel.selectedRecipe!!)
-            }
+        isFavourite = !isFavourite
+        val recipe = recipeUnderInspectionViewModel.recipe
+        if (isFavourite) {
+            favouriteRecipesViewModel.add(recipe.toFavouriteRecipe())
+        } else {
+            favouriteRecipesViewModel.delete(recipe.toFavouriteRecipe())
         }
     }
 
     fun handleEditClick() {
-        recipeViewModel.setRecipeInAddition(recipeViewModel.selectedRecipe)
         navController.navigate("recipe_editor")
     }
 
@@ -141,30 +130,23 @@ fun RecipeScreen(
     }
 
     fun calculateIngredients(newServings: Int) {
-        showServingsChangedNotice = newServings != recipeViewModel.selectedRecipe?.servings?.toInt()
+        val recipe = recipeUnderInspectionViewModel.recipe
+        showServingsChangedNotice = newServings != recipe.servings
 
-        val ingredientsPerServing = recipeViewModel.selectedRecipe?.extendedIngredients?.map {
-            it.measures.metric.amount.toFloat() / recipeViewModel.selectedRecipe!!.servings.toInt()
+        val ingredientsPerServing = recipe.ingredients.map {
+            it.amount / recipe.servings
         }
 
-        val newIngredientAmounts = ingredientsPerServing?.map { it * newServings }
-
-        val newIngredients = recipeViewModel.selectedRecipe?.extendedIngredients?.mapIndexed { index: Int, item: Ingredient ->
-            item.copy(
-                measures = item.measures.copy(
-                    metric = item.measures.metric.copy(
-                        amount = newIngredientAmounts?.get(index) ?: -1
-                    )
-                )
-            )
+        val newIngredientAmounts = ingredientsPerServing.map {
+            it * newServings
         }
 
-        if (newIngredients != null) {
-            ingredients.clear()
-            newIngredients.map {
-                ingredients.add(it)
-            }
+        val newIngredients = recipe.ingredients.mapIndexed { index: Int, item: PersonalIngredient ->
+            item.copy(amount = newIngredientAmounts[index])
         }
+
+        ingredients.clear()
+        ingredients.addAll(newIngredients)
     }
 
     Column(modifier =
@@ -173,7 +155,7 @@ fun RecipeScreen(
             .padding(32.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        if (loading) LinearProgressIndicator()
+        if (recipeUnderInspectionViewModel.loading) LinearProgressIndicator()
         else {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -186,10 +168,10 @@ fun RecipeScreen(
                     // Building annotated string for heading text with different styles
                     text = buildAnnotatedString {
                         withStyle(style = titleStyle) {
-                            append("${recipeViewModel.selectedRecipe?.title}")
+                            append(recipeUnderInspectionViewModel.recipe.title)
                         }
                         withStyle(style = subtitleStyle) {
-                            append(" #${recipeViewModel.selectedRecipe?.id}")
+                            append(" #${recipeUnderInspectionViewModel.recipe.id}")
                         }
                     },
                 )
@@ -256,14 +238,10 @@ fun RecipeScreen(
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-            // TODO: This looks stupid! Fix it!
-            if (recipeViewModel.selectedRecipe?.image != null
-                && recipeViewModel.selectedRecipe?.image != ""
-                && recipeViewModel.selectedRecipe?.image != "null"
-            ) {
+            if (recipeUnderInspectionViewModel.recipe.image != "") {
                 if (imageLoading) CircularProgressIndicator()
                 RecipeImage(
-                    model = recipeViewModel.selectedRecipe?.image,
+                    model = recipeUnderInspectionViewModel.recipe.image,
                     onLoadSuccess = { imageLoading = false }
                 )
             } else {
@@ -272,13 +250,11 @@ fun RecipeScreen(
             Spacer(modifier = Modifier.height(24.dp))
             Column {
                 // TODO: Add functionality to change the serving size
-                if (recipeViewModel.selectedRecipe?.servings != null) {
-                    NumberCounter(
-                        value = recipeViewModel.selectedRecipe?.servings!!.toInt(),
-                        suffix = "servings",
-                        onNumberChange = ::calculateIngredients,
-                    )
-                }
+                NumberCounter(
+                    value = recipeUnderInspectionViewModel.recipe.servings,
+                    suffix = "servings",
+                    onNumberChange = ::calculateIngredients,
+                )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Ingredients",
@@ -302,26 +278,24 @@ fun RecipeScreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                recipeViewModel.selectedRecipe?.analyzedInstructions?.map { instruction ->
-                    instruction.steps.map { step ->
-                        Row {
-                            Text(
-                                text = "${step.number}",
-                                modifier = Modifier
-                                    .width(24.dp)
-                                    .height(24.dp),
-                                style = TextStyle(
-                                    fontSize = 24.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    textAlign = TextAlign.Center,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
+                recipeUnderInspectionViewModel.recipe.instructions.map { instruction ->
+                    Row {
+                        Text(
+                            text = "${instruction.number}",
+                            modifier = Modifier
+                                .width(24.dp)
+                                .height(24.dp),
+                            style = TextStyle(
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.primary
                             )
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Text(text = step.step, modifier = Modifier.padding(top = 2.dp))
-                        }
-                        Spacer(modifier = Modifier.height(16.dp))
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(text = instruction.step, modifier = Modifier.padding(top = 2.dp))
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
@@ -329,8 +303,8 @@ fun RecipeScreen(
 }
 
 @Composable
-fun IngredientRow(ingredient: Ingredient) {
-    val fractionStr = Utils.convertToFraction(ingredient.measures.metric.amount.toFloat())
+fun IngredientRow(ingredient: PersonalIngredient) {
+    val fractionStr = Utils.convertToFraction(ingredient.amount)
 
     Row(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -338,12 +312,12 @@ fun IngredientRow(ingredient: Ingredient) {
             modifier = Modifier.width(104.dp)
         ) {
             if (fractionStr != null) {
-                if (ingredient.measures.metric.amount.toInt() != 0) {
-                    Text(text = "${ingredient.measures.metric.amount.toInt()}")
+                if (ingredient.amount.toInt() != 0) {
+                    Text(text = "${ingredient.amount.toInt()}")
                     Spacer(modifier = Modifier.width(4.dp))
                 }
             } else {
-                Text(text = Utils.formatFloatToString(ingredient.measures.metric.amount.toFloat()))
+                Text(text = Utils.formatFloatToString(ingredient.amount))
                 Spacer(modifier = Modifier.width(4.dp))
             }
             if (fractionStr != null) {
@@ -354,7 +328,7 @@ fun IngredientRow(ingredient: Ingredient) {
                 )
                 Spacer(modifier = Modifier.width(4.dp))
             }
-            Text(ingredient.measures.metric.unitShort)
+            Text(ingredient.unit)
         }
         Text(
             text = ingredient.name,

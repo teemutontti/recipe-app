@@ -1,5 +1,6 @@
 package com.example.recipeapp.composables
 
+import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
@@ -20,11 +21,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.recipeapp.ApplicationContext
+import com.example.recipeapp.models.SharedPreferencesKeys.PREFS_NAME
 import com.example.recipeapp.repositories.RecipeRepository
+import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 
 @Composable
 fun AddRecipeButton(navController: NavController) {
-    val recipeViewModel: RecipeRepository = viewModel(LocalContext.current as ComponentActivity)
+    val recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel = viewModel()
 
     Box(
         modifier = Modifier.padding(16.dp)
@@ -40,7 +44,7 @@ fun AddRecipeButton(navController: NavController) {
                 .clip(CircleShape)
                 .shadow(2.dp),
             onClick = {
-                recipeViewModel.setRecipeInAddition(null)
+                recipeUnderInspectionViewModel.setRecipe(null)
                 navController.navigate("recipe_editor")
             }
         ) {

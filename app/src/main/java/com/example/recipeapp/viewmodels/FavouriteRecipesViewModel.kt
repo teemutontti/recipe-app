@@ -39,7 +39,7 @@ class FavouriteRecipesViewModel(application: Application): AndroidViewModel(appl
         viewModelScope.launch {
             val allRecipes = repository.getAllRecipes()
             _recipes.addAll(allRecipes)
-            _loading.value = _recipes.size == 0
+            _loading.value = false
         }
     }
 

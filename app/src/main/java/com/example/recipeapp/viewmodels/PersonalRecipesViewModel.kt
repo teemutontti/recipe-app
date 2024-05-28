@@ -33,7 +33,7 @@ class PersonalRecipesViewModel(application: Application): AndroidViewModel(appli
         viewModelScope.launch {
             val allRecipes = repository.getAllRecipes()
             _recipes.addAll(allRecipes)
-            _loading.value = _recipes.size == 0
+            _loading.value = false
         }
     }
 

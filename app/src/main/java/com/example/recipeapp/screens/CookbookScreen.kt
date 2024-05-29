@@ -1,7 +1,5 @@
 package com.example.recipeapp.screens
 
-import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,12 +12,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -29,15 +27,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.room.Room
-import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.composables.AddRecipeButton
 import com.example.recipeapp.composables.NavBar
 import com.example.recipeapp.composables.RecipeList
 import com.example.recipeapp.composables.TopBar
 import com.example.recipeapp.models.CachedRecipe
-import com.example.recipeapp.models.SharedPreferencesKeys.PREFS_NAME
-import com.example.recipeapp.models.room.AppDatabase
 import com.example.recipeapp.viewmodels.FavouriteRecipesViewModel
 import com.example.recipeapp.viewmodels.PersonalRecipesViewModel
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
@@ -46,17 +40,13 @@ import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 fun CookbookScreen(navController: NavController) {
     Scaffold(
         topBar = { TopBar(title = "Cookbook") },
-        content = {
-            CookbookScreenContent(navController = navController, paddingValues = it)
-        },
-        bottomBar = {
-            NavBar(navController = navController, selected = "cookbook")
-        }
+        content = { CookbookScreenContent(navController, it) },
+        bottomBar = { NavBar(navController, "cookbook") }
     )
 }
 
 @Composable
-fun CookbookScreenContent(navController: NavController, paddingValues: PaddingValues) {
+private fun CookbookScreenContent(navController: NavController, paddingValues: PaddingValues) {
     var selectedTab: Int by remember { mutableIntStateOf(0) }
 
     Column(modifier = Modifier.padding(paddingValues)) {
@@ -75,38 +65,20 @@ fun CookbookScreenContent(navController: NavController, paddingValues: PaddingVa
             }
             Spacer(modifier = Modifier.height(16.dp))
             when (selectedTab) {
-                0 -> OwnRecipesTab(navController)
-                1 -> SavedRecipesTab(navController)
+                0 -> PersonalRecipesTab(navController)
+                1 -> FavouriteRecipesTab(navController)
             }
         }
     }
 }
 
 @Composable
-fun OwnRecipesTab(navController: NavController) {
-    val context = ApplicationContext.current
-    val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-    val db = Room.databaseBuilder(context, AppDatabase::class.java, "app_db").build()
-
+private fun PersonalRecipesTab(navController: NavController) {
     val personalRecipesViewModel: PersonalRecipesViewModel = viewModel()
     val recipeInEditingViewModel: RecipeUnderInspectionViewModel = viewModel()
 
-    LaunchedEffect(personalRecipesViewModel.recipes) {
-        Log.d("CookbookScreen", "personal recipes: ${personalRecipesViewModel.recipes.size}")
-        personalRecipesViewModel.recipes.forEach {
-            Log.d("CookbookScreen", "personal recipes: $it")
-        }
-    }
-
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomEnd,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
+        Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             if (personalRecipesViewModel.loading) {
                 LinearProgressIndicator()
             } else {
@@ -132,7 +104,7 @@ fun OwnRecipesTab(navController: NavController) {
 }
 
 @Composable
-fun SavedRecipesTab(navController: NavController) {
+private fun FavouriteRecipesTab(navController: NavController) {
     val favouriteRecipesViewModel: FavouriteRecipesViewModel = viewModel()
 
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {

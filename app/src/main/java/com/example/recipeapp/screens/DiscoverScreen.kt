@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.room.Room
 import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.composables.AddRecipeButton
 import com.example.recipeapp.composables.CustomSearchBar
@@ -42,12 +42,8 @@ import com.example.recipeapp.viewmodels.TodaysSpecialsViewModel
 fun DiscoverScreen(navController: NavController) {
     Scaffold(
         topBar = { TopBar(title = "Discover") },
-        content = {
-            DiscoverScreenContent(navController = navController, paddingValues = it)
-        },
-        bottomBar = {
-            NavBar(navController = navController, selected = "discover")
-        }
+        content = { DiscoverScreenContent(navController, it) },
+        bottomBar = { NavBar(navController, "discover") }
     )
 }
 
@@ -59,45 +55,23 @@ private fun DiscoverScreenContent(navController: NavController, paddingValues: P
 
     Box(
         contentAlignment = Alignment.BottomEnd,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
+        modifier = Modifier.fillMaxSize().padding(paddingValues)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
+        Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-                CustomSearchBar(
-                    onSearchAction = { showSearchPanel = true },
-                    onBackAction = { showSearchPanel = false }
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
 
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .fillMaxSize()
-            ) {
+                /* === SEARCH SECTION === */
+                CustomSearchBar({ showSearchPanel = true }, { showSearchPanel = false })
+                if (showSearchPanel) SearchPanel(navController = navController)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                /* === TODAY'S SPECIALS SECTION === */
                 if (todaysSpecialsViewModel.loading) {
                     LinearProgressIndicator()
                 } else {
-                    Column {
-                        Text(
-                            text = "Today's Specials",
-                            style = TextStyle(
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        RecipeShelf(navController, todaysSpecialsViewModel.recipes)
-                    }
-                }
-                if (showSearchPanel) {
-                    SearchPanel(navController = navController)
+                    Text("Today's Specials", style = MaterialTheme.typography.headlineMedium)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    RecipeShelf(navController, todaysSpecialsViewModel.recipes)
                 }
             }
         }

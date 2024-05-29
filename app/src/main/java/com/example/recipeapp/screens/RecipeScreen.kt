@@ -244,93 +244,41 @@ fun RecipeScreen(
                 RecipeImage(painter = painterResource(id = R.drawable.meal))
             }
             Spacer(modifier = Modifier.height(24.dp))
-            Column {
-                // TODO: Add functionality to change the serving size
-                NumberCounter(
-                    value = recipeUnderInspectionViewModel.recipe.servings,
-                    suffix = "servings",
-                    onNumberChange = ::calculateIngredients,
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Ingredients",
-                    style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
-                )
+
+            /* === SERVINGS SECTION === */
+            NumberCounter(
+                value = recipeUnderInspectionViewModel.recipe.servings,
+                suffix = "servings",
+                onNumberChange = ::calculateIngredients,
+                max = 50,
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            /* === INGREDIENTS SECTION === */
+            if (recipeUnderInspectionViewModel.recipe.ingredients.isNotEmpty()) {
+                Text("Ingredients")
                 Spacer(modifier = Modifier.height(8.dp))
-                Column {
-                    ingredients.forEach {
-                        IngredientRow(it)
-                    }
+                recipeUnderInspectionViewModel.recipe.ingredients.forEachIndexed { index, ingredient ->
+                    IngredientRow(index, ingredient)
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
                 Spacer(modifier = Modifier.height(24.dp))
-                Row(verticalAlignment = Alignment.Bottom) {
-                    Text(
-                        text = "Instructions",
-                        style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
-                    )
-                    if (showServingsChangedNotice) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                        UserFeedbackMessage("Serving size changed", type = "warning")
-                    }
+            }
+
+            /* === INSTRUCTIONS SECTION === */
+            if (recipeUnderInspectionViewModel.recipe.instructions.isNotEmpty()) {
+                Text("Instructions")
+                if (showServingsChangedNotice) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    UserFeedbackMessage("Serving size changed", type = "warning")
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                recipeUnderInspectionViewModel.recipe.instructions.map { instruction ->
-                    Row {
-                        Text(
-                            text = "${instruction.number}",
-                            modifier = Modifier
-                                .width(24.dp)
-                                .height(24.dp),
-                            style = TextStyle(
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                textAlign = TextAlign.Center,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        )
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Text(text = instruction.step, modifier = Modifier.padding(top = 2.dp))
-                    }
+                recipeUnderInspectionViewModel.recipe.instructions.forEachIndexed { index, instruction ->
+                    InstructionRow(index, instruction)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
+                Spacer(modifier = Modifier.height(24.dp))
             }
         }
     }
-}
-
-@Composable
-fun IngredientRow(ingredient: PersonalIngredient) {
-    val fractionStr = Utils.convertToFraction(ingredient.amount)
-
-    Row(modifier = Modifier.fillMaxWidth()) {
-        Row(
-            verticalAlignment = Alignment.Bottom,
-            modifier = Modifier.width(104.dp)
-        ) {
-            if (fractionStr != null) {
-                if (ingredient.amount.toInt() != 0) {
-                    Text(text = "${ingredient.amount.toInt()}")
-                    Spacer(modifier = Modifier.width(4.dp))
-                }
-            } else {
-                Text(text = Utils.formatFloatToString(ingredient.amount))
-                Spacer(modifier = Modifier.width(4.dp))
-            }
-            if (fractionStr != null) {
-                Text(
-                    text = fractionStr,
-                    style = TextStyle(fontSize = 12.sp),
-                    modifier = Modifier.padding(bottom = 1.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-            }
-            Text(ingredient.unit)
-        }
-        Text(
-            text = ingredient.name,
-            modifier = Modifier.weight(1f),
-            style = TextStyle(lineHeight = 16.sp, fontSize = 16.sp)
-        )
-    }
-    Spacer(modifier = Modifier.height(6.dp))
 }

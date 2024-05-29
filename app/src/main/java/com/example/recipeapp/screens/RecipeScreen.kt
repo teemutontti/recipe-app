@@ -134,8 +134,8 @@ fun RecipeScreen(
             item.copy(amount = newIngredientAmounts[index])
         }
 
-        ingredients.clear()
-        ingredients.addAll(newIngredients)
+        val newRecipe = recipe.copy(ingredients = newIngredients, servings = newServings)
+        recipeUnderInspectionViewModel.setRecipe(newRecipe)
     }
 
     Column(modifier =

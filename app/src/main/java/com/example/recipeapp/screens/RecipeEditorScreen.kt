@@ -26,12 +26,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -57,7 +55,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -65,6 +62,8 @@ import androidx.navigation.NavController
 import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.R
 import com.example.recipeapp.composables.IngredientForm
+import com.example.recipeapp.composables.IngredientRow
+import com.example.recipeapp.composables.InstructionRow
 import com.example.recipeapp.composables.NumberCounter
 import com.example.recipeapp.composables.RecipeImage
 import com.example.recipeapp.composables.StepIndicator
@@ -83,13 +82,11 @@ fun RecipeEditorScreen(navController: NavController) {
     var allowNext by remember { mutableStateOf(false) }
 
     fun onSave() {
-        // TODO: Move id generation to preview step!!
-        recipeUnderInspectionViewModel.recipe?.let {
-            if (it.id == -1) {
-                personalRecipesViewModel.add(it)
-            } else {
-                personalRecipesViewModel.edit(it)
-            }
+        val recipe = recipeUnderInspectionViewModel.recipe
+        if (recipe.id == -1) {
+            personalRecipesViewModel.add(recipe)
+        } else {
+            personalRecipesViewModel.edit(recipe)
         }
         navController.navigate("cookbook")
     }
@@ -116,9 +113,7 @@ fun RecipeEditorScreen(navController: NavController) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                         contentDescription = "back",
-                        modifier = Modifier
-                            .height(16.dp)
-                            .width(16.dp)
+                        modifier = Modifier.height(16.dp).width(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text("Back")
@@ -138,15 +133,11 @@ fun RecipeEditorScreen(navController: NavController) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp)
+                modifier = Modifier.fillMaxWidth().padding(24.dp)
             ) {
                 if (currentFormStep > 0) {
                     Button(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(44.dp),
+                        modifier = Modifier.weight(1f).height(44.dp),
                         onClick = { handleStepChange(-1) },
                         border = BorderStroke(2.dp, MaterialTheme.colorScheme.surface),
                         colors = ButtonDefaults.buttonColors(
@@ -160,9 +151,7 @@ fun RecipeEditorScreen(navController: NavController) {
                 }
                 Button(
                     enabled = allowNext,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(44.dp),
+                    modifier = Modifier.weight(1f).height(44.dp),
                     onClick = { handleStepChange(1) }
                 ) {
                     Text(if (currentFormStep == 3) "Save" else "Next")

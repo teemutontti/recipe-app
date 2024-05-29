@@ -1,6 +1,5 @@
 package com.example.recipeapp.composables
 
-import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -35,48 +34,32 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.recipeapp.ApplicationContext
-import com.example.recipeapp.models.SharedPreferencesKeys.PREFS_NAME
 import com.example.recipeapp.models.room.PersonalIngredient
 import com.example.recipeapp.utils.Utils
-import com.example.recipeapp.utils.Utils.LARGE_HEADING_STYLE
-import com.example.recipeapp.utils.Utils.SMALL_HEADING_STYLE
-import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun IngredientForm(addIngredient: (PersonalIngredient) -> Unit) {
-    val context = ApplicationContext.current
-    val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-
-    val recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel = viewModel()
-
     var name: String by remember { mutableStateOf("") }
     var amount: Int by remember { mutableIntStateOf(1) }
     var unit: String by remember { mutableStateOf("") }
-
     var nameError by remember { mutableStateOf(false) }
     var amountError by remember { mutableStateOf(false) }
     var unitError by remember { mutableStateOf(false) }
 
     fun handleIngredientSave() {
-        // Validating inputs
         nameError = !Utils.Validator.ingredientName(name)
         amountError = !Utils.Validator.ingredientAmount(amount)
         unitError = !Utils.Validator.ingredientUnit(unit)
 
         if (!nameError && !amountError && !unitError) {
-            recipeUnderInspectionViewModel.recipe?.let {
-                // Handles the state change in parent and allows next click
-                addIngredient(
-                    PersonalIngredient(
-                        name = name,
-                        unit = unit,
-                        amount = amount.toFloat(),
-                    )
+            addIngredient(
+                PersonalIngredient(
+                    name = name,
+                    unit = unit,
+                    amount = amount.toFloat(),
                 )
-            }
+            )
         }
     }
 
@@ -85,7 +68,10 @@ fun IngredientForm(addIngredient: (PersonalIngredient) -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text("Ingredients", style = LARGE_HEADING_STYLE)
+        Text(
+            text = "Ingredients",
+            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
+        )
         TextButton(
             contentPadding = PaddingValues(horizontal = 8.dp),
             modifier = Modifier.fillMaxHeight(),
@@ -113,7 +99,6 @@ fun IngredientForm(addIngredient: (PersonalIngredient) -> Unit) {
 
     Text(
         text = "Select amount:",
-        style = SMALL_HEADING_STYLE,
         color = if (amountError) {
             MaterialTheme.colorScheme.error
         } else {
@@ -131,7 +116,6 @@ fun IngredientForm(addIngredient: (PersonalIngredient) -> Unit) {
 
     Text(
         text = "Select a unit:",
-        style = SMALL_HEADING_STYLE,
         color = if (unitError) {
             MaterialTheme.colorScheme.error
         } else {

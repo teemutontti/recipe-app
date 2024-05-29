@@ -349,33 +349,12 @@ private fun IngredientsStep(
     IngredientForm { handleIngredientAdd(it) }
 
     Spacer(modifier = Modifier.height(16.dp))
-    Text(
-        text = "Current ingredients (${recipeUnderInspectionViewModel.recipe.ingredients.size}):",
-        style = TextStyle(fontWeight = FontWeight.SemiBold)
-    )
-    recipeUnderInspectionViewModel.recipe.ingredients.mapIndexed { index, ingredient ->
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("${ingredient.amount} ${ingredient.unit}   ${ingredient.name}")
-            IconButton(
-                modifier = Modifier
-                    .padding(0.dp)
-                    .height(32.dp)
-                    .width(32.dp),
-                onClick = { handleIngredientDelete(index) }
-            ) {
-                Icon(
-                    Icons.Rounded.Clear,
-                    "delete",
-                    tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier
-                        .height(24.dp)
-                        .width(24.dp)
-                )
-            }
+
+    if (recipeUnderInspectionViewModel.recipe.ingredients.isNotEmpty()) {
+        Text("Current ingredients:")
+        Spacer(modifier = Modifier.height(8.dp))
+        recipeUnderInspectionViewModel.recipe.ingredients.mapIndexed { index, ingredient ->
+            IngredientRow(index, ingredient, handleDelete = { handleIngredientDelete(index) })
         }
     }
 }
@@ -392,8 +371,8 @@ private fun InstructionsStep(
         instructions.addAll(recipeUnderInspectionViewModel.recipe.instructions)
     }
 
-    LaunchedEffect(instructions) {
-        if (instructions.size > 0) {
+    LaunchedEffect(instructions.size) {
+        if (instructions.isNotEmpty()) {
             handleAllowNextChange(true)
         } else {
             handleAllowNextChange(false)
@@ -406,47 +385,49 @@ private fun InstructionsStep(
             text = text.replace("\n", "")
 
             // Generating the next steps number
-            val nextNumber =
-                if (instructions.isEmpty()) 1
-                else instructions.size + 1
+            val nextNumber = if (instructions.isEmpty()) 1 else instructions.size + 1
 
-            val newInstruction = PersonalInstruction(
-                number = nextNumber,
-                step = text
-            )
+            // Generating the new instruction
+            val newInstruction = PersonalInstruction(nextNumber, text)
 
-            // Setting instructions state
-            instructions.add(newInstruction)
-
-            // Setting state in viewModel
+            // Adding to viewModel state
             recipeUnderInspectionViewModel.addInstruction(newInstruction)
+
+            // Setting state in composable
+            instructions.clear()
+            instructions.addAll(recipeUnderInspectionViewModel.recipe.instructions)
 
             // Setting the text-field text state to null
             text = ""
         }
     }
 
-    fun handleIngredientDelete(index: Int) {
-        // TODO: Add delete functionality
+    fun deleteInstruction(index: Int) {
+        instructions.removeAt(index)
+
+        // Mapping instructions to set new instruction numbers
+        val newInstructions = instructions.mapIndexed { i, instruction ->
+            instruction.copy(number = i + 1)
+        }
+
+        instructions.clear()
+        instructions.addAll(newInstructions)
+
+        // Overwriting the whole recipe so instruction numbers are also updated to view model
+        val newRecipe = recipeUnderInspectionViewModel.recipe.copy(instructions = newInstructions)
+        recipeUnderInspectionViewModel.setRecipe(newRecipe)
     }
 
-    Text(
-        text = "Instructions",
-        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
-    )
-
+    Text("Instructions")
     Spacer(modifier = Modifier.height(16.dp))
-    Row(
-        modifier = Modifier.fillMaxWidth()
-    ) {
+
+    Row(modifier = Modifier.fillMaxWidth()) {
         TextField(
             value = text,
             shape = RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp, bottomEnd = 4.dp),
             onValueChange = { text = it },
             label = { Text("Text") },
-            modifier = Modifier
-                .weight(0.9f)
-                .padding(0.dp)
+            modifier = Modifier.weight(0.9f).padding(0.dp)
         )
         Button(
             onClick = ::addInstruction,
@@ -462,31 +443,12 @@ private fun InstructionsStep(
     }
 
     Spacer(modifier = Modifier.height(24.dp))
-    Text(
-        text = "Current instructions",
-        style = TextStyle(fontWeight = FontWeight.SemiBold)
-    )
-    instructions.forEach { instruction ->
-        Column {
-            Spacer(modifier = Modifier.height(8.dp))
-            Row {
-                Text(
-                    text = "${instruction.number}",
-                    modifier = Modifier
-                        .width(24.dp)
-                        .height(24.dp),
-                    style = TextStyle(
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(text = instruction.step, modifier = Modifier.padding(top = 2.dp))
-            }
-            Spacer(modifier = Modifier.height(16.dp))
 
+    if (instructions.isNotEmpty()) {
+        Text("Current instructions")
+        Spacer(modifier = Modifier.height(8.dp))
+        instructions.forEachIndexed { index, instruction ->
+            InstructionRow(index, instruction, ::deleteInstruction)
         }
     }
 }

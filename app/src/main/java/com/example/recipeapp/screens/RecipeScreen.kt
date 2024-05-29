@@ -1,8 +1,5 @@
 package com.example.recipeapp.screens
 
-import android.content.Context
-import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,40 +27,32 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.room.Room
-import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.R
 import com.example.recipeapp.composables.DeleteDialog
+import com.example.recipeapp.composables.IngredientRow
+import com.example.recipeapp.composables.InstructionRow
 import com.example.recipeapp.composables.NumberCounter
 import com.example.recipeapp.composables.RecipeImage
 import com.example.recipeapp.composables.UserFeedbackMessage
-import com.example.recipeapp.models.SharedPreferencesKeys.PREFS_NAME
-import com.example.recipeapp.models.room.AppDatabase
-import com.example.recipeapp.models.room.DatabaseProvider
 import com.example.recipeapp.models.room.PersonalIngredient
-import com.example.recipeapp.models.room.PersonalRecipe
-import com.example.recipeapp.repositories.RecipeRepository
-import com.example.recipeapp.utils.Utils
 import com.example.recipeapp.viewmodels.FavouriteRecipesViewModel
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 
@@ -81,8 +70,8 @@ fun RecipeScreen(
     var isFavourite by remember { mutableStateOf(false) }
     var showMore by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
-    val ingredients = remember { mutableStateListOf<PersonalIngredient>() }
     var showServingsChangedNotice by remember { mutableStateOf(false) }
+    var initialServings by remember { mutableIntStateOf(recipeUnderInspectionViewModel.recipe.servings) }
 
     val titleStyle = SpanStyle(
         fontSize = 32.sp,
@@ -103,12 +92,12 @@ fun RecipeScreen(
             // Checking if the recipe is a favourite and updating state based on it
             val recipeIds = favouriteRecipesViewModel.recipes.map { it.id }
             isFavourite = recipeIds.contains(apiRecipeId)
+
+            // Updating initial servings state
+            initialServings = recipeUnderInspectionViewModel.recipe.servings
         } else {
             recipeUnderInspectionViewModel.setLoadingDone()
         }
-
-        // Setting ingredients state so that servings size can be modified
-        ingredients.addAll(recipeUnderInspectionViewModel.recipe.ingredients)
     }
 
     fun handleFavouriteClick() {
@@ -131,7 +120,7 @@ fun RecipeScreen(
 
     fun calculateIngredients(newServings: Int) {
         val recipe = recipeUnderInspectionViewModel.recipe
-        showServingsChangedNotice = newServings != recipe.servings
+        showServingsChangedNotice = newServings != initialServings
 
         val ingredientsPerServing = recipe.ingredients.map {
             it.amount / recipe.servings
@@ -165,7 +154,6 @@ fun RecipeScreen(
                     overflow = TextOverflow.Visible,
                     modifier = Modifier.weight(1f),
                     style = TextStyle(lineHeight = 32.sp),
-                    // Building annotated string for heading text with different styles
                     text = buildAnnotatedString {
                         withStyle(style = titleStyle) {
                             append(recipeUnderInspectionViewModel.recipe.title)

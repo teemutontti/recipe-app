@@ -164,7 +164,10 @@ fun RecipeScreen(
                     },
                 )
                 if (apiRecipeId != null) {
-                    IconButton(onClick = { handleFavouriteClick() }) {
+                    IconButton(
+                        enabled = !preview,
+                        onClick = { handleFavouriteClick() }
+                    ) {
                         Icon(
                             imageVector =
                             if (isFavourite) Icons.Rounded.Star
@@ -178,7 +181,10 @@ fun RecipeScreen(
                     }
                 } else {
                     Column {
-                        IconButton(onClick = { showMore = !showMore }) {
+                        IconButton(
+                            enabled = !preview,
+                            onClick = { showMore = !showMore }
+                        ) {
                             Icon(Icons.Default.MoreVert, "more")
                         }
                         DropdownMenu(expanded = showMore, onDismissRequest = { showMore = false }) {
@@ -226,6 +232,8 @@ fun RecipeScreen(
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
+
+            /* === IMAGE SECTION === */
             if (recipeUnderInspectionViewModel.recipe.image != "") {
                 if (imageLoading) CircularProgressIndicator()
                 RecipeImage(

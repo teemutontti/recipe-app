@@ -61,6 +61,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.R
+import com.example.recipeapp.composables.BackButton
 import com.example.recipeapp.composables.IngredientForm
 import com.example.recipeapp.composables.IngredientRow
 import com.example.recipeapp.composables.InstructionRow
@@ -107,19 +108,7 @@ fun RecipeEditorScreen(navController: NavController) {
     }
 
     Scaffold(
-        topBar = {
-            TextButton(onClick = { navController.navigateUp() }) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                        contentDescription = "back",
-                        modifier = Modifier.height(16.dp).width(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text("Back")
-                }
-            }
-        },
+        topBar = { BackButton(navController) },
         content = {
             RecipeEditorContent(
                 navController = navController,

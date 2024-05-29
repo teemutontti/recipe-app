@@ -40,6 +40,8 @@ import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.models.SharedPreferencesKeys.PREFS_NAME
 import com.example.recipeapp.models.room.PersonalIngredient
 import com.example.recipeapp.utils.Utils
+import com.example.recipeapp.utils.Utils.LARGE_HEADING_STYLE
+import com.example.recipeapp.utils.Utils.SMALL_HEADING_STYLE
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -83,10 +85,7 @@ fun IngredientForm(addIngredient: (PersonalIngredient) -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text(
-            text = "Ingredients",
-            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
-        )
+        Text("Ingredients", style = LARGE_HEADING_STYLE)
         TextButton(
             contentPadding = PaddingValues(horizontal = 8.dp),
             modifier = Modifier.fillMaxHeight(),
@@ -114,14 +113,12 @@ fun IngredientForm(addIngredient: (PersonalIngredient) -> Unit) {
 
     Text(
         text = "Select amount:",
-        style = TextStyle(
-            color =
-            if (amountError) {
-                MaterialTheme.colorScheme.error
-            } else {
-                MaterialTheme.colorScheme.onBackground
-            }
-        )
+        style = SMALL_HEADING_STYLE,
+        color = if (amountError) {
+            MaterialTheme.colorScheme.error
+        } else {
+            MaterialTheme.colorScheme.onBackground
+        }
     )
     Spacer(modifier = Modifier.height(8.dp))
     NumberCounter(
@@ -134,16 +131,16 @@ fun IngredientForm(addIngredient: (PersonalIngredient) -> Unit) {
 
     Text(
         text = "Select a unit:",
-        style = TextStyle(color =
-        if (unitError) {
+        style = SMALL_HEADING_STYLE,
+        color = if (unitError) {
             MaterialTheme.colorScheme.error
-        }else {
+        } else {
             MaterialTheme.colorScheme.onBackground
         }
-        )
     )
     Spacer(modifier = Modifier.height(8.dp))
-    // Using FlowRow to wrap larger list to separate lines
+
+    // Using FlowRow to wrap row to separate lines on overflow
     FlowRow(
         horizontalArrangement = Arrangement.Start,
         verticalArrangement = Arrangement.Top
@@ -151,27 +148,24 @@ fun IngredientForm(addIngredient: (PersonalIngredient) -> Unit) {
         Utils.INGREDIENT_UNITS.forEach {
             TextButton(
                 shape = RoundedCornerShape(8.dp),
-                modifier = Modifier
-                    .height(32.dp)
-                    .padding(2.dp),
+                modifier = Modifier.height(32.dp).padding(2.dp),
                 contentPadding = PaddingValues(0.dp),
                 onClick = {
                     unit = it
                     unitError = false
                 },
-                colors =
-                if (unitError) {
-                    ButtonDefaults.buttonColors(
-                        contentColor = MaterialTheme.colorScheme.onError,
-                        containerColor = MaterialTheme.colorScheme.error
-                    )
-                } else {
-                    ButtonDefaults.buttonColors(
-                        contentColor = MaterialTheme.colorScheme.onBackground,
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
-                }
-                ,
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = if (unitError) {
+                        MaterialTheme.colorScheme.onError
+                    } else {
+                        MaterialTheme.colorScheme.onBackground
+                    },
+                    containerColor = if (unitError) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.surface
+                    }
+                ),
                 border = BorderStroke(
                     width = 2.dp,
                     color =

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -63,17 +64,19 @@ fun IngredientForm(addIngredient: (PersonalIngredient) -> Unit) {
         }
     }
 
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = "Ingredients",
-            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
+    Row(modifier = Modifier.fillMaxWidth()) {
+        TextField(
+            value = name,
+            label = { Text("Name") },
+            onValueChange = { name = it },
+            isError = nameError,
+            supportingText = { if (nameError) Text("Enter proper name") },
+            modifier = Modifier.weight(0.8f)
         )
         TextButton(
-            contentPadding = PaddingValues(horizontal = 8.dp),
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 16.dp),
+            shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             modifier = Modifier.fillMaxHeight(),
             onClick = { handleIngredientSave() }
         ) {
@@ -86,16 +89,6 @@ fun IngredientForm(addIngredient: (PersonalIngredient) -> Unit) {
             }
         }
     }
-
-    Spacer(modifier = Modifier.height(16.dp))
-    TextField(
-        value = name,
-        label = { Text("Name") },
-        onValueChange = { name = it },
-        isError = nameError,
-        supportingText = { if (nameError) Text("Enter proper name") }
-    )
-    Spacer(modifier = Modifier.height(16.dp))
 
     Text(
         text = "Select amount:",

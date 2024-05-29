@@ -162,23 +162,22 @@ private fun RecipeEditorContent(
 
     Column(modifier = Modifier
         .padding(paddingValues)
-        .verticalScroll(rememberScrollState())
-    ) {
-        Column(modifier = Modifier.padding(24.dp)) {
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp)
-            ) {
-                StepIndicator(
-                    steps = 0..3,
-                    currentStep = currentFormStep,
-                )
-                Spacer(modifier = Modifier.height(32.dp))
-                when (currentFormStep) {
-                    0 -> TitleStep(viewModel, handleAllowNextChange, handleStepChange)
-                    1 -> IngredientsStep(viewModel, handleAllowNextChange)
-                    2 -> InstructionsStep(viewModel, handleAllowNextChange)
-                    3 -> PreviewStep(viewModel, handleAllowNextChange, navController)
-                }
+        .verticalScroll(rememberScrollState())) {
+        Column(modifier = Modifier.padding(horizontal = 40.dp)) {
+            when (currentFormStep) {
+                0 -> Text("General", style = MaterialTheme.typography.headlineLarge)
+                1 -> Text("Ingredients", style = MaterialTheme.typography.headlineLarge)
+                2 -> Text("Instructions", style = MaterialTheme.typography.headlineLarge)
+                3 -> Text("Preview", style = MaterialTheme.typography.headlineLarge)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            StepIndicator(0..3, currentFormStep)
+            Spacer(modifier = Modifier.height(32.dp))
+            when (currentFormStep) {
+                0 -> TitleStep(viewModel, handleAllowNextChange, handleStepChange)
+                1 -> IngredientsStep(viewModel, handleAllowNextChange)
+                2 -> InstructionsStep(viewModel, handleAllowNextChange)
+                3 -> PreviewStep(viewModel, handleAllowNextChange, navController)
             }
         }
     }

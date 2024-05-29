@@ -239,11 +239,7 @@ private fun TitleStep(
         // TODO: Add functionality
     }
 
-    Text(
-        text = "Title & Image",
-        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
-    )
-    Spacer(modifier = Modifier.height(16.dp))
+    /* === TITLE SECTION === */
     TextField(
         value = title,
         onValueChange = { title = it },
@@ -258,25 +254,20 @@ private fun TitleStep(
         )
     )
     Spacer(modifier = Modifier.height(24.dp))
-    Text("Set serving size:", style = TextStyle(fontWeight = FontWeight.SemiBold))
+
+    /* === SERVING SIZE SECTION === */
+    Text("Set serving size:", style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(8.dp))
     NumberCounter(
         value = servings,
         onNumberChange = { servings = it },
         max = 40
     )
-    Spacer(modifier = Modifier.height(16.dp))
-    Text("Change image:", style = TextStyle(fontWeight = FontWeight.SemiBold))
-    Spacer(modifier = Modifier.height(8.dp))
-    /* TODO: Add take a photo functionality
-    Button(
-        contentPadding = PaddingValues(horizontal = 8.dp),
-        onClick = { handleTakePhoto() }
-    ) {
-        Icon(Icons.Rounded.CameraAlt, "camera")
-        Text("Take a Photo")
-    }
-     */
+    Spacer(modifier = Modifier.height(24.dp))
+
+    /* === IMAGE SECTION === */
+    // TODO: Add take photo functionality
+    Text("Change image:", style = MaterialTheme.typography.headlineSmall)
     Spacer(modifier = Modifier.height(8.dp))
     OutlinedButton(
         shape = RoundedCornerShape(16.dp),
@@ -406,9 +397,6 @@ private fun InstructionsStep(
         recipeUnderInspectionViewModel.setRecipe(newRecipe)
     }
 
-    Text("Instructions")
-    Spacer(modifier = Modifier.height(16.dp))
-
     Row(modifier = Modifier.fillMaxWidth()) {
         TextField(
             value = text,
@@ -452,12 +440,6 @@ private fun PreviewStep(
     LaunchedEffect(Unit) {
         handleAllowNextChange(true)
     }
-
-    Text(
-        text = "Preview & Save",
-        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 32.sp)
-    )
-    Spacer(modifier = Modifier.height(16.dp))
 
     Column {
         Text(

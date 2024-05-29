@@ -104,11 +104,11 @@ fun NumberCounter(
             TextButton(
                 contentPadding = PaddingValues(0.dp),
                 shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
+                onClick = { handleNumberChange(1) },
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .width(44.dp)
-                    .height(44.dp),
-                onClick = { handleNumberChange(1) }
+                    .height(44.dp)
             ) {
                 Text("+")
             }

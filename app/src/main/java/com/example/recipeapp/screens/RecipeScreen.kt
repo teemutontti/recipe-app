@@ -146,7 +146,7 @@ fun RecipeScreen(
                             append(recipe.title)
                         }
                         withStyle(style = subtitleStyle) {
-                            append(" #${if (recipe.id == -1) "OWN" else recipe.id }")
+                            append(" #${if (recipe.id == -1) "UNKNOWN" else recipe.id }")
                         }
                     },
                 )

@@ -1,52 +1,62 @@
 package com.example.recipeapp.models
 
-import com.example.recipeapp.models.room.PersonalIngredient
-import com.example.recipeapp.models.room.PersonalInstruction
-import com.example.recipeapp.models.room.PersonalRecipe
+import com.example.recipeapp.models.room.FavouriteRecipe
+import com.example.recipeapp.utils.Utils.emptyRecipe
 
 data class SpoonacularRecipe(
-    override val id: Number,
-    override val title: String,
-    override val image: String,
-    override val servings: Number,
+    val id: Int,
+    val title: String,
+    val image: String,
+    val servings: Int,
     val readyInMinutes: Number,
     val license: String,
     val sourceName: String,
     val sourceUrl: String,
     val extendedIngredients: List<SpoonacularIngredient>,
-    val analyzedInstructions: List<SpoonacularInstruction>
-): Recipe {
-    fun toCachedRecipe(): CachedRecipe {
-        return CachedRecipe(
-            id = this.id.toInt(),
-            image = this.image,
-            title = this.title
-        )
-    }
-
-    fun toPersonalRecipe(): PersonalRecipe {
-        val ingredients = this.extendedIngredients.map {
-            PersonalIngredient(
-                name = it.name,
-                amount = it.measures.metric.amount.toFloat(),
-                unit = it.measures.metric.unitShort
-            )
-        }
-        val instructions = this.analyzedInstructions[0].steps.map {
-            PersonalInstruction(
-                number = it.number.toInt(),
-                step = it.step
-            )
-        }
-        return PersonalRecipe(
-            id = this.id.toInt(),
+    val analyzedInstructions: List<SpoonacularInstruction>,
+){
+    fun toRecipe(): Recipe {
+        return emptyRecipe.copy(
+            id = this.id,
             title = this.title,
             image = this.image,
-            servings = this.servings.toInt(),
-            ingredients = ingredients,
-            instructions = instructions
+            servings = this.servings,
+            ingredients = this.extendedIngredients.toIngredientList(),
+            instructions = this.analyzedInstructions.toInstructionList(),
         )
     }
+    fun toSavable(): FavouriteRecipe {
+        return FavouriteRecipe(
+            id = this.id,
+            title = this.title,
+            image = this.image,
+        )
+    }
+}
+
+private fun List<SpoonacularIngredient>.toIngredientList(): List<Ingredient> {
+    return this.map {
+        Ingredient(
+            name = it.name,
+            unit = it.measures.metric.unitShort,
+            amount = it.measures.metric.amount.toFloat()
+        )
+    }
+}
+
+private fun List<SpoonacularInstruction>.toInstructionList(): List<Instruction> {
+    val newInstructions = mutableListOf<Instruction>()
+    this.forEach { instruction ->
+        instruction.steps.forEach { step ->
+            newInstructions.add(
+                Instruction(
+                    number = step.number.toInt(),
+                    text = step.step
+                )
+            )
+        }
+    }
+    return newInstructions
 }
 
 data class SpoonacularIngredient(
@@ -75,7 +85,7 @@ data class Step(
 )
 
 data class SearchResponse(
-    val results: List<CachedRecipe>
+    val results: List<SpoonacularRecipe>
 )
 data class SpoonacularResponse(
     val recipes: List<SpoonacularRecipe>

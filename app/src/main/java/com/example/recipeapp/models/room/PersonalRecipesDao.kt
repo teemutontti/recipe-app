@@ -12,8 +12,8 @@ interface PersonalRecipeDao {
     @Query("SELECT * FROM personal_recipes")
     suspend fun getAll(): List<PersonalRecipe>
 
-    @Query("SELECT * FROM personal_recipes WHERE id == :userId")
-    suspend fun getRecipeById(userId: Int): PersonalRecipe
+    @Query("SELECT * FROM personal_recipes WHERE id == :recipeId")
+    suspend fun getRecipeById(recipeId: Int): PersonalRecipe?
 
     @Insert
     suspend fun insertRecipe(vararg recipes: PersonalRecipe)

@@ -7,7 +7,10 @@ import android.util.Log
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.recipeapp.models.Recipe
+import com.example.recipeapp.models.room.FavouriteRecipe
 import com.example.recipeapp.models.room.PersonalRecipe
+import com.example.recipeapp.utils.Utils.emptyRecipe
 
 object Utils {
     private var _id: Int = 0
@@ -48,7 +51,9 @@ object Utils {
         }
     }
 
-    val emptyRecipe = PersonalRecipe(
+
+
+    val emptyRecipe = Recipe(
         id = -1,
         title = "",
         image = "",
@@ -57,7 +62,29 @@ object Utils {
         instructions = emptyList(),
     )
 
-    fun formatFloatToString(number: Float): String {
+    // Conversion function for Jetpack Room Entity class
+    fun PersonalRecipe.toRecipe(): Recipe {
+        return emptyRecipe.copy(
+            id = this.id,
+            title = this.title,
+            image = this.image,
+            servings = this.servings,
+            ingredients = this.ingredients,
+            instructions = this.instructions,
+            isPersonalRecipe = true,
+        )
+    }
+
+    // Conversion function for Jetpack Room Entity class
+    fun FavouriteRecipe.toRecipe(): Recipe {
+        return emptyRecipe.copy(
+            id = id,
+            title = title,
+            image = image,
+        )
+    }
+
+    private fun formatFloatToString(number: Float): String {
         if (number < 1) {
             return String.format("%.1f", number).replace(",", ".")
         } else {

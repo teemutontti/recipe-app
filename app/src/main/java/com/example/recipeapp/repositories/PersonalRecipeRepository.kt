@@ -11,22 +11,63 @@ class PersonalRecipeRepository(db: AppDatabase): ManageableRecipeRepository<Pers
     private val personalRecipeDao: PersonalRecipeDao = db.personalRecipeDao()
 
     // Data fetching functions
-    override suspend fun getAll(): List<PersonalRecipe> {
-        return withContext(Dispatchers.IO) {
-            personalRecipeDao.getAll()
+    override suspend fun getAll(): ResponseHandler<List<PersonalRecipe>> {
+        return try {
+            val newRecipes = withContext(Dispatchers.IO) { personalRecipeDao.getAll() }
+            ResponseHandler(success = newRecipes)
+        } catch (e: Exception) {
+            Log.e("PersonalRecipeRepository", "getAll(): $e")
+            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
         }
+
     }
-    override suspend fun getById(id: Int): PersonalRecipe? {
-        return withContext(Dispatchers.IO) {
-            personalRecipeDao.getRecipeById(id)
+    override suspend fun getById(id: Int): ResponseHandler<PersonalRecipe?> {
+        return try {
+            val newRecipe = withContext(Dispatchers.IO) { personalRecipeDao.getRecipeById(id) }
+            ResponseHandler(success = newRecipe)
+        } catch (e: Exception) {
+            Log.e("PersonalRecipeRepository", "getById(): $e")
+            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
         }
     }
 
     // Data management functions
-    override suspend fun add(r: PersonalRecipe) = personalRecipeDao.insertRecipe(r)
-    override suspend fun delete(r: PersonalRecipe) = personalRecipeDao.deleteRecipe(r)
-    suspend fun update(r: PersonalRecipe) = personalRecipeDao.updateRecipe(r)
+    override suspend fun add(r: PersonalRecipe): ResponseHandler<PersonalRecipe?> {
+        return try {
+            personalRecipeDao.insertRecipe(r)
+            ResponseHandler() // No need for return
+        } catch (e: Exception) {
+            Log.e("PersonalRecipeRepository", "add(): $e")
+            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
+        }
+    }
+    override suspend fun delete(r: PersonalRecipe): ResponseHandler<PersonalRecipe?> {
+        return try {
+            personalRecipeDao.deleteRecipe(r)
+            ResponseHandler() // No need for return
+        } catch (e: Exception) {
+            Log.e("PersonalRecipeRepository", "delete(): $e")
+            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
+        }
+    }
+    suspend fun update(r: PersonalRecipe): ResponseHandler<PersonalRecipe?> {
+        return try {
+            personalRecipeDao.updateRecipe(r)
+            ResponseHandler()
+        } catch (e: Exception) {
+            Log.e("PersonalRecipeRepository", "update(): $e")
+            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
+        }
+    }
 
     // Utility functions
-    suspend fun isRecipeInDatabase(id: Int) = personalRecipeDao.getRecipeById(id) != null
+    suspend fun isRecipeInDatabase(id: Int): ResponseHandler<Boolean> {
+        return try {
+            val recipeFound = personalRecipeDao.getRecipeById(id) != null
+            ResponseHandler(success = recipeFound)
+        } catch (e: Exception) {
+            Log.e("PersonalRecipeRepository", "isRecipeInDatabase(): $e")
+            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
+        }
+    }
 }

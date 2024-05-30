@@ -8,7 +8,7 @@ import com.example.recipeapp.models.SharedPreferencesManager
 import com.example.recipeapp.models.SpoonacularRecipe
 import com.example.recipeapp.services.RetrofitInstance
 
-class RecipeUnderInspectionRepository(private val prefs: SharedPreferences) {
+class RecipeUnderInspectionRepository {
     suspend fun fetchRecipe(recipeId: Int): SpoonacularRecipe? {
         val response = RetrofitInstance().recipeService.getRecipeInformation(
             apiKey = BuildConfig.API_KEY,

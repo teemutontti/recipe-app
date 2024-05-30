@@ -1,10 +1,10 @@
 package com.example.recipeapp.repositories
 
 interface ManageableRecipeRepository<T> {
-    suspend fun getAll(): List<T>
-    suspend fun getById(id: Int): T?
-    suspend fun add(r: T)
-    suspend fun delete(r: T)
+    suspend fun getAll(): ResponseHandler<List<T>>
+    suspend fun getById(id: Int): ResponseHandler<T?>
+    suspend fun add(r: T): ResponseHandler<T?>
+    suspend fun delete(r: T): ResponseHandler<T?>
 }
 
 /*

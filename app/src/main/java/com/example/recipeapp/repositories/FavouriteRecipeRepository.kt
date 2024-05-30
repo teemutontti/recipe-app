@@ -1,5 +1,6 @@
 package com.example.recipeapp.repositories
 
+import android.util.Log
 import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.models.room.AppDatabase
 import com.example.recipeapp.models.room.FavouriteRecipe
@@ -11,18 +12,42 @@ class FavouriteRecipeRepository(db: AppDatabase): ManageableRecipeRepository<Fav
     private var favouriteRecipeDao: FavouriteRecipeDao = db.favouriteRecipeDao()
 
     // Data fetching functions
-    override suspend fun getAll(): List<FavouriteRecipe> {
-        return withContext(Dispatchers.IO) {
-            favouriteRecipeDao.getAll()
+    override suspend fun getAll(): ResponseHandler<List<FavouriteRecipe>> {
+        return try {
+            val newRecipes = withContext(Dispatchers.IO) { favouriteRecipeDao.getAll() }
+            ResponseHandler(success = newRecipes)
+        } catch (e: Exception) {
+            Log.e("FavouriteRecipeRepository", "getAll(): $e")
+            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
         }
     }
-    override suspend fun getById(id: Int): FavouriteRecipe? {
-        return withContext(Dispatchers.IO) {
-            favouriteRecipeDao.getRecipeById(id)
+    override suspend fun getById(id: Int): ResponseHandler<FavouriteRecipe?> {
+        return try {
+            val newRecipe = withContext(Dispatchers.IO) { favouriteRecipeDao.getRecipeById(id) }
+            ResponseHandler(success = newRecipe)
+        } catch (e: Exception) {
+            Log.e("FavouriteRecipeRepository", "getById(): $e")
+            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
         }
     }
 
     // Data management functions
-    override suspend fun add(r: FavouriteRecipe) = favouriteRecipeDao.insertRecipe(r)
-    override suspend fun delete(r: FavouriteRecipe) = favouriteRecipeDao.deleteRecipe(r)
+    override suspend fun add(r: FavouriteRecipe): ResponseHandler<FavouriteRecipe?> {
+        return try {
+            favouriteRecipeDao.insertRecipe(r)
+            ResponseHandler()
+        } catch (e: Exception) {
+            Log.e("FavouriteRecipeRepository", "add(): $e")
+            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
+        }
+    }
+    override suspend fun delete(r: FavouriteRecipe): ResponseHandler<FavouriteRecipe?> {
+        return try {
+            favouriteRecipeDao.deleteRecipe(r)
+            ResponseHandler()
+        } catch (e: Exception) {
+            Log.e("FavouriteRecipeRepository", "delete(): $e")
+            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
+        }
+    }
 }

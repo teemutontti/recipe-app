@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 interface RecipesViewModel {
     val recipes: List<Recipe>
     val loading: Boolean
+    val error: String?
     fun loadData()
     fun add(r: Recipe)
     fun delete(r: Recipe)

@@ -15,27 +15,30 @@ import com.example.recipeapp.utils.Utils.toRecipe
 import kotlinx.coroutines.launch
 
 class FavouriteRecipesViewModel(application: Application): AndroidViewModel(application), RecipesViewModel {
-    private val repository: FavouriteRecipeRepository
-    private var _recipes: SnapshotStateList<FavouriteRecipe>
-    private var _loading: MutableState<Boolean>
+    private val database = DatabaseProvider.getInstance(application.applicationContext)
+    private val repository: FavouriteRecipeRepository = FavouriteRecipeRepository(database)
+
+    private var _recipes = mutableStateListOf<FavouriteRecipe>()
+    private var _loading = mutableStateOf<Boolean>(true)
+    private var _error = mutableStateOf<String?>(null)
 
     init {
-        val database = DatabaseProvider.getInstance(application.applicationContext)
-        repository = FavouriteRecipeRepository(database)
-        _recipes = mutableStateListOf()
-        _loading = mutableStateOf(true)
         loadData()
     }
 
-    // State getters
     override val recipes get() = _recipes.map { it.toRecipe() }
     override val loading get() = _loading.value
+    override val error get() = _error.value
 
     override fun loadData() {
         viewModelScope.launch {
-            val allRecipes = repository.getAll()
-            _recipes.clear()
-            _recipes.addAll(allRecipes)
+            val responseHandler = repository.getAll()
+            if (responseHandler.success != null) {
+                _recipes.clear()
+                _recipes.addAll(responseHandler.success)
+            } else {
+                _error.value = responseHandler.error
+            }
             _loading.value = false
         }
     }
@@ -44,7 +47,8 @@ class FavouriteRecipesViewModel(application: Application): AndroidViewModel(appl
         _loading.value = true
         viewModelScope.launch {
             val favouriteRecipe = r.toFavourite()
-            repository.add(favouriteRecipe)
+            val responseHandler = repository.add(favouriteRecipe)
+            if (responseHandler.error != null) _error.value = responseHandler.error
             loadData()
         }
     }
@@ -53,7 +57,8 @@ class FavouriteRecipesViewModel(application: Application): AndroidViewModel(appl
         _loading.value = true
         viewModelScope.launch {
             val favouriteRecipe = r.toFavourite()
-            repository.delete(favouriteRecipe)
+            val responseHandler = repository.delete(favouriteRecipe)
+            if (responseHandler.error != null) _error.value = responseHandler.error
             loadData()
         }
     }

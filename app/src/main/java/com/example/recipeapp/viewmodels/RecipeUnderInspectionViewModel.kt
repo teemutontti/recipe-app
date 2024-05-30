@@ -20,18 +20,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class RecipeUnderInspectionViewModel(application: Application): AndroidViewModel(application) {
-    private val repository: RecipeUnderInspectionRepository
-    private var _recipe: MutableState<Recipe>
-    private var _loading: MutableState<Boolean>
+    private val repository: RecipeUnderInspectionRepository = RecipeUnderInspectionRepository()
+    private var _recipe: MutableState<Recipe> = mutableStateOf(emptyRecipe)
+    private var _loading: MutableState<Boolean> = mutableStateOf(true)
 
-    init {
-        val prefs = application.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        repository = RecipeUnderInspectionRepository(prefs)
-        _recipe = mutableStateOf(emptyRecipe)
-        _loading = mutableStateOf(true)
-    }
-
-    // State getters
     val recipe: MutableState<Recipe> get() = _recipe
     val loading: MutableState<Boolean> get() = _loading
 

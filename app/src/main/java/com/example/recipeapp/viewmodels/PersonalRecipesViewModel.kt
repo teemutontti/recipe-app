@@ -17,27 +17,28 @@ import com.example.recipeapp.utils.Utils.toRecipe
 import kotlinx.coroutines.launch
 
 class PersonalRecipesViewModel(application: Application): AndroidViewModel(application), RecipesViewModel {
-    private val repository: PersonalRecipeRepository
-    private var _recipes: SnapshotStateList<PersonalRecipe>
-    private var _loading: MutableState<Boolean>
+    private val database = DatabaseProvider.getInstance(application.applicationContext)
+    private val repository = PersonalRecipeRepository(database)
 
-    init {
-        val database: AppDatabase = DatabaseProvider.getInstance(application.applicationContext)
-        repository = PersonalRecipeRepository(database)
-        _recipes = mutableStateListOf()
-        _loading = mutableStateOf(true)
-        loadData()
-    }
+    private var _recipes = mutableStateListOf<PersonalRecipe>()
+    private var _loading = mutableStateOf(true)
+    private var _error = mutableStateOf<String?>(null)
 
-    // State getters
+    init { loadData() }
+
     override val recipes: List<Recipe> get() = _recipes.map { it.toRecipe() }
     override val loading: Boolean get() = _loading.value
+    override val error: String? get() = _error.value
 
     override fun loadData() {
         viewModelScope.launch {
-            val allRecipes = repository.getAll()
-            _recipes.clear()
-            _recipes.addAll(allRecipes)
+            val responseHandler = repository.getAll()
+            if (responseHandler.success != null) {
+                _recipes.clear()
+                _recipes.addAll(responseHandler.success)
+            } else {
+                _error.value = responseHandler.error
+            }
             _loading.value = false
         }
     }
@@ -46,7 +47,8 @@ class PersonalRecipesViewModel(application: Application): AndroidViewModel(appli
         _loading.value = true
         viewModelScope.launch {
             val personalRecipe = r.toPersonal()
-            repository.add(personalRecipe)
+            val responseHandler = repository.add(personalRecipe)
+            if (responseHandler.error != null) _error.value = responseHandler.error
             loadData()
         }
     }
@@ -54,7 +56,8 @@ class PersonalRecipesViewModel(application: Application): AndroidViewModel(appli
     override fun delete(r: Recipe) {
         _loading.value = true
         viewModelScope.launch {
-            repository.delete(r.toPersonal())
+            val responseHandler = repository.delete(r.toPersonal())
+            if (responseHandler.error != null) _error.value = responseHandler.error
             loadData()
         }
     }
@@ -62,7 +65,8 @@ class PersonalRecipesViewModel(application: Application): AndroidViewModel(appli
     fun edit(r: Recipe) {
         _loading.value = true
         viewModelScope.launch {
-            repository.update(r.toPersonal())
+            val responseHandler = repository.update(r.toPersonal())
+            if (responseHandler.error != null) _error.value = responseHandler.error
             loadData()
         }
     }
@@ -70,8 +74,9 @@ class PersonalRecipesViewModel(application: Application): AndroidViewModel(appli
     fun isRecipeInDatabase(recipe: Recipe, callback: (Boolean) -> Unit) {
         _loading.value = true
         viewModelScope.launch {
-            val result = repository.isRecipeInDatabase(recipe.id)
-            callback(result)
+            val responseHandler = repository.isRecipeInDatabase(recipe.id)
+            if (responseHandler.success != null) callback(responseHandler.success)
+            if (responseHandler.error != null) _error.value = responseHandler.error
             loadData()
         }
     }

@@ -2,92 +2,84 @@ package com.example.recipeapp.viewmodels
 
 import android.app.Application
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.recipeapp.models.CachedRecipe
+import com.example.recipeapp.models.Ingredient
+import com.example.recipeapp.models.Instruction
+import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.models.SharedPreferencesKeys.PREFS_NAME
-import com.example.recipeapp.models.SpoonacularInstruction
-import com.example.recipeapp.models.room.AppDatabase
-import com.example.recipeapp.models.room.DatabaseProvider
-import com.example.recipeapp.models.room.PersonalIngredient
-import com.example.recipeapp.models.room.PersonalInstruction
-import com.example.recipeapp.models.room.PersonalRecipe
 import com.example.recipeapp.repositories.RecipeUnderInspectionRepository
-import com.example.recipeapp.utils.Utils
+import com.example.recipeapp.utils.Utils.emptyRecipe
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class RecipeUnderInspectionViewModel(application: Application): AndroidViewModel(application) {
     private val repository: RecipeUnderInspectionRepository
+    private var _recipe: MutableState<Recipe>
+    private var _loading: MutableState<Boolean>
 
     init {
         val prefs = application.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         repository = RecipeUnderInspectionRepository(prefs)
+        _recipe = mutableStateOf(emptyRecipe)
+        _loading = mutableStateOf(true)
     }
 
-    // Recipe state encapsulation
-    private var _recipe = mutableStateOf<PersonalRecipe?>(null)
-    val recipe: PersonalRecipe get() = _recipe.value ?: Utils.emptyRecipe
+    // State getters
+    val recipe: MutableState<Recipe> get() = _recipe
+    val loading: MutableState<Boolean> get() = _loading
 
-    // Loading state encapsulation
-    private val _loading = mutableStateOf(true)
-    val loading: Boolean get() = _loading.value
-
-    fun setRecipe(newRecipe: PersonalRecipe?) {
-        Log.d("Underrrr", "Setting recipe: $newRecipe")
-        _recipe.value = newRecipe
-        _loading.value = _recipe.value == null
-        Log.d("Underrrr", "Setting recipe: ${_recipe.value}")
+    fun setRecipe(newRecipe: Recipe?) {
+        viewModelScope.launch {
+            _recipe.value = newRecipe ?: emptyRecipe
+            delay(125) // Adding small delay to get rid of loading bar flashing
+            _loading.value = false
+        }
     }
 
-    fun fetch(recipeId: Int) {
+    fun fetchRecipe(id: Int) {
+        _loading.value = true
         viewModelScope.launch(Dispatchers.IO) {
-            Log.d("ASYNC", "Working in: $this")
-            val newRecipe = repository.fetchRecipe(recipeId)?.toPersonalRecipe()
+            val newRecipe = repository.fetchRecipe(id)?.toRecipe()
             setRecipe(newRecipe)
         }
     }
 
-    fun addIngredient(ingredient: PersonalIngredient) {
-        val newIngredients = recipe.ingredients.toMutableList()
+    fun addIngredient(ingredient: Ingredient) {
+        val newIngredients = recipe.value.ingredients.toMutableList()
         newIngredients.add(ingredient)
 
-        val newRecipe = recipe.copy(ingredients = newIngredients)
+        val newRecipe = recipe.value.copy(ingredients = newIngredients)
         setRecipe(newRecipe)
     }
 
     fun deleteIngredient(index: Int) {
-        val newIngredients = recipe.ingredients.toMutableList()
+        val newIngredients = recipe.value.ingredients.toMutableList()
         newIngredients.removeAt(index)
 
-        val newRecipe = recipe.copy(ingredients = newIngredients)
+        val newRecipe = recipe.value.copy(ingredients = newIngredients)
         setRecipe(newRecipe)
     }
 
-    fun addInstruction(instruction: PersonalInstruction) {
-        val newInstructions = recipe.instructions.toMutableList()
+    fun addInstruction(instruction: Instruction) {
+        val newInstructions = recipe.value.instructions.toMutableList()
         newInstructions.add(instruction)
 
-        val newRecipe = recipe.copy(instructions = newInstructions)
+        val newRecipe = recipe.value.copy(instructions = newInstructions)
         setRecipe(newRecipe)
     }
 
     fun deleteInstruction(index: Int) {
-        val newInstructions = recipe.instructions.toMutableList()
+        val newInstructions = recipe.value.instructions.toMutableList()
         newInstructions.removeAt(index)
 
-        val newRecipe = recipe.copy(instructions = newInstructions)
+        val newRecipe = recipe.value.copy(instructions = newInstructions)
         setRecipe(newRecipe)
-    }
-
-    fun setLoadingDone() {
-        _loading.value= false
     }
 }

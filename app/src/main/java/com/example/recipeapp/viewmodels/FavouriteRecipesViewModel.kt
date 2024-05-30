@@ -1,63 +1,60 @@
 package com.example.recipeapp.viewmodels
 
 import android.app.Application
-import android.text.Spannable.Factory
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
-import com.example.recipeapp.models.room.AppDatabase
+import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.models.room.DatabaseProvider
 import com.example.recipeapp.models.room.FavouriteRecipe
 import com.example.recipeapp.repositories.FavouriteRecipeRepository
+import com.example.recipeapp.utils.Utils.toRecipe
 import kotlinx.coroutines.launch
 
-class FavouriteRecipesViewModel(application: Application): AndroidViewModel(application) {
-    private var repository: FavouriteRecipeRepository
+class FavouriteRecipesViewModel(application: Application): AndroidViewModel(application), RecipesViewModel {
+    private val repository: FavouriteRecipeRepository
+    private var _recipes: SnapshotStateList<FavouriteRecipe>
+    private var _loading: MutableState<Boolean>
 
     init {
         val database = DatabaseProvider.getInstance(application.applicationContext)
         repository = FavouriteRecipeRepository(database)
+        _recipes = mutableStateListOf()
+        _loading = mutableStateOf(true)
+        loadData()
     }
 
-    // Recipe state encapsulation
-    private var _recipes = mutableStateListOf<FavouriteRecipe>()
-    val recipes get() = _recipes
+    // State getters
+    override val recipes get() = _recipes.map { it.toRecipe() }
+    override val loading get() = _loading.value
 
-    // Loading state encapsulation
-    private var _loading = mutableStateOf(true)
-    val loading get() = _loading.value
-
-    init {
+    override fun loadData() {
         viewModelScope.launch {
-            val allRecipes = repository.getAllRecipes()
+            val allRecipes = repository.getAll()
+            _recipes.clear()
             _recipes.addAll(allRecipes)
             _loading.value = false
         }
     }
 
-    fun add(recipe: FavouriteRecipe) {
+    override fun add(r: Recipe) {
+        _loading.value = true
         viewModelScope.launch {
-            repository.add(recipe)
+            val favouriteRecipe = r.toFavourite()
+            repository.add(favouriteRecipe)
+            loadData()
         }
     }
 
-    fun edit(recipe: FavouriteRecipe) {
+    override fun delete(r: Recipe) {
+        _loading.value = true
         viewModelScope.launch {
-            repository.update(recipe)
-        }
-    }
-
-    fun delete(recipe: FavouriteRecipe) {
-        viewModelScope.launch {
-            repository.delete(recipe)
+            val favouriteRecipe = r.toFavourite()
+            repository.delete(favouriteRecipe)
+            loadData()
         }
     }
 }

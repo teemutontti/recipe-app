@@ -7,9 +7,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.recipeapp.models.CachedRecipe
+import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.models.SharedPreferencesKeys.PREFS_NAME
+import com.example.recipeapp.models.SpoonacularRecipe
+import com.example.recipeapp.models.room.FavouriteRecipe
 import com.example.recipeapp.repositories.TodaysSpecialsRepository
+import com.example.recipeapp.utils.Utils.toRecipe
 import kotlinx.coroutines.launch
 
 class TodaysSpecialsViewModel(application: Application): AndroidViewModel(application) {
@@ -21,8 +24,8 @@ class TodaysSpecialsViewModel(application: Application): AndroidViewModel(applic
     }
 
     // Specials state encapsulation
-    private val _recipes = mutableStateListOf<CachedRecipe>()
-    val recipes get() = _recipes
+    private val _recipes = mutableStateListOf<FavouriteRecipe>()
+    val recipes: List<Recipe> get() = _recipes.map { it.toRecipe() }
 
     // Loading state encapsulation
     private val _loading = mutableStateOf(true) // Initializing to true
@@ -30,24 +33,11 @@ class TodaysSpecialsViewModel(application: Application): AndroidViewModel(applic
 
     init {
         viewModelScope.launch {
-            Log.d("ASYNC", "Working in ${this}")
             val newRecipes = repository.getTodaysSpecials()
             if (newRecipes != null) {
                 _recipes.addAll(newRecipes)
                 _loading.value = _recipes.size == 0
             }
-        }
-    }
-
-    private fun update(newRecipes: List<CachedRecipe>) {
-        _recipes.clear()
-        _recipes.addAll(newRecipes)
-    }
-
-    fun save(newRecipes: List<CachedRecipe>) {
-        viewModelScope.launch {
-            repository.setTodaysSpecials(newRecipes)
-            update(newRecipes)
         }
     }
 }

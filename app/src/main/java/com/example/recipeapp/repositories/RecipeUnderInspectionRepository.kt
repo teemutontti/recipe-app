@@ -14,6 +14,7 @@ class RecipeUnderInspectionRepository(private val prefs: SharedPreferences) {
             apiKey = BuildConfig.API_KEY,
             id = recipeId,
         )
+        Log.d("RecipeFetchResponse", "Response: $response")
         if (response.isSuccessful) {
             return response.body()
         }

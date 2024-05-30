@@ -2,36 +2,31 @@ package com.example.recipeapp.repositories
 
 import android.content.SharedPreferences
 import com.example.recipeapp.BuildConfig.API_KEY
-import com.example.recipeapp.models.CachedRecipe
+import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.models.SharedPreferencesManager
-import com.example.recipeapp.models.SpoonacularRecipe
+import com.example.recipeapp.models.room.FavouriteRecipe
 import com.example.recipeapp.services.RetrofitInstance
-import com.example.recipeapp.utils.Utils
+import com.example.recipeapp.utils.Utils.SPECIAL_MEAL_TYPES
+import com.example.recipeapp.utils.Utils.toRecipe
 
 class TodaysSpecialsRepository(private val prefs: SharedPreferences) {
-    fun setTodaysSpecials(specials: List<CachedRecipe>) {
-        SharedPreferencesManager.saveTodaysSpecials(prefs, specials)
-    }
+    suspend fun getTodaysSpecials(): List<FavouriteRecipe>? {
+        val isLoaded = SharedPreferencesManager.isTodaysSpecialsLoaded(prefs)
+        if (isLoaded) return SharedPreferencesManager.getTodaysSpecials(prefs)
+        else {
+            val newRecipes = SPECIAL_MEAL_TYPES.map {
+                val response = RetrofitInstance().recipeService.getRandomRecipes(API_KEY, it, 1)
+                val recipe = response.body()?.recipes?.get(0)
 
-    suspend fun getTodaysSpecials(): List<CachedRecipe>? {
-        if (SharedPreferencesManager.isTodaysSpecialsLoaded(prefs)) {
-            return SharedPreferencesManager.getTodaysSpecials(prefs)
-        } else {
-            val newSpecials = mutableListOf<CachedRecipe>()
-            Utils.SPECIAL_MEAL_TYPES.forEach {
-                val response = RetrofitInstance().recipeService.getRandomRecipes(
-                    apiKey = API_KEY,
-                    includeTags = it,
-                    number = 1
-                )
-                if (response.isSuccessful) {
-                    response.body()?.recipes?.get(0)?.let { recipe: SpoonacularRecipe ->
-                        newSpecials.add(recipe.toCachedRecipe())
-                    }
+                if (response.isSuccessful && recipe != null) {
+                    recipe.toSavable()
+                } else {
+                    // Return null for the whole function if fetch is unsuccessful
+                    return null
                 }
             }
-            SharedPreferencesManager.saveTodaysSpecials(prefs, newSpecials)
-            return newSpecials
+            SharedPreferencesManager.saveTodaysSpecials(prefs, newRecipes)
+            return newRecipes
         }
     }
 }

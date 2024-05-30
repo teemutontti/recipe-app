@@ -1,5 +1,6 @@
 package com.example.recipeapp.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -52,61 +53,44 @@ import com.example.recipeapp.composables.InstructionRow
 import com.example.recipeapp.composables.NumberCounter
 import com.example.recipeapp.composables.RecipeImage
 import com.example.recipeapp.composables.UserFeedbackMessage
-import com.example.recipeapp.models.room.PersonalIngredient
 import com.example.recipeapp.viewmodels.FavouriteRecipesViewModel
-import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
+import com.example.recipeapp.viewmodels.ViewModelWrapper
+
 
 @Composable
 fun RecipeScreen(
     navController: NavController,
-    apiRecipeId: Int? = null,
-    preview: Boolean = false
+    viewModels: ViewModelWrapper,
+    preview: Boolean = false,
 ) {
-    val recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel = viewModel()
-    val favouriteRecipesViewModel: FavouriteRecipesViewModel = viewModel()
-
-    // State declarations
+    val recipe by viewModels.inspection.recipe
+    val isLoading by viewModels.inspection.loading
     var imageLoading by remember { mutableStateOf(true) }
     var isFavourite by remember { mutableStateOf(false) }
     var showMore by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showServingsChangedNotice by remember { mutableStateOf(false) }
-    var initialServings by remember { mutableIntStateOf(recipeUnderInspectionViewModel.recipe.servings) }
-
-    val titleStyle = SpanStyle(
-        fontSize = 32.sp,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.onBackground
-    )
-    val subtitleStyle = SpanStyle(
-        fontSize = 16.sp,
-        fontWeight = FontWeight.Normal,
-        color = Color.Gray,
-    )
+    var initialServings by remember { mutableIntStateOf(recipe.servings) }
 
     LaunchedEffect(Unit) {
-        if (apiRecipeId != null) {
-            // Fetching recipe from API
-            recipeUnderInspectionViewModel.fetch(apiRecipeId)
+        if (!recipe.isPersonalRecipe) {
+            viewModels.inspection.fetchRecipe(recipe.id)
 
             // Checking if the recipe is a favourite and updating state based on it
-            val recipeIds = favouriteRecipesViewModel.recipes.map { it.id }
-            isFavourite = recipeIds.contains(apiRecipeId)
-
-            // Updating initial servings state
-            initialServings = recipeUnderInspectionViewModel.recipe.servings
-        } else {
-            recipeUnderInspectionViewModel.setLoadingDone()
+            val recipeIds = viewModels.favourite.recipes.map { it.id }
+            isFavourite = recipeIds.contains(recipe.id)
         }
+
+        // Updating initial servings state
+        initialServings = recipe.servings
     }
 
     fun handleFavouriteClick() {
         isFavourite = !isFavourite
-        val recipe = recipeUnderInspectionViewModel.recipe
         if (isFavourite) {
-            favouriteRecipesViewModel.add(recipe.toFavouriteRecipe())
+            viewModels.favourite.add(recipe)
         } else {
-            favouriteRecipesViewModel.delete(recipe.toFavouriteRecipe())
+            viewModels.favourite.delete(recipe)
         }
     }
 
@@ -119,32 +103,38 @@ fun RecipeScreen(
     }
 
     fun calculateIngredients(newServings: Int) {
-        val recipe = recipeUnderInspectionViewModel.recipe
         showServingsChangedNotice = newServings != initialServings
 
-        val ingredientsPerServing = recipe.ingredients.map {
-            it.amount / recipe.servings
-        }
+        // Calculate new ingredient amounts based on new servings size
+        val ingredientsPerServing = recipe.ingredients.map { it.amount / recipe.servings }
+        val newIngredientAmounts = ingredientsPerServing.map { it * newServings }
 
-        val newIngredientAmounts = ingredientsPerServing.map {
-            it * newServings
-        }
-
-        val newIngredients = recipe.ingredients.mapIndexed { index: Int, item: PersonalIngredient ->
+        // Forming a new ingredient list
+        val newIngredients = recipe.ingredients.mapIndexed { index, item ->
             item.copy(amount = newIngredientAmounts[index])
         }
 
-        val newRecipe = recipe.copy(ingredients = newIngredients, servings = newServings)
-        recipeUnderInspectionViewModel.setRecipe(newRecipe)
+        // Saving a new recipe with updated amounts to view model
+        val newRecipe = newIngredients.let { recipe.copy(ingredients = it, servings = newServings) }
+        viewModels.inspection.setRecipe(newRecipe)
     }
+
+    val titleStyle = SpanStyle(
+        fontSize = 32.sp,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onBackground
+    )
+    val subtitleStyle = SpanStyle(
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Normal,
+        color = Color.Gray,
+    )
 
     Column(modifier =
         if (preview) Modifier.padding(32.dp)
-        else Modifier
-            .padding(32.dp)
-            .verticalScroll(rememberScrollState())
+        else Modifier.padding(32.dp).verticalScroll(rememberScrollState())
     ) {
-        if (recipeUnderInspectionViewModel.loading) LinearProgressIndicator()
+        if (isLoading) LinearProgressIndicator()
         else {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -156,30 +146,14 @@ fun RecipeScreen(
                     style = TextStyle(lineHeight = 32.sp),
                     text = buildAnnotatedString {
                         withStyle(style = titleStyle) {
-                            append(recipeUnderInspectionViewModel.recipe.title)
+                            append(recipe.title)
                         }
                         withStyle(style = subtitleStyle) {
-                            append(" #${recipeUnderInspectionViewModel.recipe.id}")
+                            append(" #${if (recipe.id == -1) "OWN" else recipe.id }")
                         }
                     },
                 )
-                if (apiRecipeId != null) {
-                    IconButton(
-                        enabled = !preview,
-                        onClick = { handleFavouriteClick() }
-                    ) {
-                        Icon(
-                            imageVector =
-                            if (isFavourite) Icons.Rounded.Star
-                            else Icons.Rounded.StarBorder,
-                            contentDescription = "star icon",
-                            modifier = Modifier
-                                .width(32.dp)
-                                .height(32.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                } else {
+                if (recipe.isPersonalRecipe) {
                     Column {
                         IconButton(
                             enabled = !preview,
@@ -226,18 +200,34 @@ fun RecipeScreen(
                             )
                         }
                         if (showDeleteDialog) {
-                            DeleteDialog(navController = navController) { showDeleteDialog = false }
+                            DeleteDialog(navController, viewModels) { showDeleteDialog = false }
                         }
+                    }
+                } else {
+                    IconButton(
+                        enabled = !preview,
+                        onClick = { handleFavouriteClick() }
+                    ) {
+                        Icon(
+                            imageVector = if (isFavourite) {
+                                Icons.Rounded.Star
+                            } else {
+                                Icons.Rounded.StarBorder
+                            },
+                            contentDescription = "star icon",
+                            modifier = Modifier.width(32.dp).height(32.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
 
             /* === IMAGE SECTION === */
-            if (recipeUnderInspectionViewModel.recipe.image != "") {
+            if (recipe.image != "") {
                 if (imageLoading) CircularProgressIndicator()
                 RecipeImage(
-                    model = recipeUnderInspectionViewModel.recipe.image,
+                    model = recipe.image,
                     onLoadSuccess = { imageLoading = false }
                 )
             } else {
@@ -247,7 +237,7 @@ fun RecipeScreen(
 
             /* === SERVINGS SECTION === */
             NumberCounter(
-                value = recipeUnderInspectionViewModel.recipe.servings,
+                value = recipe.servings,
                 suffix = "servings",
                 onNumberChange = ::calculateIngredients,
                 max = 50,
@@ -255,10 +245,10 @@ fun RecipeScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             /* === INGREDIENTS SECTION === */
-            if (recipeUnderInspectionViewModel.recipe.ingredients.isNotEmpty()) {
-                Text("Ingredients")
+            if (recipe.ingredients.isNotEmpty()) {
+                Text("Ingredients", style = MaterialTheme.typography.headlineMedium)
                 Spacer(modifier = Modifier.height(8.dp))
-                recipeUnderInspectionViewModel.recipe.ingredients.forEachIndexed { index, ingredient ->
+                recipe.ingredients.forEachIndexed { index, ingredient ->
                     IngredientRow(index, ingredient)
                     Spacer(modifier = Modifier.height(4.dp))
                 }
@@ -266,14 +256,14 @@ fun RecipeScreen(
             }
 
             /* === INSTRUCTIONS SECTION === */
-            if (recipeUnderInspectionViewModel.recipe.instructions.isNotEmpty()) {
-                Text("Instructions")
+            if (recipe.instructions.isNotEmpty()) {
+                Text("Instructions", style = MaterialTheme.typography.headlineMedium)
                 if (showServingsChangedNotice) {
                     Spacer(modifier = Modifier.height(8.dp))
                     UserFeedbackMessage("Serving size changed", type = "warning")
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                recipeUnderInspectionViewModel.recipe.instructions.forEachIndexed { index, instruction ->
+                recipe.instructions.forEachIndexed { index, instruction ->
                     InstructionRow(index, instruction)
                     Spacer(modifier = Modifier.height(16.dp))
                 }

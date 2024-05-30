@@ -1,6 +1,5 @@
 package com.example.recipeapp.composables
 
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,40 +11,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.recipeapp.ApplicationContext
-import com.example.recipeapp.repositories.RecipeRepository
-import com.example.recipeapp.viewmodels.PersonalRecipesViewModel
-import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
+import com.example.recipeapp.viewmodels.ViewModelWrapper
 
 @Composable
-fun DeleteDialog(navController: NavController, exitDialog: () -> Unit) {
-    val personalRecipesViewModel: PersonalRecipesViewModel = viewModel(LocalContext.current as ComponentActivity)
-    val recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel = viewModel(LocalContext.current as ComponentActivity)
-
+fun DeleteDialog(
+    navController: NavController,
+    viewModels: ViewModelWrapper,
+    exitDialog: () -> Unit
+) {
     fun handleDelete() {
         exitDialog()
-        recipeUnderInspectionViewModel.recipe?.let {
-            personalRecipesViewModel.delete(recipeUnderInspectionViewModel.recipe!!)
-        }
+        viewModels.personal.delete(viewModels.inspection.recipe.value)
         navController.navigate("cookbook")
     }
 

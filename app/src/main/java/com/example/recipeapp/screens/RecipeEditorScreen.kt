@@ -1,6 +1,7 @@
 package com.example.recipeapp.screens
 
 import android.content.Intent
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -24,7 +25,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material3.Button
@@ -38,6 +38,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -56,7 +57,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.ApplicationContext
@@ -68,28 +68,35 @@ import com.example.recipeapp.composables.InstructionRow
 import com.example.recipeapp.composables.NumberCounter
 import com.example.recipeapp.composables.RecipeImage
 import com.example.recipeapp.composables.StepIndicator
-import com.example.recipeapp.models.room.PersonalIngredient
-import com.example.recipeapp.models.room.PersonalInstruction
+import com.example.recipeapp.models.Ingredient
+import com.example.recipeapp.models.Instruction
 import com.example.recipeapp.utils.Utils
 import com.example.recipeapp.viewmodels.PersonalRecipesViewModel
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
+import com.example.recipeapp.viewmodels.ViewModelWrapper
 
 @Composable
-fun RecipeEditorScreen(navController: NavController) {
-    val personalRecipesViewModel: PersonalRecipesViewModel = viewModel()
-    val recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel = viewModel()
-
+fun RecipeEditorScreen(navController: NavController, viewModels: ViewModelWrapper) {
     var currentFormStep by remember { mutableIntStateOf(0) }
     var allowNext by remember { mutableStateOf(false) }
 
-    fun onSave() {
-        val recipe = recipeUnderInspectionViewModel.recipe
-        if (recipe.id == -1) {
-            personalRecipesViewModel.add(recipe)
-        } else {
-            personalRecipesViewModel.edit(recipe)
+    fun handleSave() {
+        val recipe = viewModels.inspection.recipe.value
+        Log.d("RecipeEditor", "Id: ${recipe.id}")
+        viewModels.personal.isRecipeInDatabase(recipe) { isFound ->
+            if (isFound) {
+                if (recipe.id == -1) {
+                    Log.d("Editor", "Addition save 1: $recipe")
+                    viewModels.personal.add(recipe)
+                }
+                Log.d("Editor", "Editing save: $recipe")
+                viewModels.personal.edit(recipe)
+            } else {
+                Log.d("Editor", "Addition save 2: $recipe")
+                viewModels.personal.add(recipe)
+            }
+            navController.navigate("cookbook")
         }
-        navController.navigate("cookbook")
     }
 
     fun handleStepChange(direction: Int) {
@@ -97,7 +104,7 @@ fun RecipeEditorScreen(navController: NavController) {
         if (newCurrentFormStep in 0..4) {
             currentFormStep = newCurrentFormStep
             if (newCurrentFormStep == 4) {
-                onSave()
+                handleSave()
             }
         }
         allowNext = direction < 0
@@ -113,6 +120,7 @@ fun RecipeEditorScreen(navController: NavController) {
             RecipeEditorContent(
                 navController = navController,
                 paddingValues = it,
+                viewModels = viewModels,
                 currentFormStep = currentFormStep,
                 handleAllowNextChange = ::handleAllowNextChange,
                 handleStepChange = ::handleStepChange,
@@ -154,15 +162,17 @@ fun RecipeEditorScreen(navController: NavController) {
 private fun RecipeEditorContent(
     navController: NavController,
     paddingValues: PaddingValues,
+    viewModels: ViewModelWrapper,
     currentFormStep: Int,
     handleAllowNextChange: (Boolean) -> Unit,
     handleStepChange: (Int) -> Unit,
 ) {
-    val viewModel: RecipeUnderInspectionViewModel = viewModel()
+    val viewModel: RecipeUnderInspectionViewModel = viewModels.inspection
 
     Column(modifier = Modifier
         .padding(paddingValues)
-        .verticalScroll(rememberScrollState())) {
+        .verticalScroll(rememberScrollState())
+    ) {
         Column(modifier = Modifier.padding(horizontal = 40.dp)) {
             when (currentFormStep) {
                 0 -> Text("General", style = MaterialTheme.typography.headlineLarge)
@@ -177,7 +187,7 @@ private fun RecipeEditorContent(
                 0 -> TitleStep(viewModel, handleAllowNextChange, handleStepChange)
                 1 -> IngredientsStep(viewModel, handleAllowNextChange)
                 2 -> InstructionsStep(viewModel, handleAllowNextChange)
-                3 -> PreviewStep(viewModel, handleAllowNextChange, navController)
+                3 -> PreviewStep(viewModels, handleAllowNextChange, navController)
             }
         }
     }
@@ -185,30 +195,24 @@ private fun RecipeEditorContent(
 
 @Composable
 private fun TitleStep(
-    recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel,
+    viewModel: RecipeUnderInspectionViewModel,
     handleAllowNextChange: (Boolean) -> Unit,
     toNextStep: (Int) -> Unit
 ) {
-    var title: String by remember {
-        mutableStateOf(recipeUnderInspectionViewModel.recipe.title)
-    }
-    var servings by remember {
-        mutableIntStateOf(recipeUnderInspectionViewModel.recipe.servings)
-    }
-    var image by remember {
-        mutableStateOf(recipeUnderInspectionViewModel.recipe.image)
-    }
+    var title: String by remember { mutableStateOf(viewModel.recipe.value.title) }
+    var servings by remember { mutableIntStateOf(viewModel.recipe.value.servings) }
+    var image by remember { mutableStateOf(viewModel.recipe.value.image) }
 
     LaunchedEffect(title, servings) {
         val titleOk = Utils.Validator.recipeTitle(title)
         val servingsOk = Utils.Validator.recipeServings(servings)
 
         if (titleOk && servingsOk) {
-            val newRecipe = recipeUnderInspectionViewModel.recipe.copy(
+            val newRecipe = viewModel.recipe.value.copy(
                 title = title,
                 servings = servings
             )
-            recipeUnderInspectionViewModel.setRecipe(newRecipe)
+            viewModel.setRecipe(newRecipe)
             handleAllowNextChange(true)
         } else {
             handleAllowNextChange(false)
@@ -306,33 +310,34 @@ private fun TitleStep(
 
 @Composable
 private fun IngredientsStep(
-    recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel,
+    viewModel: RecipeUnderInspectionViewModel,
     handleAllowNextChange: (Boolean) -> Unit
 ) {
-    LaunchedEffect(recipeUnderInspectionViewModel.recipe) {
-        if (recipeUnderInspectionViewModel.recipe.ingredients.isEmpty()) {
+    LaunchedEffect(viewModel.recipe.value) {
+        if (viewModel.recipe.value.ingredients.isEmpty()) {
             handleAllowNextChange(false)
         } else {
             handleAllowNextChange(true)
         }
     }
 
-    fun handleIngredientAdd(ingredient: PersonalIngredient) {
-        recipeUnderInspectionViewModel.addIngredient(ingredient)
+    fun handleIngredientAdd(ingredient: Ingredient) {
+        // TODO: Clear data on save
+        viewModel.addIngredient(ingredient)
     }
 
     fun handleIngredientDelete(index: Int) {
-        recipeUnderInspectionViewModel.deleteIngredient(index)
+        viewModel.deleteIngredient(index)
     }
 
     IngredientForm { handleIngredientAdd(it) }
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    if (recipeUnderInspectionViewModel.recipe.ingredients.isNotEmpty()) {
+    if (viewModel.recipe.value.ingredients.isNotEmpty()) {
         Text("Current ingredients:")
         Spacer(modifier = Modifier.height(8.dp))
-        recipeUnderInspectionViewModel.recipe.ingredients.mapIndexed { index, ingredient ->
+        viewModel.recipe.value.ingredients.mapIndexed { index, ingredient ->
             IngredientRow(index, ingredient, handleDelete = { handleIngredientDelete(index) })
         }
     }
@@ -340,14 +345,14 @@ private fun IngredientsStep(
 
 @Composable
 private fun InstructionsStep(
-    recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel,
+    viewModel: RecipeUnderInspectionViewModel,
     handleAllowNextChange: (Boolean) -> Unit
 ) {
     var text by remember { mutableStateOf("") }
-    val instructions = remember { mutableStateListOf<PersonalInstruction>() }
+    val instructions = remember { mutableStateListOf<Instruction>() }
 
     LaunchedEffect(Unit) {
-        instructions.addAll(recipeUnderInspectionViewModel.recipe.instructions)
+        instructions.addAll(viewModel.recipe.value.instructions)
     }
 
     LaunchedEffect(instructions.size) {
@@ -367,14 +372,14 @@ private fun InstructionsStep(
             val nextNumber = if (instructions.isEmpty()) 1 else instructions.size + 1
 
             // Generating the new instruction
-            val newInstruction = PersonalInstruction(nextNumber, text)
+            val newInstruction = Instruction(nextNumber, text)
 
             // Adding to viewModel state
-            recipeUnderInspectionViewModel.addInstruction(newInstruction)
+            viewModel.addInstruction(newInstruction)
 
             // Setting state in composable
             instructions.clear()
-            instructions.addAll(recipeUnderInspectionViewModel.recipe.instructions)
+            instructions.addAll(viewModel.recipe.value.instructions)
 
             // Setting the text-field text state to null
             text = ""
@@ -393,8 +398,8 @@ private fun InstructionsStep(
         instructions.addAll(newInstructions)
 
         // Overwriting the whole recipe so instruction numbers are also updated to view model
-        val newRecipe = recipeUnderInspectionViewModel.recipe.copy(instructions = newInstructions)
-        recipeUnderInspectionViewModel.setRecipe(newRecipe)
+        val newRecipe = viewModel.recipe.value.copy(instructions = newInstructions)
+        viewModel.setRecipe(newRecipe)
     }
 
     Row(modifier = Modifier.fillMaxWidth()) {
@@ -431,7 +436,7 @@ private fun InstructionsStep(
 
 @Composable
 private fun PreviewStep(
-    recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel,
+    viewModels: ViewModelWrapper,
     handleAllowNextChange: (Boolean) -> Unit,
     navController: NavController
 ) {
@@ -449,7 +454,7 @@ private fun PreviewStep(
                 color = Color.Gray.copy(alpha = 0.8f)
             )
         )
-        Text(recipeUnderInspectionViewModel.recipe.title)
+        Text(viewModels.inspection.recipe.value.title)
     }
     Spacer(modifier = Modifier.height(8.dp))
     Column {
@@ -460,7 +465,7 @@ private fun PreviewStep(
                 color = Color.Gray.copy(alpha = 0.8f)
             )
         )
-        Text(recipeUnderInspectionViewModel.recipe.image)
+        Text(viewModels.inspection.recipe.value.image)
     }
     Spacer(modifier = Modifier.height(8.dp))
     Column {
@@ -471,7 +476,7 @@ private fun PreviewStep(
                 color = Color.Gray.copy(alpha = 0.8f)
             )
         )
-        Text("${recipeUnderInspectionViewModel.recipe.servings}")
+        Text("${viewModels.inspection.recipe.value.servings}")
     }
     Spacer(modifier = Modifier.height(8.dp))
     Column {
@@ -483,7 +488,7 @@ private fun PreviewStep(
             )
         )
         Column {
-            recipeUnderInspectionViewModel.recipe.ingredients.forEach {
+            viewModels.inspection.recipe.value.ingredients.forEach {
                 Text("${it.amount} ${it.unit}  ${it.name}")
             }
         }
@@ -498,10 +503,10 @@ private fun PreviewStep(
             )
         )
         Column {
-            recipeUnderInspectionViewModel.recipe.instructions.forEach { instruction ->
+            viewModels.inspection.recipe.value.instructions.forEach { instruction ->
                 Row {
                     Text("${instruction.number}")
-                    Text(instruction.step)
+                    Text(instruction.text)
                 }
             }
         }
@@ -523,7 +528,7 @@ private fun PreviewStep(
                 .clip(RoundedCornerShape(8.dp))
                 .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
         ) {
-            RecipeScreen(navController = navController, preview = true)
+            RecipeScreen(navController, viewModels, preview = true)
         }
     }
 }

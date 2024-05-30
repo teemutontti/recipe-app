@@ -1,8 +1,5 @@
 package com.example.recipeapp.composables
 
-import android.content.Context
-import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,44 +26,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.R
-import com.example.recipeapp.models.CachedRecipe
-import com.example.recipeapp.models.SharedPreferencesKeys.PREFS_NAME
-import com.example.recipeapp.models.room.FavouriteRecipe
-import com.example.recipeapp.models.room.PersonalRecipe
+import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 
 @Composable
 fun RecipeButton(
     navController: NavController,
-    apiRecipe: CachedRecipe? = null,
-    ownRecipe: PersonalRecipe? = null,
-) {
-    val recipeUnderInspectionViewModel: RecipeUnderInspectionViewModel = viewModel()
-
+    recipe: Recipe,
+    viewModel: RecipeUnderInspectionViewModel
+){
     var loading by remember { mutableStateOf(true) }
     var imageError by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        Log.d("RecipeButton", "apiRecipe: $apiRecipe")
-        Log.d("RecipeButton", "ownRecipe: $ownRecipe")
-    }
-
     fun handleRecipeClick() {
-        if (apiRecipe != null) {
-            navController.navigate("recipe/${apiRecipe.id}")
-        } else if (ownRecipe != null) {
-            recipeUnderInspectionViewModel.setRecipe(ownRecipe)
-            navController.navigate("recipe/${null}")
-        }
+        viewModel.setRecipe(recipe)
+        navController.navigate("recipe")
     }
 
     TextButton(
@@ -87,7 +67,7 @@ fun RecipeButton(
         ) {
             if (!imageError) {
                 RecipeImage(
-                    model = apiRecipe?.image ?: ownRecipe?.image,
+                    model = recipe.image,
                     isPreview = true,
                     onLoadError = { imageError = true },
                     onLoadSuccess = {
@@ -124,7 +104,7 @@ fun RecipeButton(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = apiRecipe?.title ?: ownRecipe?.title ?: "Loading...",
+                    text = recipe.title,
                     style = TextStyle(
                         fontSize = 20.sp
                     )

@@ -36,21 +36,29 @@ import com.example.recipeapp.composables.SearchPanel
 import com.example.recipeapp.composables.TopBar
 import com.example.recipeapp.models.SharedPreferencesKeys.PREFS_NAME
 import com.example.recipeapp.models.room.AppDatabase
+import com.example.recipeapp.viewmodels.PersonalRecipesViewModel
+import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 import com.example.recipeapp.viewmodels.TodaysSpecialsViewModel
+import com.example.recipeapp.viewmodels.ViewModelWrapper
 
 @Composable
-fun DiscoverScreen(navController: NavController) {
+fun DiscoverScreen(
+    navController: NavController,
+    viewModels: ViewModelWrapper,
+) {
     Scaffold(
         topBar = { TopBar(title = "Discover") },
-        content = { DiscoverScreenContent(navController, it) },
+        content = { DiscoverScreenContent(navController, it, viewModels) },
         bottomBar = { NavBar(navController, "discover") }
     )
 }
 
 @Composable
-private fun DiscoverScreenContent(navController: NavController, paddingValues: PaddingValues) {
-    val todaysSpecialsViewModel: TodaysSpecialsViewModel = viewModel()
-
+private fun DiscoverScreenContent(
+    navController: NavController,
+    paddingValues: PaddingValues,
+    viewModels: ViewModelWrapper,
+) {
     var showSearchPanel by remember { mutableStateOf(false) }
 
     Box(
@@ -62,19 +70,19 @@ private fun DiscoverScreenContent(navController: NavController, paddingValues: P
 
                 /* === SEARCH SECTION === */
                 CustomSearchBar({ showSearchPanel = true }, { showSearchPanel = false })
-                if (showSearchPanel) SearchPanel(navController = navController)
+                if (showSearchPanel) SearchPanel(navController, viewModels)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 /* === TODAY'S SPECIALS SECTION === */
-                if (todaysSpecialsViewModel.loading) {
+                if (viewModels.specials.loading) {
                     LinearProgressIndicator()
                 } else {
                     Text("Today's Specials", style = MaterialTheme.typography.headlineMedium)
                     Spacer(modifier = Modifier.height(8.dp))
-                    RecipeShelf(navController, todaysSpecialsViewModel.recipes)
+                    RecipeShelf(navController, viewModels.specials.recipes, viewModels)
                 }
             }
         }
-        AddRecipeButton(navController)
+        AddRecipeButton(navController, viewModels.inspection)
     }
 }

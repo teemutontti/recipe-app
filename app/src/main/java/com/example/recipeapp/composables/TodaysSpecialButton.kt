@@ -1,5 +1,6 @@
 package com.example.recipeapp.composables
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,91 +31,93 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.R
-import com.example.recipeapp.models.CachedRecipe
+import com.example.recipeapp.models.Recipe
+import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 
 @Composable
 fun TodaysSpecialButton(
     navController: NavController,
-    recipe: CachedRecipe?,
-    index: Int
+    index: Int,
+    recipe: Recipe,
+    viewModel: RecipeUnderInspectionViewModel,
 ) {
     var loading by remember { mutableStateOf(true) }
     var imageError by remember { mutableStateOf(false) }
 
     fun handleRecipeClick() {
-        if (recipe != null) navController.navigate("recipe/${recipe.id}")
+        viewModel.setRecipe(recipe)
+        navController.navigate("recipe")
     }
 
-    if (recipe != null) {
-        TextButton(
-            shape = RoundedCornerShape(8.dp),
-            contentPadding = PaddingValues(0.dp),
-            onClick = { handleRecipeClick() },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.scrim
-            )
-        ) {
-            Box(modifier = Modifier.height(162.dp)) {
-                if (!imageError) {
-                    RecipeImage(
-                        model = recipe.image,
-                        onLoadError = { imageError = true },
-                        onLoadSuccess = { loading = false },
-                    )
-                } else {
-                    RecipeImage(painter = painterResource(id = R.drawable.meal))
-                }
-
-                // Adding shadow with box composable for better text readability
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(
-                            Brush.linearGradient(
-                                colors = listOf(
-                                    Color.Black.copy(alpha = 0.7f),
-                                    Color.Transparent,
-                                    Color.Black.copy(alpha = 0.7f),
-                                ),
-                                start = Offset(0f, 0f),
-                                end = Offset(0f, Float.POSITIVE_INFINITY)
-                            )
-                        )
+    TextButton(
+        shape = RoundedCornerShape(8.dp),
+        contentPadding = PaddingValues(0.dp),
+        onClick = { handleRecipeClick() },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.scrim
+        )
+    ) {
+        Box(modifier = Modifier.height(162.dp)) {
+            if (!imageError) {
+                RecipeImage(
+                    model = recipe.image,
+                    onLoadError = { imageError = true },
+                    onLoadSuccess = { loading = false },
                 )
-                Column(
-                    verticalArrangement = Arrangement.SpaceBetween,
-                    horizontalAlignment = Alignment.Start,
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        text = when (index) {
-                            0 -> "Breakfast"
-                            1 -> "Lunch"
-                            2 -> "Dinner"
-                            else -> "Snack"
-                        },
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                    Text(
-                        text = recipe.title ?: "Loading...",
-                        style = TextStyle(
-                            fontSize = 20.sp
+            } else {
+                RecipeImage(painter = painterResource(id = R.drawable.meal))
+            }
+
+            // Adding shadow with box composable for better text readability
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(
+                        Brush.linearGradient(
+                            colors = listOf(
+                                Color.Black.copy(alpha = 0.7f),
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.7f),
+                            ),
+                            start = Offset(0f, 0f),
+                            end = Offset(0f, Float.POSITIVE_INFINITY)
                         )
                     )
-                }
-                if (loading && !imageError) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator()
-                    }
+            )
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = when (index) {
+                        0 -> "Breakfast"
+                        1 -> "Lunch"
+                        2 -> "Dinner"
+                        else -> "Snack"
+                    },
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = recipe.title ?: "Loading...",
+                    style = TextStyle(
+                        fontSize = 20.sp
+                    )
+                )
+            }
+            if (loading && !imageError) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator()
                 }
             }
         }

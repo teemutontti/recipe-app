@@ -1,5 +1,6 @@
 package com.example.recipeapp.composables
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,14 +29,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.recipeapp.models.CachedRecipe
+import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.utils.Utils
+import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
+import com.example.recipeapp.viewmodels.TodaysSpecialsViewModel
+import com.example.recipeapp.viewmodels.ViewModelWrapper
 import kotlinx.coroutines.delay
 
 @Composable
-fun RecipeShelf(navController: NavController, recipes: List<CachedRecipe>) {
+fun RecipeShelf(navController: NavController, recipes: List<Recipe>, viewModels: ViewModelWrapper) {
     var specialInView by remember { mutableIntStateOf(0) }
-    var lazyRowState = rememberLazyListState()
+    val lazyRowState = rememberLazyListState()
 
     LaunchedEffect(key1 = specialInView) {
         lazyRowState.animateScrollToItem(specialInView)
@@ -60,11 +64,7 @@ fun RecipeShelf(navController: NavController, recipes: List<CachedRecipe>) {
         ) {
             itemsIndexed(recipes) { index, recipe ->
                 Column(modifier = Modifier.fillParentMaxWidth()) {
-                    TodaysSpecialButton(
-                        navController = navController,
-                        recipe = recipe,
-                        index = index
-                    )
+                    TodaysSpecialButton(navController, index, recipe, viewModels.inspection)
                 }
                 if (index < recipes.size - 1) Spacer(modifier = Modifier.width(32.dp))
             }

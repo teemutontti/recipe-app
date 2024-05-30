@@ -51,8 +51,6 @@ object Utils {
         }
     }
 
-
-
     val emptyRecipe = Recipe(
         id = -1,
         title = "",

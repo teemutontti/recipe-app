@@ -43,7 +43,8 @@ import com.example.recipeapp.viewmodels.ViewModelWrapper
 @Composable
 fun CustomSearchBar(
     viewModel: SearchViewModel,
-    handleResultVisibility: (Boolean) -> Unit,
+    showResult: Boolean,
+    handleShowResult: (Boolean) -> Unit,
 ) {
     var loading by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
@@ -52,7 +53,7 @@ fun CustomSearchBar(
         Log.d("CustomSearchBar", "Query: $query")
         if (query != "") {
             loading = true
-            handleResultVisibility(true)
+            handleShowResult(true)
             viewModel.search(query)
             loading = false
         }
@@ -72,13 +73,13 @@ fun CustomSearchBar(
             contentPadding = PaddingValues(0.dp),
             modifier = Modifier.width(32.dp).height(32.dp),
             onClick = {
-                if (query != "") {
-                    handleResultVisibility(false)
+                if (showResult) {
+                    handleShowResult(false)
                     query = ""
                 }
             }
         ) {
-            if (query != "") {
+            if (showResult) {
                 Icon(Icons.AutoMirrored.Rounded.ArrowBack, "back")
             } else {
                 Icon(Icons.Rounded.Search, "search")

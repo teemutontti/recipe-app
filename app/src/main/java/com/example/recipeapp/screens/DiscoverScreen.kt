@@ -29,6 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.composables.AddRecipeButton
+import com.example.recipeapp.composables.CategoryShelf
 import com.example.recipeapp.composables.CustomSearchBar
 import com.example.recipeapp.composables.NavBar
 import com.example.recipeapp.composables.RecipeShelf
@@ -74,9 +75,7 @@ private fun DiscoverScreenContent(
             Column(modifier = Modifier.padding(horizontal = 24.dp)) {
 
                 /* === SEARCH SECTION === */
-                CustomSearchBar(viewModels.search) {
-                    showSearchPanel = it
-                }
+                CustomSearchBar(viewModels.search, showSearchPanel) { showSearchPanel = it }
                 if (showSearchPanel) SearchPanel(navController, viewModels)
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -95,6 +94,12 @@ private fun DiscoverScreenContent(
                         animate = true,
                     )
                 }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                /* === CATEGORY SEARCH SECTION === */
+                Text("Categories", style = MaterialTheme.typography.headlineMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                CategoryShelf(viewModels, showSearchPanel) { showSearchPanel = it }
             }
         }
         AddRecipeButton(navController, viewModels.inspection)

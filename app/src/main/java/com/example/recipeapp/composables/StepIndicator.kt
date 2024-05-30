@@ -50,31 +50,15 @@ fun StepIndicator(
                     .clip(CircleShape)
                     .height(24.dp)
                     .width(24.dp)
-                    .background(
-                        if (currentStep >= it) {
-                            MaterialTheme.colorScheme.tertiary
-                        } else {
-                            MaterialTheme.colorScheme.surface
-                        }
-                    )
+                    .background(MaterialTheme.colorScheme.surface)
                     .border(
                         width = 1.dp,
-                        color = if (currentStep < it) {
-                            MaterialTheme.colorScheme.outline
-                        } else {
-                            Color.Transparent
-                        },
+                        color = MaterialTheme.colorScheme.outline,
                         shape = CircleShape
                     )
             ) {
-                if (currentStep > it) {
-                    Icon(
-                        imageVector = Icons.Rounded.Check,
-                        contentDescription = "check",
-                        tint = MaterialTheme.colorScheme.scrim,
-                        modifier = Modifier.padding(2.dp)
-                    )
-                } else {
+                if (currentStep > it) CheckCircle()
+                else {
                     Text(
                         text = "${it + 1}",
                         style = TextStyle(

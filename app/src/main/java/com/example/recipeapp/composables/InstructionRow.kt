@@ -46,25 +46,49 @@ fun InstructionRow(
     instruction: Instruction,
     handleDelete: ((Int) -> Unit)? = null,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth()
+    var isDone by remember { mutableStateOf(false) }
+
+    TextButton(
+        enabled = handleDelete == null,
+        shape = RoundedCornerShape(4.dp),
+        onClick = { isDone = !isDone },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent
+        )
     ) {
-        Row {
-            Text(
-                text = "${instruction.number}",
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.width(32.dp).height(32.dp),
-            )
-            Spacer(modifier = Modifier.width(24.dp))
-            Text(
-                text = instruction.step,
-                modifier = Modifier.padding(top = 2.dp),
-            )
-        }
-        if (handleDelete != null) {
-            RemoveButton(index = index, onClick = { handleDelete(index) })
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row {
+                Column(modifier = Modifier.width(32.dp).height(32.dp)) {
+                    if (isDone) CheckCircle()
+                    else {
+                        Text(
+                            text = "${instruction.number}",
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = instruction.text,
+                    modifier = Modifier.padding(top = 2.dp),
+                    style = MaterialTheme.typography.bodyLarge,
+                    textDecoration = if (isDone) TextDecoration.LineThrough else null,
+                    color = if (isDone) {
+                        MaterialTheme.colorScheme.outline
+                    } else {
+                        MaterialTheme.colorScheme.onBackground
+                    }
+                )
+            }
+            if (handleDelete != null) {
+                RemoveButton(index = index, onClick = { handleDelete(index) })
+            }
         }
     }
 }

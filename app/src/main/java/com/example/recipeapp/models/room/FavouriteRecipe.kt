@@ -3,6 +3,7 @@ package com.example.recipeapp.models.room
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.recipeapp.models.CachedRecipe
+import com.example.recipeapp.models.ViewableRecipe
 
 @Entity(tableName = "favourite_recipes")
 data class FavouriteRecipe(
@@ -10,4 +11,4 @@ data class FavouriteRecipe(
     val id: Int,
     val image: String,
     val title: String,
-)
+): CachedRecipe()

@@ -1,9 +1,12 @@
 package com.example.recipeapp.repositories
 
-interface RecipeRepository<T> {
-    suspend fun add(recipe: T)
-    suspend fun update(recipe: T)
-    suspend fun delete(recipe: T)
+import com.example.recipeapp.models.Recipe
+
+interface ManageableData<T>: Data<T> {
+    override suspend fun getAll(): List<T>
+    suspend fun add(recipe: Recipe)
+    suspend fun update(recipe: Recipe)
+    suspend fun delete(recipe: Recipe)
 }
 
 /*

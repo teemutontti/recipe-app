@@ -99,4 +99,5 @@ dependencies {
     //noinspection KaptUsageInsteadOfKsp
     kapt(libs.androidx.room.compiler) // Room annotation processor
     implementation(libs.androidx.room.ktx) // Needed for coroutine support
+    implementation(libs.androidx.lifecycle.runtime.compose)
 }

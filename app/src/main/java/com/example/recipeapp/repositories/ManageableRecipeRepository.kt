@@ -1,12 +1,9 @@
 package com.example.recipeapp.repositories
 
-import com.example.recipeapp.models.Recipe
-
 interface ManageableRecipeRepository<T> {
     suspend fun getAll(): List<T>
     suspend fun getById(id: Int): T?
     suspend fun add(r: T)
-    suspend fun update(r: T)
     suspend fun delete(r: T)
 }
 

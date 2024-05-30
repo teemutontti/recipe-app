@@ -24,6 +24,5 @@ class FavouriteRecipeRepository(db: AppDatabase): ManageableRecipeRepository<Fav
 
     // Data management functions
     override suspend fun add(r: FavouriteRecipe) = favouriteRecipeDao.insertRecipe(r)
-    override suspend fun update(r: FavouriteRecipe) = favouriteRecipeDao.updateRecipe(r)
     override suspend fun delete(r: FavouriteRecipe) = favouriteRecipeDao.deleteRecipe(r)
 }

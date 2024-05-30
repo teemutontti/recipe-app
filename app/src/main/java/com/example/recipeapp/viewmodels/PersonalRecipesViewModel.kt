@@ -54,22 +54,16 @@ class PersonalRecipesViewModel(application: Application): AndroidViewModel(appli
     override fun delete(r: Recipe) {
         _loading.value = true
         viewModelScope.launch {
-            val recipe = repository.getById(r.id)
-            if (recipe != null) {
-                repository.delete(recipe)
-                loadData()
-            }
+            repository.delete(r.toPersonal())
+            loadData()
         }
     }
 
     fun edit(r: Recipe) {
         _loading.value = true
         viewModelScope.launch {
-            val recipe = repository.getById(r.id)
-            if (recipe != null) {
-                repository.update(recipe)
-                loadData()
-            }
+            repository.update(r.toPersonal())
+            loadData()
         }
     }
 

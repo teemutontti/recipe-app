@@ -1,5 +1,6 @@
 package com.example.recipeapp.repositories
 
+import android.util.Log
 import com.example.recipeapp.models.room.PersonalRecipe
 import com.example.recipeapp.models.room.AppDatabase
 import com.example.recipeapp.models.room.PersonalRecipeDao
@@ -23,8 +24,8 @@ class PersonalRecipeRepository(db: AppDatabase): ManageableRecipeRepository<Pers
 
     // Data management functions
     override suspend fun add(r: PersonalRecipe) = personalRecipeDao.insertRecipe(r)
-    override suspend fun update(r: PersonalRecipe) = personalRecipeDao.updateRecipe(r)
     override suspend fun delete(r: PersonalRecipe) = personalRecipeDao.deleteRecipe(r)
+    suspend fun update(r: PersonalRecipe) = personalRecipeDao.updateRecipe(r)
 
     // Utility functions
     suspend fun isRecipeInDatabase(id: Int) = personalRecipeDao.getRecipeById(id) != null

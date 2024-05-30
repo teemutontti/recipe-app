@@ -37,7 +37,12 @@ import com.example.recipeapp.viewmodels.ViewModelWrapper
 import kotlinx.coroutines.delay
 
 @Composable
-fun RecipeShelf(navController: NavController, recipes: List<Recipe>, viewModels: ViewModelWrapper) {
+fun RecipeShelf(
+    navController: NavController,
+    recipes: List<Recipe>,
+    viewModels: ViewModelWrapper,
+    animate: Boolean = false,
+) {
     var specialInView by remember { mutableIntStateOf(0) }
     val lazyRowState = rememberLazyListState()
 

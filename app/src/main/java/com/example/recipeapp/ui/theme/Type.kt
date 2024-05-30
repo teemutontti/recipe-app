@@ -34,7 +34,13 @@ val Typography = Typography(
     ),
     //bodyMedium = TextStyle(),
     //bodySmall = TextStyle(),
-    //labelLarge = TextStyle(),
-    //labelMedium = TextStyle(),
-    //labelSmall = TextStyle(),
+    labelLarge = TextStyle(
+        fontSize = 16.sp
+    ),
+    labelMedium = TextStyle(
+        fontSize = 14.sp
+    ),
+    labelSmall = TextStyle(
+        fontSize = 12.sp
+    ),
 )

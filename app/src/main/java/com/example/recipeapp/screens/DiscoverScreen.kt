@@ -69,7 +69,9 @@ private fun DiscoverScreenContent(
             Column(modifier = Modifier.padding(horizontal = 24.dp)) {
 
                 /* === SEARCH SECTION === */
-                CustomSearchBar({ showSearchPanel = true }, { showSearchPanel = false })
+                CustomSearchBar(viewModels.search) {
+                    showSearchPanel = it
+                }
                 if (showSearchPanel) SearchPanel(navController, viewModels)
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -79,7 +81,12 @@ private fun DiscoverScreenContent(
                 } else {
                     Text("Today's Specials", style = MaterialTheme.typography.headlineMedium)
                     Spacer(modifier = Modifier.height(8.dp))
-                    RecipeShelf(navController, viewModels.specials.recipes, viewModels)
+                    RecipeShelf(
+                        navController,
+                        viewModels.specials.recipes,
+                        viewModels,
+                        animate = true,
+                    )
                 }
             }
         }

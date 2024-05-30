@@ -16,14 +16,24 @@ data class SpoonacularRecipe(
     val analyzedInstructions: List<SpoonacularInstruction>,
 ){
     fun toRecipe(): Recipe {
-        return emptyRecipe.copy(
-            id = this.id,
-            title = this.title,
-            image = this.image,
-            servings = this.servings,
-            ingredients = this.extendedIngredients.toIngredientList(),
-            instructions = this.analyzedInstructions.toInstructionList(),
-        )
+        if (this.extendedIngredients != null && this.analyzedInstructions != null) {
+            return emptyRecipe.copy(
+                id = this.id,
+                title = this.title,
+                image = this.image,
+                servings = this.servings,
+                ingredients = this.extendedIngredients.toIngredientList(),
+                instructions = this.analyzedInstructions.toInstructionList(),
+            )
+        } else {
+            return emptyRecipe.copy(
+                id = this.id,
+                title = this.title,
+                image = this.image,
+                servings = this.servings,
+            )
+        }
+
     }
     fun toSavable(): FavouriteRecipe {
         return FavouriteRecipe(

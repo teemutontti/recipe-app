@@ -1,5 +1,6 @@
 package com.example.recipeapp.composables
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -37,22 +38,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.recipeapp.viewmodels.SearchViewModel
+import com.example.recipeapp.viewmodels.ViewModelWrapper
 
 @Composable
 fun CustomSearchBar(
-    onBackAction: () -> Unit = {},
-    onSearchAction: () -> Unit = {},
+    viewModel: SearchViewModel,
+    handleResultVisibility: (Boolean) -> Unit,
 ) {
-    val searchViewModel: SearchViewModel = viewModel()
-
     var loading by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
 
     fun handleSearch() {
+        Log.d("CustomSearchBar", "Query: $query")
         if (query != "") {
             loading = true
-            onSearchAction()
-            searchViewModel.search(query)
+            handleResultVisibility(true)
+            viewModel.search(query)
             loading = false
         }
     }
@@ -69,12 +70,10 @@ fun CustomSearchBar(
     ) {
         TextButton(
             contentPadding = PaddingValues(0.dp),
-            modifier = Modifier
-                .width(32.dp)
-                .height(32.dp),
+            modifier = Modifier.width(32.dp).height(32.dp),
             onClick = {
                 if (query != "") {
-                    onBackAction()
+                    handleResultVisibility(false)
                     query = ""
                 }
             }

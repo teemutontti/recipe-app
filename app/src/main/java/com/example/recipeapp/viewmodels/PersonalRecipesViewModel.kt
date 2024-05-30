@@ -67,7 +67,6 @@ class PersonalRecipesViewModel(application: Application): AndroidViewModel(appli
         viewModelScope.launch {
             val recipe = repository.getById(r.id)
             if (recipe != null) {
-                repository.delete(recipe)
                 repository.update(recipe)
                 loadData()
             }

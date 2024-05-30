@@ -7,10 +7,10 @@ import com.example.recipeapp.models.Instruction
 
 @Entity(tableName = "personal_recipes")
 data class PersonalRecipe(
-    @PrimaryKey(autoGenerate = true) val id: Int,
     val title: String,
     val image: String,
     val servings: Int,
     val ingredients: List<Ingredient>,
     val instructions: List<Instruction>,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
 )

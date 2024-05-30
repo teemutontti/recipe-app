@@ -10,12 +10,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.recipeapp.ApplicationContext
+import com.example.recipeapp.LocalApplicationContext
 import com.example.recipeapp.utils.Utils.checkInternetConnection
 
+/**
+ * Composable function that displays a top bar with a title and optional subtitle.
+ *
+ * @param title The title to display.
+ * @param subtitle The optional subtitle to display.
+ */
 @Composable
 fun TopBar(title: String, subtitle: String? = null) {
-    val context = ApplicationContext.current
+    val context = LocalApplicationContext.current
     val networkConnected = checkInternetConnection(context)
 
     Column(modifier = Modifier.fillMaxWidth().padding(24.dp)) {

@@ -1,6 +1,5 @@
 package com.example.recipeapp.screens
 
-import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,13 +20,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.composables.AddRecipeButton
 import com.example.recipeapp.composables.CategoryShelf
 import com.example.recipeapp.composables.CustomSearchBar
@@ -36,13 +30,13 @@ import com.example.recipeapp.composables.RecipeShelf
 import com.example.recipeapp.composables.SearchPanel
 import com.example.recipeapp.composables.TopBar
 import com.example.recipeapp.composables.UserFeedbackMessage
-import com.example.recipeapp.models.SharedPreferencesKeys.PREFS_NAME
-import com.example.recipeapp.models.room.AppDatabase
-import com.example.recipeapp.viewmodels.PersonalRecipesViewModel
-import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
-import com.example.recipeapp.viewmodels.TodaysSpecialsViewModel
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 
+/**
+ * Composable function for displaying the Discover screen.
+ * @param navController The navigation controller for navigating between screens.
+ * @param viewModels The ViewModelWrapper containing the necessary view models for the screen.
+ */
 @Composable
 fun DiscoverScreen(
     navController: NavController,
@@ -55,6 +49,12 @@ fun DiscoverScreen(
     )
 }
 
+/**
+ * Composable function for the content of the Discover screen.
+ * @param navController The navigation controller for navigating between screens.
+ * @param paddingValues Padding values for the content.
+ * @param viewModels The ViewModelWrapper containing the necessary view models for the screen.
+ */
 @Composable
 private fun DiscoverScreenContent(
     navController: NavController,
@@ -91,7 +91,6 @@ private fun DiscoverScreenContent(
                         navController,
                         viewModels.specials.recipes,
                         viewModels,
-                        animate = true,
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
@@ -99,7 +98,7 @@ private fun DiscoverScreenContent(
                 /* === CATEGORY SEARCH SECTION === */
                 Text("Categories", style = MaterialTheme.typography.headlineMedium)
                 Spacer(modifier = Modifier.height(8.dp))
-                CategoryShelf(viewModels, showSearchPanel) { showSearchPanel = it }
+                CategoryShelf(viewModels) { showSearchPanel = it }
             }
         }
         AddRecipeButton(navController, viewModels.inspection)

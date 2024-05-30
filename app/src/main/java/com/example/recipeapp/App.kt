@@ -18,6 +18,15 @@ import com.example.recipeapp.viewmodels.SearchViewModel
 import com.example.recipeapp.viewmodels.TodaysSpecialsViewModel
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 
+/**
+ * Composable function representing the entry point of the Recipe App.
+ *
+ * This function sets up navigation using Jetpack Compose's NavHost and defines
+ * different screens of the app such as DiscoverScreen, CookbookScreen, RecipeScreen,
+ * and RecipeEditorScreen.
+ *
+ * @param applicationContext The application context required for providing dependencies.
+ */
 @Composable
 fun App(applicationContext: Context) {
     val navController = rememberNavController()
@@ -36,7 +45,7 @@ fun App(applicationContext: Context) {
         specials = todaysSpecialsViewModel,
     )
 
-    CompositionLocalProvider(ApplicationContext provides applicationContext) {
+    CompositionLocalProvider(LocalApplicationContext provides applicationContext) {
         NavHost(navController = navController, startDestination = "discover") {
             composable("discover") {
                 DiscoverScreen(navController, viewModels)

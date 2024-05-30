@@ -1,6 +1,5 @@
 package com.example.recipeapp.composables
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,22 +30,27 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.utils.Utils
-import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
-import com.example.recipeapp.viewmodels.TodaysSpecialsViewModel
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 import kotlinx.coroutines.delay
 
+/**
+ * Composable function that displays a shelf of recipes.
+ * The recipes are being navigated automatically with a short delay.
+ *
+ * @param navController The [NavController] used for navigation.
+ * @param recipes The list of recipes to be displayed on the shelf.
+ * @param viewModels The [ViewModelWrapper] containing view models needed for handling recipes.
+ */
 @Composable
 fun RecipeShelf(
     navController: NavController,
     recipes: List<Recipe>,
     viewModels: ViewModelWrapper,
-    animate: Boolean = false,
 ) {
     var specialInView by remember { mutableIntStateOf(0) }
     val lazyRowState = rememberLazyListState()
 
-    LaunchedEffect(key1 = specialInView) {
+    LaunchedEffect(specialInView) {
         lazyRowState.animateScrollToItem(specialInView)
     }
 
@@ -80,19 +84,18 @@ fun RecipeShelf(
             modifier = Modifier.fillMaxWidth()
         ) {
             repeat(times = recipes.size) {
-                Box(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .clickable { specialInView = it }
-                        .background(
-                            if (lazyRowState.firstVisibleItemIndex == it) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.surfaceVariant
-                            }
-                        )
+                Box(modifier = Modifier
+                    .padding(4.dp)
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .clickable { specialInView = it }
+                    .background(
+                        if (lazyRowState.firstVisibleItemIndex == it) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.surfaceVariant
+                        }
+                    )
                 )
             }
         }

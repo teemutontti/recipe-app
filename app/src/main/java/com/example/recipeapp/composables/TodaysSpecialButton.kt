@@ -1,6 +1,5 @@
 package com.example.recipeapp.composables
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,12 +30,19 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.R
 import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 
+/**
+ * Composable function that displays a button for today's special recipe.
+ *
+ * @param navController The NavController to handle navigation.
+ * @param index The index of the recipe.
+ * @param recipe The recipe to display.
+ * @param viewModel The view model for inspecting recipes.
+ */
 @Composable
 fun TodaysSpecialButton(
     navController: NavController,

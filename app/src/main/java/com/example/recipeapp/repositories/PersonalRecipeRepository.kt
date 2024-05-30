@@ -7,67 +7,108 @@ import com.example.recipeapp.models.room.PersonalRecipeDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+/**
+ * Repository class for managing personal recipes in the database.
+ *
+ * @property db The Room database instance.
+ */
 class PersonalRecipeRepository(db: AppDatabase): ManageableRecipeRepository<PersonalRecipe> {
     private val personalRecipeDao: PersonalRecipeDao = db.personalRecipeDao()
 
     // Data fetching functions
-    override suspend fun getAll(): ResponseHandler<List<PersonalRecipe>> {
+    /**
+     * Fetches all personal recipes from the database.
+     *
+     * @return A [RepositoryResponseHandler] containing a list of personal recipes if successful, or an error message if failed.
+     */
+    override suspend fun getAll(): RepositoryResponseHandler<List<PersonalRecipe>> {
         return try {
             val newRecipes = withContext(Dispatchers.IO) { personalRecipeDao.getAll() }
-            ResponseHandler(success = newRecipes)
+            RepositoryResponseHandler(success = newRecipes)
         } catch (e: Exception) {
             Log.e("PersonalRecipeRepository", "getAll(): $e")
-            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
+            RepositoryResponseHandler(error = "Internal room error occurred! Contact the developer!")
         }
 
     }
-    override suspend fun getById(id: Int): ResponseHandler<PersonalRecipe?> {
+    /**
+     * Fetches a personal recipe from the database by its ID.
+     *
+     * @param id The ID of the personal recipe to fetch.
+     * @return A [RepositoryResponseHandler] containing the fetched personal recipe if successful, or an error message if failed.
+     */
+    override suspend fun getById(id: Int): RepositoryResponseHandler<PersonalRecipe?> {
         return try {
             val newRecipe = withContext(Dispatchers.IO) { personalRecipeDao.getRecipeById(id) }
-            ResponseHandler(success = newRecipe)
+            RepositoryResponseHandler(success = newRecipe)
         } catch (e: Exception) {
             Log.e("PersonalRecipeRepository", "getById(): $e")
-            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
+            RepositoryResponseHandler(error = "Internal room error occurred! Contact the developer!")
         }
     }
 
     // Data management functions
-    override suspend fun add(r: PersonalRecipe): ResponseHandler<PersonalRecipe?> {
+    /**
+     * Adds a new personal recipe to the database.
+     *
+     * @param r The personal recipe to add.
+     * @return A [RepositoryResponseHandler] indicating the success of the operation, or an error message if failed.
+     */
+    override suspend fun add(r: PersonalRecipe): RepositoryResponseHandler<PersonalRecipe?> {
         return try {
             personalRecipeDao.insertRecipe(r)
-            ResponseHandler() // No need for return
+            RepositoryResponseHandler() // No need for return
         } catch (e: Exception) {
             Log.e("PersonalRecipeRepository", "add(): $e")
-            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
+            RepositoryResponseHandler(error = "Internal room error occurred! Contact the developer!")
         }
     }
-    override suspend fun delete(r: PersonalRecipe): ResponseHandler<PersonalRecipe?> {
+    /**
+     * Deletes an existing personal recipe from the database.
+     *
+     * @param r The personal recipe to delete.
+     * @return A [RepositoryResponseHandler] indicating the success of the operation, or an error message if failed.
+     */
+    override suspend fun delete(r: PersonalRecipe): RepositoryResponseHandler<PersonalRecipe?> {
         return try {
             personalRecipeDao.deleteRecipe(r)
-            ResponseHandler() // No need for return
+            RepositoryResponseHandler() // No need for return
         } catch (e: Exception) {
             Log.e("PersonalRecipeRepository", "delete(): $e")
-            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
+            RepositoryResponseHandler(error = "Internal room error occurred! Contact the developer!")
         }
     }
-    suspend fun update(r: PersonalRecipe): ResponseHandler<PersonalRecipe?> {
+    /**
+     * Updates an existing personal recipe in the database.
+     *
+     * @param r The personal recipe to update.
+     * @return A [RepositoryResponseHandler] indicating the success of the operation, or an error message if failed.
+     */
+    suspend fun update(r: PersonalRecipe): RepositoryResponseHandler<PersonalRecipe?> {
         return try {
             personalRecipeDao.updateRecipe(r)
-            ResponseHandler()
+            RepositoryResponseHandler()
         } catch (e: Exception) {
             Log.e("PersonalRecipeRepository", "update(): $e")
-            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
+            RepositoryResponseHandler(error = "Internal room error occurred! Contact the developer!")
         }
     }
 
     // Utility functions
-    suspend fun isRecipeInDatabase(id: Int): ResponseHandler<Boolean> {
+    /**
+     * Checks if a personal recipe with the specified ID exists in the database.
+     *
+     * @param id The ID of the personal recipe to check.
+     * @return A [RepositoryResponseHandler] indicating whether the recipe exists in the database or not,
+     * or an error message if failed.
+     */
+    suspend fun isRecipeInDatabase(id: Int): RepositoryResponseHandler<Boolean> {
         return try {
             val recipeFound = personalRecipeDao.getRecipeById(id) != null
-            ResponseHandler(success = recipeFound)
+            RepositoryResponseHandler(success = recipeFound)
         } catch (e: Exception) {
             Log.e("PersonalRecipeRepository", "isRecipeInDatabase(): $e")
-            ResponseHandler(error = "Internal room error occurred! Contact the developer!")
+            RepositoryResponseHandler(error = "Internal room error occurred! Contact the developer!")
         }
     }
 }

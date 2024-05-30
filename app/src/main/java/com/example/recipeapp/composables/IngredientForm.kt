@@ -34,6 +34,12 @@ import androidx.compose.ui.unit.dp
 import com.example.recipeapp.models.Ingredient
 import com.example.recipeapp.utils.Utils
 
+/**
+ * A composable function that displays a form for adding an ingredient.
+ * It includes fields for the ingredient name, amount, and unit, and validates the input before adding the ingredient.
+ *
+ * @param addIngredient A lambda function to handle adding the ingredient.
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun IngredientForm(addIngredient: (Ingredient) -> Unit) {

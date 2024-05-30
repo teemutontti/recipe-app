@@ -10,17 +10,29 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+/**
+ * Retrofit instance for interacting with the Spoonacular API.
+ */
 class RetrofitInstance {
     private val BASE_URL = "https://api.spoonacular.com/"
 
+    /**
+     * Retrofit instance initialized with the base URL and GsonConverterFactory.
+     */
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
+    /**
+     * Service interface for making API calls related to recipes.
+     */
     val recipeService: RecipeService = retrofit.create(RecipeService::class.java)
 }
 
+/**
+ * Service interface defining methods for interacting with recipe-related endpoints of the Spoonacular API.
+ */
 interface RecipeService {
     @GET("recipes/random")
     suspend fun getRandomRecipes(

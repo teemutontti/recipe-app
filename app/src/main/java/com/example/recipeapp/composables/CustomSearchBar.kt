@@ -36,10 +36,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.recipeapp.viewmodels.SearchViewModel
-import com.example.recipeapp.viewmodels.ViewModelWrapper
 
+/**
+ * A composable function that displays a custom search bar.
+ * It allows users to input a search query and triggers a search action in the provided ViewModel.
+ *
+ * @param viewModel The SearchViewModel that handles the search logic.
+ * @param showResult A boolean flag indicating whether search results are currently being shown.
+ * @param handleShowResult A lambda function to handle the visibility of search results.
+ */
 @Composable
 fun CustomSearchBar(
     viewModel: SearchViewModel,

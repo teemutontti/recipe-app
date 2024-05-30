@@ -4,35 +4,24 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
+import com.example.recipeapp.R
 import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.models.room.FavouriteRecipe
 import com.example.recipeapp.models.room.PersonalRecipe
-import com.example.recipeapp.utils.Utils.emptyRecipe
 
+/**
+ * Utility functions and constants used throughout the application.
+ */
 object Utils {
-    private var _id: Int = 0
-
-    fun setId(newId: Int) {
-        _id = newId
-    }
-
-    fun getNextId(): Int {
-        _id += 1
-        return _id
-    }
-
     val INGREDIENT_UNITS = listOf("ml", "l", "tsp", "tbsp", "mg", "g", "kg", "pinch", "piece")
     val SPECIAL_MEAL_TYPES = listOf("breakfast", "lunch", "dinner", "snack")
-    val DEFAULT_TEXT_STYLE = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Normal)
-    val SMALL_HEADING_STYLE = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-    val LARGE_HEADING_STYLE = TextStyle(fontSize = 32.sp, fontWeight = FontWeight.Bold, )
     const val LANDSCAPE_ASPECT_RATIO: Float = 1.7777778f
     const val IMAGE_WIDTH: Int = 288
     const val IMAGE_HEIGHT: Int = 162
 
+    /**
+     * Validator for recipe title.
+     */
     object Validator {
         fun recipeTitle(title: String): Boolean {
             return title.length > 2
@@ -60,7 +49,23 @@ object Utils {
         instructions = emptyList(),
     )
 
+    val categories = listOf(
+        Category(R.drawable.chicken, "Chicken", "chicken"),
+        Category(R.drawable.beef, "Beef", "beef"),
+        Category(R.drawable.pork, "Pork", "pork"),
+        Category(R.drawable.fish, "Seafood", "seafood"),
+        Category(R.drawable.spaghetti, "Pasta", "pasta"),
+        Category(R.drawable.rice, "Rice", "rice"),
+        Category(R.drawable.vegetable, "Vegetable", "vegetable"),
+        Category(R.drawable.fruit, "Fruit", "fruit"),
+    )
+
     // Conversion function for Jetpack Room Entity class
+    /**
+     * Converts a [PersonalRecipe] object to a [Recipe] object.
+     * @param personalRecipe The personal recipe to convert.
+     * @return The converted recipe.
+     */
     fun PersonalRecipe.toRecipe(): Recipe {
         return emptyRecipe.copy(
             id = this.id,
@@ -74,6 +79,11 @@ object Utils {
     }
 
     // Conversion function for Jetpack Room Entity class
+    /**
+     * Converts a [FavouriteRecipe] object to a [Recipe] object.
+     * @param favouriteRecipe The favourite recipe to convert.
+     * @return The converted recipe.
+     */
     fun FavouriteRecipe.toRecipe(): Recipe {
         return emptyRecipe.copy(
             id = id,
@@ -90,6 +100,11 @@ object Utils {
         }
     }
 
+    /**
+     * Converts a float number to a fraction if applicable.
+     * @param number The number to convert.
+     * @return The converted fraction or formatted number.
+     */
     fun convertToFraction(number: Float): String {
         Log.d("FractionCreation", "Creating fraction for: $number")
         val decimal = number - number.toInt()
@@ -114,6 +129,11 @@ object Utils {
         return formatFloatToString(number)
     }
 
+    /**
+     * Checks if there is an active internet connection.
+     * @param context The context of the application.
+     * @return True if there is an active internet connection, false otherwise.
+     */
     fun checkInternetConnection(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
@@ -133,7 +153,25 @@ object Utils {
     }
 }
 
+/**
+ * Represents a fraction with its range.
+ * @property range The range within which the fraction applies.
+ * @property fraction The fraction represented as a string.
+ */
 data class Fraction(
     val range: ClosedFloatingPointRange<Float>,
     val fraction: String
+)
+
+/**
+ * Represents a category of recipes.
+ *
+ * @property drawableId The resource ID of the drawable associated with the category.
+ * @property title The title of the category.
+ * @property query The query string associated with the category, used for searching recipes.
+ */
+data class Category(
+    val drawableId: Int,
+    val title: String,
+    val query: String,
 )

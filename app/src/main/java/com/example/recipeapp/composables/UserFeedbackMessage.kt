@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ErrorOutline
-import androidx.compose.material.icons.rounded.Notifications
-import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+/**
+ * Composable function that displays a user feedback message based on the provided type.
+ *
+ * @param message The message to display.
+ * @param type The type of feedback message. Defaults to "default".
+ */
 @Composable
 fun UserFeedbackMessage(message: String, type: String = "default") {
     when (type) {
@@ -28,6 +32,11 @@ fun UserFeedbackMessage(message: String, type: String = "default") {
     }
 }
 
+/**
+ * Composable function that displays a default user feedback message.
+ *
+ * @param message The message to display.
+ */
 @Composable
 private fun Default(message: String) {
     Row(
@@ -39,6 +48,11 @@ private fun Default(message: String) {
     }
 }
 
+/**
+ * Composable function that displays an error user feedback message.
+ *
+ * @param message The message to display.
+ */
 @Composable
 private fun Error(message: String) {
     Surface(
@@ -61,6 +75,11 @@ private fun Error(message: String) {
     }
 }
 
+/**
+ * Composable function that displays a warning user feedback message.
+ *
+ * @param message The message to display.
+ */
 @Composable
 private fun Warning(message: String) {
     Surface(

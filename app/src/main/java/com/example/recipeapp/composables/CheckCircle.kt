@@ -17,6 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 
+/**
+ * A composable function that displays a check icon inside a circular background.
+ * This can be used to indicate a selected or completed state.
+ */
 @Composable
 fun CheckCircle() {
     Box(

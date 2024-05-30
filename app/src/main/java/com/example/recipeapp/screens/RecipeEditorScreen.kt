@@ -1,7 +1,6 @@
 package com.example.recipeapp.screens
 
 import android.content.Intent
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -57,7 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.recipeapp.ApplicationContext
+import com.example.recipeapp.LocalApplicationContext
 import com.example.recipeapp.R
 import com.example.recipeapp.composables.BackButton
 import com.example.recipeapp.composables.IngredientForm
@@ -72,6 +71,11 @@ import com.example.recipeapp.utils.Utils
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 
+/**
+ * Composable function for displaying the Recipe Editor screen.
+ * @param navController The navigation controller for navigating between screens.
+ * @param viewModels The ViewModelWrapper containing the necessary view models for the screen.
+ */
 @Composable
 fun RecipeEditorScreen(navController: NavController, viewModels: ViewModelWrapper) {
     var currentFormStep by remember { mutableIntStateOf(0) }
@@ -79,17 +83,13 @@ fun RecipeEditorScreen(navController: NavController, viewModels: ViewModelWrappe
 
     fun handleSave() {
         val recipe = viewModels.inspection.recipe.value
-        Log.d("RecipeEditor", "Id: ${recipe.id}")
         viewModels.personal.isRecipeInDatabase(recipe) { isFound ->
             if (isFound) {
                 if (recipe.id == -1) {
-                    Log.d("Editor", "Addition save 1: $recipe")
                     viewModels.personal.add(recipe)
                 }
-                Log.d("Editor", "Editing save: $recipe")
                 viewModels.personal.edit(recipe)
             } else {
-                Log.d("Editor", "Addition save 2: $recipe")
                 viewModels.personal.add(recipe)
             }
             navController.navigate("cookbook")
@@ -155,6 +155,15 @@ fun RecipeEditorScreen(navController: NavController, viewModels: ViewModelWrappe
     )
 }
 
+/**
+ * Composable function for the content of the Recipe Editor screen.
+ * @param navController The navigation controller for navigating between screens.
+ * @param paddingValues Padding values for the content.
+ * @param viewModels The ViewModelWrapper containing the necessary view models for the screen.
+ * @param currentFormStep The current step in the recipe editing process.
+ * @param handleAllowNextChange Function to handle changes in the 'allowNext' state.
+ * @param handleStepChange Function to handle changing the current form step.
+ */
 @Composable
 private fun RecipeEditorContent(
     navController: NavController,
@@ -190,6 +199,13 @@ private fun RecipeEditorContent(
     }
 }
 
+/**
+ * Composable function for rendering the title step of the recipe editor.
+ *
+ * @param viewModel The [RecipeUnderInspectionViewModel] containing the recipe being edited.
+ * @param handleAllowNextChange Callback function to handle changes in allowing navigation to the next step.
+ * @param toNextStep Callback function to navigate to the next step.
+ */
 @Composable
 private fun TitleStep(
     viewModel: RecipeUnderInspectionViewModel,
@@ -217,7 +233,7 @@ private fun TitleStep(
         }
     }
 
-    val context = ApplicationContext.current
+    val context = LocalApplicationContext.current
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = {
@@ -306,6 +322,12 @@ private fun TitleStep(
     }
 }
 
+/**
+ * Composable function for rendering the ingredients step of the recipe editor.
+ *
+ * @param viewModel The [RecipeUnderInspectionViewModel] containing the recipe being edited.
+ * @param handleAllowNextChange Callback function to handle changes in allowing navigation to the next step.
+ */
 @Composable
 private fun IngredientsStep(
     viewModel: RecipeUnderInspectionViewModel,
@@ -341,6 +363,12 @@ private fun IngredientsStep(
     }
 }
 
+/**
+ * Composable function for rendering the instructions step of the recipe editor.
+ *
+ * @param viewModel The [RecipeUnderInspectionViewModel] containing the recipe being edited.
+ * @param handleAllowNextChange Callback function to handle changes in allowing navigation to the next step.
+ */
 @Composable
 private fun InstructionsStep(
     viewModel: RecipeUnderInspectionViewModel,
@@ -432,6 +460,13 @@ private fun InstructionsStep(
     }
 }
 
+/**
+ * Composable function for rendering the preview step of the recipe editor.
+ *
+ * @param viewModels The [ViewModelWrapper] containing the view models that are used.
+ * @param handleAllowNextChange Callback function to handle changes in allowing navigation to the next step.
+ * @param navController The [NavController] used for navigation.
+ */
 @Composable
 private fun PreviewStep(
     viewModels: ViewModelWrapper,

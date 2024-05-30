@@ -53,13 +53,20 @@ import com.example.recipeapp.composables.RecipeImage
 import com.example.recipeapp.composables.UserFeedbackMessage
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 
-
+/**
+ * Composable function for rendering the recipe screen.
+ *
+ * @param navController The navigation controller for navigating between screens.
+ * @param viewModels The [ViewModelWrapper] containing view models for recipe inspection and favorites.
+ * @param isPreview Flag indicating whether the screen is in preview mode.
+ */
 @Composable
 fun RecipeScreen(
     navController: NavController,
     viewModels: ViewModelWrapper,
     isPreview: Boolean = false,
 ) {
+    // State variables for recipe details
     val recipe by viewModels.inspection.recipe
     val isLoading by viewModels.inspection.loading
     var imageLoading by remember { mutableStateOf(true) }

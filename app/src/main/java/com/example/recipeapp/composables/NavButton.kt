@@ -1,6 +1,5 @@
 package com.example.recipeapp.composables
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,8 +19,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.recipeapp.ui.theme.backgroundDark
 
+/**
+ * A composable function that displays a navigation button.
+ *
+ * @param selected Whether the button is currently selected.
+ * @param onClick The callback to be invoked when the button is clicked.
+ * @param iconVector The icon vector to be displayed on the button.
+ * @param text The optional text to be displayed below the icon.
+ */
 @Composable
 fun NavButton(
     selected: Boolean,

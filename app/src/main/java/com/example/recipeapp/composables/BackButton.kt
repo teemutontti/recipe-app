@@ -16,6 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
+/**
+ * A composable function that displays a back button.
+ * When clicked, it navigates back to the previous screen using the NavController.
+ *
+ * @param navController The NavController used to navigate between screens.
+ */
 @Composable
 fun BackButton(navController: NavController) {
     TextButton(

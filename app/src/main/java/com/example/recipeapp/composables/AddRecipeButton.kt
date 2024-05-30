@@ -20,6 +20,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 
+/**
+ * A composable function that displays a circular button for adding a new recipe.
+ * When clicked, it navigates to the recipe editor screen and sets the current recipe in the ViewModel to null.
+ *
+ * @param navController The NavController used to navigate between screens.
+ * @param viewModel The ViewModel that manages the state of the recipe under inspection.
+ */
 @Composable
 fun AddRecipeButton(navController: NavController, viewModel: RecipeUnderInspectionViewModel) {
     Box(

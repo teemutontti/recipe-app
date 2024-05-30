@@ -30,12 +30,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.R
 import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 
+/**
+ * A composable function that displays a recipe button.
+ *
+ * @param navController The [NavController] used for navigation.
+ * @param recipe The recipe to be displayed.
+ * @param viewModel The [RecipeUnderInspectionViewModel] associated with the recipe.
+ */
 @Composable
 fun RecipeButton(
     navController: NavController,
@@ -76,10 +82,7 @@ fun RecipeButton(
                     }
                 )
             } else {
-                RecipeImage(
-                    painter = painterResource(id = R.drawable.meal),
-                    isPreview = true
-                )
+                RecipeImage(painter = painterResource(id = R.drawable.meal), isPreview = true)
             }
             // Adding shadow with box composable for better text readability
             Box(
@@ -99,9 +102,7 @@ fun RecipeButton(
             Column(
                 verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.Start,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier = Modifier.fillMaxHeight().padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(
                     text = recipe.title,

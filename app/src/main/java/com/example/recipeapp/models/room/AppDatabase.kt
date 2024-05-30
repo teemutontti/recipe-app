@@ -10,6 +10,10 @@ import com.example.recipeapp.models.Ingredient
 import com.example.recipeapp.models.Instruction
 import com.google.gson.Gson
 
+/**
+ * Database class representing the Room database for the Recipe App.
+ * It includes two entity tables: PersonalRecipe and FavouriteRecipe.
+ */
 @Database(entities = [PersonalRecipe::class, FavouriteRecipe::class], version = 2)
 @TypeConverters(Converters::class)
 abstract class AppDatabase: RoomDatabase() {
@@ -17,9 +21,11 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun favouriteRecipeDao(): FavouriteRecipeDao
 }
 
+/**
+ * Singleton object responsible for providing an instance of the AppDatabase.
+ */
 object DatabaseProvider {
     @Volatile private var INSTANCE: AppDatabase? = null
-
     fun getInstance(context: Context): AppDatabase {
         if (INSTANCE == null) {
             INSTANCE = Room.databaseBuilder(
@@ -33,6 +39,10 @@ object DatabaseProvider {
     }
 }
 
+/**
+ * Type converter class for converting custom types to and from Room database.
+ * Room database requires this with more complex data structure as lists.
+ */
 class Converters {
     @TypeConverter
     fun fromIngredientList(value: List<Ingredient>?): String? {

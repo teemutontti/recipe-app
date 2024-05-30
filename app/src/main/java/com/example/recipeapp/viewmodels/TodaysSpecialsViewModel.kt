@@ -2,19 +2,24 @@ package com.example.recipeapp.viewmodels
 
 import android.app.Application
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.models.SharedPreferencesKeys.PREFS_NAME
-import com.example.recipeapp.models.SpoonacularRecipe
 import com.example.recipeapp.models.room.FavouriteRecipe
 import com.example.recipeapp.repositories.TodaysSpecialsRepository
 import com.example.recipeapp.utils.Utils.toRecipe
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel class responsible for managing today's specials functionality.
+ *
+ * This class retrieves today's special recipes from the repository and encapsulates them along with loading and error states.
+ *
+ * @property application The application context associated with the ViewModel.
+ */
 class TodaysSpecialsViewModel(application: Application): AndroidViewModel(application) {
     private val repository: TodaysSpecialsRepository
 

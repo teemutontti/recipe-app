@@ -26,12 +26,7 @@ android {
         val properties = Properties()
         properties.load(keystoreFile.inputStream())
 
-        val appId: String = properties.getProperty("APP_ID") ?: ""
-        val appKey: String = properties.getProperty("APP_KEY") ?: ""
         val apiKey: String = properties.getProperty("API_KEY") ?: ""
-
-        buildConfigField("String", "APP_ID", appId)
-        buildConfigField("String", "APP_KEY", appKey)
         buildConfigField("String", "API_KEY", apiKey)
     }
 

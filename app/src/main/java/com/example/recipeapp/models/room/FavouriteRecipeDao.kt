@@ -22,4 +22,10 @@ interface FavouriteRecipeDao {
 
     @Delete
     suspend fun deleteRecipe(recipe: FavouriteRecipe)
+
+    @Query("DELETE FROM favourite_recipes")
+    suspend fun clearData()
+
+    @Query("DELETE FROM sqlite_sequence WHERE name = 'favourite_recipes'")
+    suspend fun resetAutoIncrement()
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 
@@ -23,4 +24,10 @@ interface PersonalRecipeDao {
 
     @Delete
     suspend fun deleteRecipe(recipe: PersonalRecipe)
+
+    @Query("DELETE FROM personal_recipes")
+    suspend fun clearData()
+
+    @Query("DELETE FROM sqlite_sequence WHERE name = 'personal_recipes'")
+    suspend fun resetAutoIncrement()
 }

@@ -1,9 +1,8 @@
 package com.example.recipeapp.models
 
 import android.content.SharedPreferences
-import com.example.recipeapp.models.SharedPreferencesKeys.TODAYS_SPECIALS
-import com.example.recipeapp.models.SharedPreferencesKeys.TODAYS_SPECIALS_LAST_LOAD
-import com.example.recipeapp.models.room.FavouriteRecipe
+import com.example.recipeapp.utils.SharedPreferencesKeys.TODAYS_SPECIALS
+import com.example.recipeapp.utils.SharedPreferencesKeys.TODAYS_SPECIALS_LAST_LOAD
 import com.google.gson.Gson
 import java.time.LocalDate
 

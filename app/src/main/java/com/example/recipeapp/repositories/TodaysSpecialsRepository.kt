@@ -3,7 +3,7 @@ package com.example.recipeapp.repositories
 import android.content.SharedPreferences
 import com.example.recipeapp.BuildConfig.API_KEY
 import com.example.recipeapp.models.SharedPreferencesManager
-import com.example.recipeapp.models.room.FavouriteRecipe
+import com.example.recipeapp.models.FavouriteRecipe
 import com.example.recipeapp.services.RetrofitInstance
 import com.example.recipeapp.utils.Utils.SPECIAL_MEAL_TYPES
 

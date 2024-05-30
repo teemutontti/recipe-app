@@ -1,9 +1,9 @@
 package com.example.recipeapp.repositories
 
 import android.util.Log
-import com.example.recipeapp.models.room.AppDatabase
-import com.example.recipeapp.models.room.FavouriteRecipe
-import com.example.recipeapp.models.room.FavouriteRecipeDao
+import com.example.recipeapp.models.AppDatabase
+import com.example.recipeapp.models.FavouriteRecipe
+import com.example.recipeapp.models.FavouriteRecipeDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

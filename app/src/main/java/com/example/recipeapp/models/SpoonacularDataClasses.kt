@@ -1,6 +1,5 @@
 package com.example.recipeapp.models
 
-import com.example.recipeapp.models.room.FavouriteRecipe
 import com.example.recipeapp.utils.Utils.emptyRecipe
 
 /**

@@ -1,8 +1,5 @@
 package com.example.recipeapp.models
 
-import com.example.recipeapp.models.room.FavouriteRecipe
-import com.example.recipeapp.models.room.PersonalRecipe
-
 /**
  * Represents a recipe, which can be either a personal recipe or a favorite recipe.
  *

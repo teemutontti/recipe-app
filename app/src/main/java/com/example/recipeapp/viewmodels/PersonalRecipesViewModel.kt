@@ -1,17 +1,13 @@
 package com.example.recipeapp.viewmodels
 
 import android.app.Application
-import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.models.Recipe
-import com.example.recipeapp.models.room.AppDatabase
-import com.example.recipeapp.models.room.DatabaseProvider
-import com.example.recipeapp.models.room.PersonalRecipe
+import com.example.recipeapp.models.DatabaseProvider
+import com.example.recipeapp.models.PersonalRecipe
 import com.example.recipeapp.repositories.PersonalRecipeRepository
 import com.example.recipeapp.utils.Utils.toRecipe
 import kotlinx.coroutines.launch

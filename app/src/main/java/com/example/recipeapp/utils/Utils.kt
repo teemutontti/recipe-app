@@ -5,9 +5,11 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
 import com.example.recipeapp.R
+import com.example.recipeapp.models.Category
 import com.example.recipeapp.models.Recipe
-import com.example.recipeapp.models.room.FavouriteRecipe
-import com.example.recipeapp.models.room.PersonalRecipe
+import com.example.recipeapp.models.FavouriteRecipe
+import com.example.recipeapp.models.Fraction
+import com.example.recipeapp.models.PersonalRecipe
 
 /**
  * Utility functions and constants used throughout the application.
@@ -153,25 +155,3 @@ object Utils {
     }
 }
 
-/**
- * Represents a fraction with its range.
- * @property range The range within which the fraction applies.
- * @property fraction The fraction represented as a string.
- */
-data class Fraction(
-    val range: ClosedFloatingPointRange<Float>,
-    val fraction: String
-)
-
-/**
- * Represents a category of recipes.
- *
- * @property drawableId The resource ID of the drawable associated with the category.
- * @property title The title of the category.
- * @property query The query string associated with the category, used for searching recipes.
- */
-data class Category(
-    val drawableId: Int,
-    val title: String,
-    val query: String,
-)

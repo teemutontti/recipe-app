@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.models.Recipe
-import com.example.recipeapp.models.room.DatabaseProvider
-import com.example.recipeapp.models.room.FavouriteRecipe
+import com.example.recipeapp.models.DatabaseProvider
+import com.example.recipeapp.models.FavouriteRecipe
 import com.example.recipeapp.repositories.FavouriteRecipeRepository
 import com.example.recipeapp.utils.Utils.toRecipe
 import kotlinx.coroutines.launch

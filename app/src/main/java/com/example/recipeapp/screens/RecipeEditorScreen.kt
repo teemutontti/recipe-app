@@ -38,7 +38,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -57,7 +56,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.ApplicationContext
 import com.example.recipeapp.R
@@ -71,7 +69,6 @@ import com.example.recipeapp.composables.StepIndicator
 import com.example.recipeapp.models.Ingredient
 import com.example.recipeapp.models.Instruction
 import com.example.recipeapp.utils.Utils
-import com.example.recipeapp.viewmodels.PersonalRecipesViewModel
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 
@@ -528,7 +525,7 @@ private fun PreviewStep(
                 .clip(RoundedCornerShape(8.dp))
                 .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
         ) {
-            RecipeScreen(navController, viewModels, preview = true)
+            RecipeScreen(navController, viewModels, isPreview = true)
         }
     }
 }

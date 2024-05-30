@@ -1,6 +1,5 @@
 package com.example.recipeapp.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -44,7 +43,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.recipeapp.R
 import com.example.recipeapp.composables.DeleteDialog
@@ -53,7 +51,6 @@ import com.example.recipeapp.composables.InstructionRow
 import com.example.recipeapp.composables.NumberCounter
 import com.example.recipeapp.composables.RecipeImage
 import com.example.recipeapp.composables.UserFeedbackMessage
-import com.example.recipeapp.viewmodels.FavouriteRecipesViewModel
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 
 
@@ -61,7 +58,7 @@ import com.example.recipeapp.viewmodels.ViewModelWrapper
 fun RecipeScreen(
     navController: NavController,
     viewModels: ViewModelWrapper,
-    preview: Boolean = false,
+    isPreview: Boolean = false,
 ) {
     val recipe by viewModels.inspection.recipe
     val isLoading by viewModels.inspection.loading
@@ -73,7 +70,7 @@ fun RecipeScreen(
     var initialServings by remember { mutableIntStateOf(recipe.servings) }
 
     LaunchedEffect(Unit) {
-        if (!recipe.isPersonalRecipe) {
+        if (!recipe.isPersonalRecipe && !isPreview) {
             viewModels.inspection.fetchRecipe(recipe.id)
 
             // Checking if the recipe is a favourite and updating state based on it
@@ -131,7 +128,7 @@ fun RecipeScreen(
     )
 
     Column(modifier =
-        if (preview) Modifier.padding(32.dp)
+        if (isPreview) Modifier.padding(32.dp)
         else Modifier.padding(32.dp).verticalScroll(rememberScrollState())
     ) {
         if (isLoading) LinearProgressIndicator()
@@ -156,7 +153,7 @@ fun RecipeScreen(
                 if (recipe.isPersonalRecipe) {
                     Column {
                         IconButton(
-                            enabled = !preview,
+                            enabled = !isPreview,
                             onClick = { showMore = !showMore }
                         ) {
                             Icon(Icons.Default.MoreVert, "more")
@@ -205,7 +202,7 @@ fun RecipeScreen(
                     }
                 } else {
                     IconButton(
-                        enabled = !preview,
+                        enabled = !isPreview,
                         onClick = { handleFavouriteClick() }
                     ) {
                         Icon(

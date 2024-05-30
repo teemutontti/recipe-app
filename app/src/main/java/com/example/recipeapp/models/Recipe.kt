@@ -12,6 +12,12 @@ data class Recipe(
     val instructions: List<Instruction>,
     val isPersonalRecipe: Boolean = false,
 ){
-    fun toPersonal() = PersonalRecipe(id, title, image, servings, ingredients, instructions)
+    fun toPersonal(): PersonalRecipe {
+        return if (id == -1) {
+            PersonalRecipe(title, image, servings, ingredients, instructions)
+        } else {
+            PersonalRecipe(title, image, servings, ingredients, instructions, id)
+        }
+    }
     fun toFavourite() = FavouriteRecipe(id, image, title)
 }

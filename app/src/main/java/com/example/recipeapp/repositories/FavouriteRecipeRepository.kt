@@ -1,30 +1,29 @@
 package com.example.recipeapp.repositories
 
-import com.example.recipeapp.models.CachedRecipe
+import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.models.room.AppDatabase
 import com.example.recipeapp.models.room.FavouriteRecipe
 import com.example.recipeapp.models.room.FavouriteRecipeDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class FavouriteRecipeRepository(db: AppDatabase) {
+class FavouriteRecipeRepository(db: AppDatabase): ManageableRecipeRepository<FavouriteRecipe> {
     private var favouriteRecipeDao: FavouriteRecipeDao = db.favouriteRecipeDao()
 
-    suspend fun getAllRecipes(): List<FavouriteRecipe> {
+    // Data fetching functions
+    override suspend fun getAll(): List<FavouriteRecipe> {
         return withContext(Dispatchers.IO) {
             favouriteRecipeDao.getAll()
         }
     }
-
-    suspend fun add(recipe: FavouriteRecipe) {
-        favouriteRecipeDao.insertRecipe(recipe)
+    override suspend fun getById(id: Int): FavouriteRecipe? {
+        return withContext(Dispatchers.IO) {
+            favouriteRecipeDao.getRecipeById(id)
+        }
     }
 
-    suspend fun update(recipe: FavouriteRecipe) {
-        favouriteRecipeDao.updateRecipe(recipe)
-    }
-
-    suspend fun delete(recipe: FavouriteRecipe) {
-        favouriteRecipeDao.deleteRecipe(recipe)
-    }
+    // Data management functions
+    override suspend fun add(r: FavouriteRecipe) = favouriteRecipeDao.insertRecipe(r)
+    override suspend fun update(r: FavouriteRecipe) = favouriteRecipeDao.updateRecipe(r)
+    override suspend fun delete(r: FavouriteRecipe) = favouriteRecipeDao.deleteRecipe(r)
 }

@@ -200,14 +200,15 @@ private fun TitleStep(
     var servings by remember { mutableIntStateOf(viewModel.recipe.value.servings) }
     var image by remember { mutableStateOf(viewModel.recipe.value.image) }
 
-    LaunchedEffect(title, servings) {
+    LaunchedEffect(title, servings, image) {
         val titleOk = Utils.Validator.recipeTitle(title)
         val servingsOk = Utils.Validator.recipeServings(servings)
 
         if (titleOk && servingsOk) {
             val newRecipe = viewModel.recipe.value.copy(
                 title = title,
-                servings = servings
+                servings = servings,
+                image = image,
             )
             viewModel.setRecipe(newRecipe)
             handleAllowNextChange(true)

@@ -31,13 +31,18 @@ class TodaysSpecialsViewModel(application: Application): AndroidViewModel(applic
     private val _loading = mutableStateOf(true) // Initializing to true
     val loading get() = _loading.value
 
+    private val _error = mutableStateOf<String?>(null)
+    val error get() = _error.value
+
     init {
         viewModelScope.launch {
-            val newRecipes = repository.getTodaysSpecials()
-            if (newRecipes != null) {
-                _recipes.addAll(newRecipes)
-                _loading.value = _recipes.size == 0
+            val responseHandler = repository.getTodaysSpecials()
+            if (responseHandler.success != null) {
+                _recipes.addAll(responseHandler.success)
+            } else {
+                _error.value = responseHandler.error
             }
+            _loading.value = false
         }
     }
 }

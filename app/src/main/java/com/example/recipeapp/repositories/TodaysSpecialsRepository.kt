@@ -10,23 +10,27 @@ import com.example.recipeapp.utils.Utils.SPECIAL_MEAL_TYPES
 import com.example.recipeapp.utils.Utils.toRecipe
 
 class TodaysSpecialsRepository(private val prefs: SharedPreferences) {
-    suspend fun getTodaysSpecials(): List<FavouriteRecipe>? {
+    suspend fun getTodaysSpecials(): ResponseHandler<List<FavouriteRecipe>> {
         val isLoaded = SharedPreferencesManager.isTodaysSpecialsLoaded(prefs)
-        if (isLoaded) return SharedPreferencesManager.getTodaysSpecials(prefs)
-        else {
+        if (isLoaded) {
+            val newRecipes = SharedPreferencesManager.getTodaysSpecials(prefs)
+            return if (newRecipes != null) {
+                ResponseHandler(success = newRecipes)
+            } else {
+                ResponseHandler(error = "Error with getting saved specials!")
+            }
+        } else {
             val newRecipes = SPECIAL_MEAL_TYPES.map {
                 val response = RetrofitInstance().recipeService.getRandomRecipes(API_KEY, it, 1)
-                val recipe = response.body()?.recipes?.get(0)
-
-                if (response.isSuccessful && recipe != null) {
-                    recipe.toSavable()
+                if (response.isSuccessful) {
+                    response.body()?.recipes?.get(0)?.toSavable()
                 } else {
-                    // Return null for the whole function if fetch is unsuccessful
-                    return null
+                    return ResponseHandler(error = "Error with the code of ${response.code()} occurred!")
                 }
             }
-            SharedPreferencesManager.saveTodaysSpecials(prefs, newRecipes)
-            return newRecipes
+
+            SharedPreferencesManager.saveTodaysSpecials(prefs, newRecipes.filterNotNull())
+            return ResponseHandler(success = newRecipes.filterNotNull())
         }
     }
 }

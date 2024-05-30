@@ -34,6 +34,7 @@ import com.example.recipeapp.composables.NavBar
 import com.example.recipeapp.composables.RecipeShelf
 import com.example.recipeapp.composables.SearchPanel
 import com.example.recipeapp.composables.TopBar
+import com.example.recipeapp.composables.UserFeedbackMessage
 import com.example.recipeapp.models.SharedPreferencesKeys.PREFS_NAME
 import com.example.recipeapp.models.room.AppDatabase
 import com.example.recipeapp.viewmodels.PersonalRecipesViewModel
@@ -63,9 +64,13 @@ private fun DiscoverScreenContent(
 
     Box(
         contentAlignment = Alignment.BottomEnd,
-        modifier = Modifier.fillMaxSize().padding(paddingValues)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
     ) {
-        Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())) {
             Column(modifier = Modifier.padding(horizontal = 24.dp)) {
 
                 /* === SEARCH SECTION === */
@@ -76,11 +81,13 @@ private fun DiscoverScreenContent(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 /* === TODAY'S SPECIALS SECTION === */
-                if (viewModels.specials.loading) {
+                Text("Today's Specials", style = MaterialTheme.typography.headlineMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                if (viewModels.specials.error != null) {
+                    UserFeedbackMessage(viewModels.specials.error!!, "error")
+                } else if (viewModels.specials.loading) {
                     LinearProgressIndicator()
                 } else {
-                    Text("Today's Specials", style = MaterialTheme.typography.headlineMedium)
-                    Spacer(modifier = Modifier.height(8.dp))
                     RecipeShelf(
                         navController,
                         viewModels.specials.recipes,

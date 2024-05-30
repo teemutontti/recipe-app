@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ErrorOutline
+import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.Icon
@@ -19,10 +20,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun UserFeedbackMessage(message: String, type: String = "error") {
+fun UserFeedbackMessage(message: String, type: String = "default") {
     when (type) {
         "error" -> Error(message)
         "warning" -> Warning(message)
+        "default" -> Default(message)
+    }
+}
+
+@Composable
+private fun Default(message: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp),
+    ) {
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(message, style = MaterialTheme.typography.labelLarge)
     }
 }
 
@@ -43,7 +56,7 @@ private fun Error(message: String) {
                 contentDescription = "error",
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(message)
+            Text(message, style = MaterialTheme.typography.labelLarge)
         }
     }
 }
@@ -65,7 +78,7 @@ private fun Warning(message: String) {
                 contentDescription = "warning",
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(message)
+            Text(message, style = MaterialTheme.typography.labelLarge)
         }
     }
 }

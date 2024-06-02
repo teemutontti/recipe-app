@@ -4,16 +4,15 @@
 RecipeApp is an app that allows users to search different recipes, save own recipes and select favourite recipes.
 The app uses [Edamam API](https://developer.edamam.com/edamam-recipe-api).
 
+## Screencast link
+[Screencast](https://www.youtube.com/watch?v=sGlaz2euWks)
+
 ## Features
 ### Current features:
-- View 3 random "Today's special" recipe names once per days
-
-### Upcoming features:
-- View recipe details
-- Save favourites
-- Create own recipes
-- Search recipes with a search query
-- Search recipes by category
+- View "Today's special" recipe names once per days
+- Add, edit, view and delete personal recipes
+- Search recipes by keyword
+- Search recipe by categories
 
 ## Getting Started
 To get started with RecipeApp, follow these steps:

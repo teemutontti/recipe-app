@@ -29,26 +29,10 @@ import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
  */
 @Composable
 fun AddRecipeButton(navController: NavController, viewModel: RecipeUnderInspectionViewModel) {
-    Box(
-        modifier = Modifier.padding(16.dp)
-    ) {
-        TextButton(
-            shape = CircleShape,
-            colors = ButtonDefaults.textButtonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-            ),
-            modifier = Modifier.width(64.dp).height(64.dp).clip(CircleShape).shadow(2.dp),
-            onClick = {
-                viewModel.setRecipe(null)
-                navController.navigate("recipe_editor")
-            }
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Add,
-                contentDescription = "add",
-                modifier = Modifier.width(56.dp).height(56.dp),
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-        }
+    fun handleAddRecipeClick() {
+        viewModel.setRecipe(null)
+        navController.navigate("recipe_editor")
+
     }
+    AddButton(::handleAddRecipeClick)
 }

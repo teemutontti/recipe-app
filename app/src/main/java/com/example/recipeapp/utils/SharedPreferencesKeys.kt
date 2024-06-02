@@ -12,4 +12,6 @@ object SharedPreferencesKeys {
 
     // Key for storing today's specials in SharedPreferences.
     const val TODAYS_SPECIALS_LAST_LOAD = "todays_specials_load_date"
+
+    const val SHOPPING_LIST = "shopping_list"
 }

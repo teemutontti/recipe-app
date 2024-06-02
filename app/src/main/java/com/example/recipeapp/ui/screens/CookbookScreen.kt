@@ -43,7 +43,7 @@ import com.example.recipeapp.viewmodels.ViewModelWrapper
 @Composable
 fun CookbookScreen(navController: NavController, viewModels: ViewModelWrapper) {
     Scaffold(
-        topBar = { TopBar(title = "Cookbook") },
+        topBar = { TopBar("Cookbook") },
         content = { CookbookScreenContent(navController, viewModels, it) },
         bottomBar = { NavBar(navController, "cookbook") }
     )

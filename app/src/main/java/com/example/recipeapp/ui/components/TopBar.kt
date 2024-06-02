@@ -20,13 +20,18 @@ import com.example.recipeapp.utils.Utils.checkInternetConnection
  * @param subtitle The optional subtitle to display.
  */
 @Composable
-fun TopBar(title: String, subtitle: String? = null) {
+fun TopBar(title: String? = null, subtitle: (@Composable () -> Unit)? = null) {
     val context = LocalApplicationContext.current
     val networkConnected = checkInternetConnection(context)
 
-    Column(modifier = Modifier.fillMaxWidth().padding(24.dp)) {
-        Text(title, style = MaterialTheme.typography.headlineLarge)
-        if (subtitle != null) Text(subtitle)
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .padding(24.dp)) {
+        if (title != null) Text(text = title, style = MaterialTheme.typography.headlineLarge)
+        if (subtitle != null) {
+            Spacer(modifier = Modifier.height(16.dp))
+            subtitle()
+        }
         if (!networkConnected) {
             Spacer(modifier = Modifier.height(8.dp))
             UserFeedbackMessage("No internet connection", type = "warning")

@@ -1,8 +1,11 @@
 package com.example.recipeapp.ui.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,11 +22,15 @@ import androidx.compose.material.icons.rounded.StarBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -60,6 +67,7 @@ import com.example.recipeapp.viewmodels.ViewModelWrapper
  * @param viewModels The [ViewModelWrapper] containing view models for recipe inspection and favorites.
  * @param isPreview Flag indicating whether the screen is in preview mode.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeScreen(
     navController: NavController,
@@ -75,6 +83,7 @@ fun RecipeScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showServingsChangedNotice by remember { mutableStateOf(false) }
     var initialServings by remember { mutableIntStateOf(recipe.servings) }
+    var swipeState = rememberDismissState()
 
     LaunchedEffect(Unit) {
         if (!recipe.isPersonalRecipe && !isPreview) {
@@ -136,7 +145,9 @@ fun RecipeScreen(
 
     Column(modifier =
         if (isPreview) Modifier.padding(32.dp)
-        else Modifier.padding(32.dp).verticalScroll(rememberScrollState())
+        else Modifier
+            .padding(32.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         if (isLoading) LinearProgressIndicator()
         else {
@@ -219,7 +230,9 @@ fun RecipeScreen(
                                 Icons.Rounded.StarBorder
                             },
                             contentDescription = "star icon",
-                            modifier = Modifier.width(32.dp).height(32.dp),
+                            modifier = Modifier
+                                .width(32.dp)
+                                .height(32.dp),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -253,7 +266,7 @@ fun RecipeScreen(
                 Text("Ingredients", style = MaterialTheme.typography.headlineMedium)
                 Spacer(modifier = Modifier.height(8.dp))
                 recipe.ingredients.forEachIndexed { index, ingredient ->
-                    IngredientRow(index, ingredient)
+                    IngredientRow(index, ingredient, viewModels)
                     Spacer(modifier = Modifier.height(4.dp))
                 }
                 Spacer(modifier = Modifier.height(24.dp))

@@ -1,6 +1,7 @@
 package com.example.recipeapp.models
 
 import android.content.SharedPreferences
+import com.example.recipeapp.utils.SharedPreferencesKeys.SHOPPING_LIST
 import com.example.recipeapp.utils.SharedPreferencesKeys.TODAYS_SPECIALS
 import com.example.recipeapp.utils.SharedPreferencesKeys.TODAYS_SPECIALS_LAST_LOAD
 import com.google.gson.Gson
@@ -44,5 +45,17 @@ object SharedPreferencesManager {
             return Gson().fromJson(json, Array<FavouriteRecipe>::class.java).toList()
         }
         return null
+    }
+
+    fun getShoppingList(prefs: SharedPreferences): List<ShoppingListItem>? {
+        val json: String? = prefs.getString(SHOPPING_LIST, null)
+        if (json != null) {
+            return Gson().fromJson(json, Array<ShoppingListItem>::class.java).toList()
+        }
+        return null
+    }
+
+    fun saveShoppingList(prefs: SharedPreferences, ingredients: List<ShoppingListItem>) {
+        prefs.edit().putString(SHOPPING_LIST, Gson().toJson(ingredients)).apply()
     }
 }

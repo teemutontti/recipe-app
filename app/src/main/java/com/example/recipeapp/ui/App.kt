@@ -12,10 +12,12 @@ import com.example.recipeapp.ui.screens.RecipeEditorScreen
 import com.example.recipeapp.ui.screens.DiscoverScreen
 import com.example.recipeapp.ui.screens.CookbookScreen
 import com.example.recipeapp.ui.screens.RecipeScreen
+import com.example.recipeapp.ui.screens.ShoppingListScreen
 import com.example.recipeapp.viewmodels.FavouriteRecipesViewModel
 import com.example.recipeapp.viewmodels.PersonalRecipesViewModel
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 import com.example.recipeapp.viewmodels.SearchViewModel
+import com.example.recipeapp.viewmodels.ShoppingListViewModel
 import com.example.recipeapp.viewmodels.TodaysSpecialsViewModel
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 
@@ -37,6 +39,7 @@ fun App(applicationContext: Context) {
     val favouriteRecipesViewModel: FavouriteRecipesViewModel = viewModel()
     val searchViewModel: SearchViewModel = viewModel()
     val todaysSpecialsViewModel: TodaysSpecialsViewModel = viewModel()
+    val shoppingListViewModel: ShoppingListViewModel = viewModel()
 
     val viewModels = ViewModelWrapper(
         favourite = favouriteRecipesViewModel,
@@ -44,6 +47,7 @@ fun App(applicationContext: Context) {
         inspection = inspectionViewModel,
         search = searchViewModel,
         specials = todaysSpecialsViewModel,
+        shopping = shoppingListViewModel,
     )
 
     CompositionLocalProvider(LocalApplicationContext provides applicationContext) {
@@ -59,6 +63,9 @@ fun App(applicationContext: Context) {
             }
             composable("recipe_editor") {
                 RecipeEditorScreen(navController, viewModels)
+            }
+            composable("shopping_list") {
+                ShoppingListScreen(navController, viewModels)
             }
         }
     }

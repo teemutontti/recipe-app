@@ -67,6 +67,7 @@ import com.example.recipeapp.ui.components.RecipeImage
 import com.example.recipeapp.ui.components.StepIndicator
 import com.example.recipeapp.models.Ingredient
 import com.example.recipeapp.models.Instruction
+import com.example.recipeapp.ui.components.TopBar
 import com.example.recipeapp.utils.Utils
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 import com.example.recipeapp.viewmodels.ViewModelWrapper
@@ -112,7 +113,7 @@ fun RecipeEditorScreen(navController: NavController, viewModels: ViewModelWrappe
     }
 
     Scaffold(
-        topBar = { BackButton(navController) },
+        topBar = { TopBar(subtitle = { BackButton(navController) }) },
         content = {
             RecipeEditorContent(
                 navController = navController,
@@ -127,11 +128,15 @@ fun RecipeEditorScreen(navController: NavController, viewModels: ViewModelWrappe
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth().padding(24.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp)
             ) {
                 if (currentFormStep > 0) {
                     Button(
-                        modifier = Modifier.weight(1f).height(44.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(44.dp),
                         onClick = { handleStepChange(-1) },
                         border = BorderStroke(2.dp, MaterialTheme.colorScheme.surface),
                         colors = ButtonDefaults.buttonColors(
@@ -145,7 +150,9 @@ fun RecipeEditorScreen(navController: NavController, viewModels: ViewModelWrappe
                 }
                 Button(
                     enabled = allowNext,
-                    modifier = Modifier.weight(1f).height(44.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(44.dp),
                     onClick = { handleStepChange(1) }
                 ) {
                     Text(if (currentFormStep == 3) "Save" else "Next")
@@ -434,7 +441,9 @@ private fun InstructionsStep(
             shape = RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp, bottomEnd = 4.dp),
             onValueChange = { text = it },
             label = { Text("Text") },
-            modifier = Modifier.weight(0.9f).padding(0.dp)
+            modifier = Modifier
+                .weight(0.9f)
+                .padding(0.dp)
         )
         Button(
             onClick = ::addInstruction,

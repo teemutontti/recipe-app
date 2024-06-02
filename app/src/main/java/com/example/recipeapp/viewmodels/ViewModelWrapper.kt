@@ -18,4 +18,5 @@ data class ViewModelWrapper (
     val inspection: RecipeUnderInspectionViewModel,
     val search: SearchViewModel,
     val specials: TodaysSpecialsViewModel,
+    val shopping: ShoppingListViewModel,
 )

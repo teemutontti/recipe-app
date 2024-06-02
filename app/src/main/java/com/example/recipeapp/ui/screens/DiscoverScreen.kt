@@ -43,7 +43,7 @@ fun DiscoverScreen(
     viewModels: ViewModelWrapper,
 ) {
     Scaffold(
-        topBar = { TopBar(title = "Discover") },
+        topBar = { TopBar("Discover") },
         content = { DiscoverScreenContent(navController, it, viewModels) },
         bottomBar = { NavBar(navController, "discover") }
     )

@@ -25,7 +25,6 @@ import androidx.navigation.NavController
 @Composable
 fun BackButton(navController: NavController) {
     TextButton(
-        modifier = Modifier.padding(16.dp),
         onClick = { navController.navigateUp() }
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.List
+import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -16,6 +17,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.rounded.Checklist
+import androidx.compose.material.icons.rounded.ShoppingCart
 
 /**
  * A composable function that displays a bottom navigation bar with buttons for navigation.
@@ -39,16 +42,22 @@ fun NavBar(navController: NavController, selected: String) {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 NavButton(
+                    selected = selected == "cookbook",
+                    onClick = { navController.navigate("cookbook") },
+                    iconVector = Icons.AutoMirrored.Rounded.MenuBook,
+                    text = "Cookbook"
+                )
+                NavButton(
                     selected = selected == "discover",
                     onClick = { navController.navigate("discover") },
                     iconVector = Icons.Filled.Dashboard,
                     text = "Discover"
                 )
                 NavButton(
-                    selected = selected == "cookbook",
-                    onClick = { navController.navigate("cookbook") },
-                    iconVector = Icons.AutoMirrored.Rounded.List,
-                    text = "Cookbook"
+                    selected = selected == "shopping_list",
+                    onClick = { navController.navigate("shopping_list") },
+                    iconVector = Icons.Rounded.Checklist,
+                    text = "Grocery"
                 )
             }
         }

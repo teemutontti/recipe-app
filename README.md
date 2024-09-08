@@ -1,11 +1,8 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/yzg6oRFh)
-
 # RecipeApp
 RecipeApp is an app that allows users to search different recipes, save own recipes and select favourite recipes.
-The app uses [Edamam API](https://developer.edamam.com/edamam-recipe-api).
+The app uses [Spoonacular API](https://spoonacular.com/food-api).
 
-## Screencast link
-[Screencast](https://www.youtube.com/watch?v=sGlaz2euWks)
+<img alt=recipe-tn src=https://github.com/user-attachments/assets/98edcfab-19b0-4d36-a46d-1b705b132625 width=400 />
 
 ## Features
 ### Current features:

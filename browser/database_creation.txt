@@ -1,0 +1,56 @@
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE admin_logs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    event VARCHAR(255) NOT NULL,
+    message VARCHAR(255) NOT NULL,
+    time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    user INT REFERENCES users(id)
+);
+
+CREATE TABLE foods (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    calories INT NOT NULL,
+    barcode VARCHAR(255),
+    serving_size INT,
+    carbs FLOAT,
+    protein FLOAT,
+    fat FLOAT,
+    created DATETIME DEFAULT CURRENT_TIMESTAMP,
+    edited DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by INT REFERENCES users(id),
+    edited_by INT REFERENCES users(id)
+);
+
+CREATE TABLE recipes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    created DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_by INT REFERENCES users(id)
+);
+
+CREATE TABLE ingredients (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    food INT REFERENCES foods(id) ON DELETE SET NULL ON UPDATE CASCADE,
+    recipe INT REFERENCES recipes(id) ON DELETE CASCADE ON UPDATE CASCADE
+)
+
+CREATE TABLE logs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    date DATE NOT NULL,
+    time TIME,
+    meal VARCHAR(255) NOT NULL,
+    user INT REFERENCES users(id),
+    food INT REFERENCES foods(id)
+);
+
+CREATE TABLE goals (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user INT REFERENCES users(id),
+
+)

@@ -1,0 +1,73 @@
+.add-food {
+    position: absolute;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.add-food button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.add-food .close-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 15px;
+}
+
+.add-food .icon {
+    width: 35px;
+    height: 35px;
+}
+
+.add-food .container {
+    padding: 40px;
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 5px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.add-food-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+    width: 320px;
+}
+
+.add-food-form span {
+    display: flex;
+    align-items: center;
+}
+
+.add-food-form span label {
+    width: 80px;
+    display: block;
+}
+
+.add-food-form span input {
+    height: 25px;
+    font-size: 18px;
+    border-radius: 2px;
+    background: none;
+    border-top: none;
+    border-right: none;
+    border-left: none;
+}
+
+.add-food-form span input[type="number"] {
+    width: 70px;
+}

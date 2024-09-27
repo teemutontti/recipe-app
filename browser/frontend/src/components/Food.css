@@ -1,0 +1,97 @@
+.food-element {
+    padding: 40px;
+    width: 220px;
+    border-radius: 10px;
+    box-shadow: 1px 2px 20px rgba(0, 0, 0, 0.2);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.food-actions button {
+    background: none;
+    border: none;
+}
+.food-actions button:hover {
+    cursor: pointer;
+}
+
+h2 {
+    margin: 0;
+}
+
+.food-header {
+    position: relative;
+}
+
+.food-actions {
+    display: none;
+    position: absolute;
+    top: 0px;
+    right: -20px;
+    list-style: none;
+    padding: 15px;
+    flex-direction: column;
+    border-radius: 8px;
+    gap: 7px;
+}
+
+.food-actions button {
+    padding: 7px 10px;
+}
+
+.show-actions-button {
+    position: absolute;
+    top: -20px;
+    right: -30px;
+    cursor: pointer;
+}
+
+.show-actions-button:focus-within + .food-actions,
+.food-actions:hover {
+    display: flex;
+}
+
+.show-actions-button .icon {
+    width: 28px;
+    height: 28px;
+}
+
+button.show-data {
+    width: 100%;
+    cursor: pointer;
+    border-radius: 20px;
+    padding: 3px;
+    margin-top: 10px;
+    box-shadow: 1px 2px 2px black;
+}
+
+button.show-data.no-shadow {
+    padding-top: 5px;
+    box-shadow: none;
+}
+
+.food-table {
+    padding: 10px;
+    margin-top: -15px;
+    padding-top: 23px;
+    border-radius: 10px;
+    list-style: none;
+    box-shadow: 1px 2px 2px black;
+}
+.food-table li {
+    display: flex;
+    justify-content: space-between;
+}
+
+.pev:hover {
+    cursor: help;
+}
+
+.circle-icon {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    filter: opacity(75%);
+}

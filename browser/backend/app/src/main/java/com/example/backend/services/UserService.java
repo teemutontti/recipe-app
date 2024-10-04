@@ -2,6 +2,8 @@ package com.example.backend.services;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.backend.entities.User;
 import com.example.backend.repositories.UserRepository;
@@ -19,54 +21,86 @@ public class UserService extends BaseService<User> {
     }
 
     @Override
-    public User create(User user) {
+    public ResponseEntity<User> create(User user) {
 
         // Hashing password
         String hashedPassword = SecurityUtil.hashPassword(user.getPassword());
         user.setPassword(hashedPassword);
 
         // Encrypting personal information
-        if (user.encrypt()) {
-            return getRepository().save(user);
-        }
-        return null;
-    }
+        boolean encryptionSuccess = user.encrypt();
 
-    @Override
-    public List<User> getAll() {
-        List<User> users = getRepository().findAll();
-        List<User> decryptedUsers = new ArrayList<User>();
-
-        // Decrypting user data
-        users.forEach(user -> {
-            if (user.decrypt()) {
-                decryptedUsers.add(user);
+        if (encryptionSuccess) {
+            try {
+                User data = getRepository().save(user);
+                return new ResponseEntity<>(data, HttpStatus.CREATED);
+            } catch (Exception e) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-        });
-
-        return decryptedUsers;
+        }
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
-    public User getById(Long id) {
-        User existingUser = getRepository().findById(id).orElse(null);
-        if (existingUser != null && existingUser.decrypt()) {
-            return existingUser;
+    public ResponseEntity<List<User>> getAll() {
+        try {
+            List<User> users = (List<User>) getRepository().findAll();
+            List<User> decryptedUsers = new ArrayList<User>();
+
+            // Decrypting user data
+            for (User user: users) {
+                boolean decryptionSuccess = user.decrypt();
+                if (decryptionSuccess) {
+                    decryptedUsers.add(user);
+                }
+            }
+            return new ResponseEntity<>(decryptedUsers, HttpStatus.OK);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return null;
     }
 
     @Override
-    public User update(Long id, User user) {
-        User existingUser = getRepository().findById(id).orElse(null);
+    public ResponseEntity<User> getById(Long id) {
+        try {
+            User existingUser = getRepository().findById(id).orElse(null);
+            if (existingUser == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
 
-        System.out.println("\n\n" + user + "\n\n");
-        System.out.println("\n\n" + existingUser + "\n\n");
-
-        if (existingUser != null && user.encrypt()) {
-            // TODO: Implement update logic
-            return getRepository().save(existingUser);
+            boolean decryptionSuccess = existingUser.decrypt();
+            if (decryptionSuccess) {
+                return new ResponseEntity<>(existingUser, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    public ResponseEntity<User> update(Long id, User user) {
+        try {
+            User existingUser = getRepository().findById(id).orElse(null);
+            if (existingUser == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+            boolean encryptionSuccess = user.encrypt();
+            if (encryptionSuccess) {
+                existingUser.update(user);
+                try {
+                    User data = getRepository().save(existingUser);
+                    return new ResponseEntity<>(data, HttpStatus.OK);
+                } catch (Exception e) {
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

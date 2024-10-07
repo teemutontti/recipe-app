@@ -1,11 +1,8 @@
 package com.example.backend.entities;
 import java.sql.Date;
 import java.sql.Time;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -15,13 +12,14 @@ public class Log implements BaseEntity<Log> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     private Date date; // NOT NULL
     private Time time;
     private String meal; // NOT NULL
-    private Long user;
-    private Long food;
+
+    private Integer user;
+    private Integer food;
 
     @Override
     public boolean update(Log log) {

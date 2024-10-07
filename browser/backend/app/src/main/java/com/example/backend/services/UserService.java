@@ -1,6 +1,10 @@
 package com.example.backend.services;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.backend.exceptions.EncryptionKeyException;
+import com.example.backend.exceptions.FailedDecryptionException;
+import com.example.backend.exceptions.FailedEncryptionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,31 +31,33 @@ public class UserService extends BaseService<User> {
         String hashedPassword = SecurityUtil.hashPassword(user.getPassword());
         user.setPassword(hashedPassword);
 
-        // Encrypting personal information
-        boolean encryptionSuccess = user.encrypt();
+        try {
+            // Encrypting personal information
+            User encryptedUser = SecurityUtil.encryptUser(user);
 
-        if (encryptionSuccess) {
-            try {
-                User data = getRepository().save(user);
-                return new ResponseEntity<>(data, HttpStatus.CREATED);
-            } catch (Exception e) {
-                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+            User data = getRepository().save(encryptedUser);
+            return new ResponseEntity<>(data, HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            System.err.println(e);
+            System.err.println("User encryption failed!");
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
     public ResponseEntity<List<User>> getAll() {
         try {
             List<User> users = (List<User>) getRepository().findAll();
-            List<User> decryptedUsers = new ArrayList<User>();
+            List<User> decryptedUsers = new ArrayList<>();
 
             // Decrypting user data
             for (User user: users) {
-                boolean decryptionSuccess = user.decrypt();
-                if (decryptionSuccess) {
-                    decryptedUsers.add(user);
+                try {
+                    User decryptedUser = SecurityUtil.decryptUser(user);
+                    decryptedUsers.add(decryptedUser);
+                } catch (FailedDecryptionException e) {
+                    System.err.println("Decryption failed for user " + user.getId());
                 }
             }
             return new ResponseEntity<>(decryptedUsers, HttpStatus.OK);
@@ -69,14 +75,17 @@ public class UserService extends BaseService<User> {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            boolean decryptionSuccess = existingUser.decrypt();
-            if (decryptionSuccess) {
-                return new ResponseEntity<>(existingUser, HttpStatus.OK);
+            try {
+                User decryptedUser = SecurityUtil.decryptUser(existingUser);
+                return new ResponseEntity<>(decryptedUser, HttpStatus.OK);
+            } catch (FailedDecryptionException e) {
+                System.err.print("Decryption failed for user " + existingUser.getId());
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
+
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
@@ -87,18 +96,15 @@ public class UserService extends BaseService<User> {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
-            boolean encryptionSuccess = user.encrypt();
-            if (encryptionSuccess) {
-                existingUser.update(user);
-                try {
-                    User data = getRepository().save(existingUser);
-                    return new ResponseEntity<>(data, HttpStatus.OK);
-                } catch (Exception e) {
-                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-            }
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            try {
+                User encryptedUser = SecurityUtil.encryptUser(user);
+                existingUser.update(encryptedUser);
 
+                User data = getRepository().save(existingUser);
+                return new ResponseEntity<>(data, HttpStatus.OK);
+            } catch (FailedEncryptionException e) {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

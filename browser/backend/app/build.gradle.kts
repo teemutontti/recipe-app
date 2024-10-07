@@ -28,6 +28,7 @@ dependencies {
 	implementation("org.bouncycastle:bcprov-jdk15on:1.70")
 	compileOnly("org.projectlombok:lombok:1.18.34")
 	annotationProcessor("org.projectlombok:lombok:1.18.34")
+	testImplementation("com.h2database:h2")
 }
 
 tasks.withType<Test> {

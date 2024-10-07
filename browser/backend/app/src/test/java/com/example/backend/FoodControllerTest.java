@@ -4,9 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -19,7 +22,7 @@ class FoodControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private final long KNOWN_ID = 14L;
+    private final long KNOWN_ID = 3L;
 
     @Test
     void testGetAll() throws Exception {
@@ -27,25 +30,6 @@ class FoodControllerTest {
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$").isArray());
-    }
-
-    @Test
-    void testGetByIdShouldReturnOk() throws Exception {
-        ResultActions result = mockMvc.perform(get("/api/foods/{id}", KNOWN_ID));
-        result.andExpect(status().isOk());
-    }
-
-    @Test
-    void testGetByIdShouldReturnNotFound() throws Exception {
-        long NOT_FOUND_ID = 9386587357L;
-        ResultActions result = mockMvc.perform(get("/api/foods/{id}", NOT_FOUND_ID));
-        result.andExpect(status().isNotFound());
-    }
-
-    @Test
-    void testGetByIdShouldReturnBadRequest() throws Exception {
-        ResultActions result = mockMvc.perform(get("/api/foods/{id}", 5.5F));
-        result.andExpect(status().isBadRequest());
     }
 
     @Test
@@ -90,6 +74,25 @@ class FoodControllerTest {
                 .content(foodJson));
 
         result.andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void testGetByIdShouldReturnOk() throws Exception {
+        ResultActions result = mockMvc.perform(get("/api/foods/{id}", KNOWN_ID));
+        result.andExpect(status().isOk());
+    }
+
+    @Test
+    void testGetByIdShouldReturnNotFound() throws Exception {
+        long NOT_FOUND_ID = 9386587357L;
+        ResultActions result = mockMvc.perform(get("/api/foods/{id}", NOT_FOUND_ID));
+        result.andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testGetByIdShouldReturnBadRequest() throws Exception {
+        ResultActions result = mockMvc.perform(get("/api/foods/{id}", 5.5F));
+        result.andExpect(status().isBadRequest());
     }
 
     @Test

@@ -5,6 +5,7 @@ build/
 # Local configuration file (sdk path, etc)
 local.properties
 application.properties
+application-test.properties
 
 # Log/OS Files
 *.log

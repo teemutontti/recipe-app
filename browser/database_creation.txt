@@ -9,7 +9,8 @@ CREATE TABLE admin_logs (
     event VARCHAR(255) NOT NULL,
     message VARCHAR(255) NOT NULL,
     time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    user INT REFERENCES users(id)
+    user INT,
+    FOREIGN KEY (user) REFERENCES users(id)
 );
 
 CREATE TABLE foods (
@@ -21,36 +22,43 @@ CREATE TABLE foods (
     carbs FLOAT,
     protein FLOAT,
     fat FLOAT,
-    created DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     edited DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    created_by INT REFERENCES users(id),
-    edited_by INT REFERENCES users(id)
+    created_by INT,
+    edited_by INT,
+    FOREIGN KEY (created_by) REFERENCES users(id),
+    FOREIGN KEY (edited_by) REFERENCES users(id)
 );
 
 CREATE TABLE recipes (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     created DATETIME DEFAULT CURRENT_TIMESTAMP,
-    created_by INT REFERENCES users(id)
+    created_by INT,
+    FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
 CREATE TABLE ingredients (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    food INT REFERENCES foods(id) ON DELETE SET NULL ON UPDATE CASCADE,
-    recipe INT REFERENCES recipes(id) ON DELETE CASCADE ON UPDATE CASCADE
-)
+    food INT,
+    recipe INT,
+    FOREIGN KEY (food) REFERENCES foods(id),
+    FOREIGN KEY (recipe) REFERENCES recipes(id)
+);
 
 CREATE TABLE logs (
     id INT PRIMARY KEY AUTO_INCREMENT,
     date DATE NOT NULL,
     time TIME,
     meal VARCHAR(255) NOT NULL,
-    user INT REFERENCES users(id),
-    food INT REFERENCES foods(id)
+    user INT,
+    food INT,
+    FOREIGN KEY (user) REFERENCES users(id),
+    FOREIGN KEY (food) REFERENCES foods(id)
 );
 
 CREATE TABLE goals (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    user INT REFERENCES users(id),
-
+    user INT,
+    FOREIGN KEY (user) REFERENCES users(id)
 )

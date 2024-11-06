@@ -1,8 +1,6 @@
 package com.example.backend.services;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.example.backend.exceptions.EncryptionKeyException;
 import com.example.backend.exceptions.FailedDecryptionException;
 import com.example.backend.exceptions.FailedEncryptionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,6 +105,20 @@ public class UserService extends BaseService<User> {
             }
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<User> login(Long id, String password) {
+        User existingUser = getRepository().findById(id).orElse(null);
+
+        if (existingUser == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if (SecurityUtil.checkPassword(password, existingUser.getPassword())) {
+            return new ResponseEntity<>(existingUser, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
 }

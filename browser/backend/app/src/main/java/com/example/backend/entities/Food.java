@@ -1,5 +1,7 @@
 package com.example.backend.entities;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import lombok.Data;
@@ -7,27 +9,24 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "foods")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Food implements BaseEntity<Food> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     private String name; // NOT NULL
     private String barcode;
     private Integer servingSize;
-
     private Integer calories; // NOT NULL
     private Float carbs;
     private Float protein;
     private Float fat;
-
     private Integer createdBy;
     private Integer editedBy;
-
     @CreationTimestamp
     private String created;
-
     @UpdateTimestamp
     private String edited;
 

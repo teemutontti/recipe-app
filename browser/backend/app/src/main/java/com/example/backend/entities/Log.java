@@ -1,23 +1,24 @@
 package com.example.backend.entities;
 import java.sql.Date;
 import java.sql.Time;
-
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "logs")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Log implements BaseEntity<Log> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     private Date date; // NOT NULL
     private Time time;
     private String meal; // NOT NULL
-
     private Integer user;
     private Integer food;
 

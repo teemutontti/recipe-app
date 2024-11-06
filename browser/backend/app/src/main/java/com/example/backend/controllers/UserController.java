@@ -1,5 +1,7 @@
 package com.example.backend.controllers;
 import com.example.backend.dto.LoginRequest;
+import com.example.backend.exceptions.EncryptionKeyException;
+import com.example.backend.exceptions.FailedCryptionException;
 import com.example.backend.exceptions.FailedDecryptionException;
 import com.example.backend.services.UserService;
 import com.example.backend.utils.SecurityUtil;
@@ -12,7 +14,7 @@ import com.example.backend.entities.User;
 @RequestMapping("/api/users")
 public class UserController extends BaseController<User, UserService> {
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) throws FailedDecryptionException {
+    public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) throws EncryptionKeyException, FailedCryptionException {
         ResponseEntity<User> response = service.login(loginRequest.getId(), loginRequest.getPassword());
         User user = response.getBody();
 

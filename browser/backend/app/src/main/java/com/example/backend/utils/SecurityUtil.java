@@ -5,6 +5,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import com.example.backend.entities.User;
 import com.example.backend.exceptions.EncryptionKeyException;
+import com.example.backend.exceptions.FailedCryptionException;
 import com.example.backend.exceptions.FailedDecryptionException;
 import com.example.backend.exceptions.FailedEncryptionException;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
@@ -25,55 +26,76 @@ public class SecurityUtil {
         return e.matches(plain, hashed);
     }
 
-    public static String encrypt(String str) throws FailedEncryptionException {
+    public static String encrypt(String str) throws FailedCryptionException, EncryptionKeyException {
+        return processCipher(str, getKey(), Cipher.ENCRYPT_MODE);
+    }
+
+    public static String encrypt(String str, SecretKey key) throws FailedCryptionException {
+        return processCipher(str, key, Cipher.ENCRYPT_MODE);
+    }
+
+    public static String decrypt(String str) throws FailedCryptionException, EncryptionKeyException {
+        return processCipher(str, getKey(), Cipher.DECRYPT_MODE);
+    }
+
+    public static String decrypt(String str, SecretKey key) throws FailedCryptionException {
+        return processCipher(str, key, Cipher.DECRYPT_MODE);
+    }
+
+    private static String processCipher(String str, SecretKey key, int mode) throws FailedCryptionException {
         try {
             Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.ENCRYPT_MODE, getKey());
+            cipher.init(mode, key);
 
-            byte[] bytes = str.getBytes(Charset.defaultCharset());
-            byte[] encryptedBytes = cipher.doFinal(bytes);
-
-            return Base64.getEncoder().encodeToString(encryptedBytes);
+            if (mode == Cipher.ENCRYPT_MODE) {
+                byte[] bytes = str.getBytes(Charset.defaultCharset());
+                byte[] encryptedBytes = cipher.doFinal(bytes);
+                return Base64.getEncoder().encodeToString(encryptedBytes);
+            } else {
+                byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(str));
+                return new String(decryptedBytes);
+            }
 
         } catch (Exception e) {
-            throw new FailedEncryptionException(e.getMessage());
+            if (mode == Cipher.ENCRYPT_MODE) {
+                throw new FailedEncryptionException(e.getMessage());
+            } else {
+                throw new FailedDecryptionException(e.getMessage());
+            }
         }
     }
 
-    public static String decrypt(String str) throws FailedDecryptionException {
-        try {
-            Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, getKey());
-
-            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(str));
-            return new String(decryptedBytes);
-
-        } catch (Exception e) {
-            throw new FailedDecryptionException(e.getMessage());
-        }
+    public static User encryptUser(User user) throws FailedCryptionException, EncryptionKeyException {
+        return encryptUser(user, getKey());
     }
 
-    public static User encryptUser(User user) throws FailedEncryptionException {
-        String encryptedEmail = encrypt(user.getEmail());
+    public static User encryptUser(User user, SecretKey aesKey) throws FailedCryptionException {
+        String encryptedEmail = encrypt(user.getEmail(), aesKey);
         user.setEmail(encryptedEmail);
         return user;
     }
 
-    public static User decryptUser(User user) throws FailedDecryptionException {
-        String decryptedEmail = decrypt(user.getEmail());
+    public static User decryptUser(User user) throws FailedCryptionException, EncryptionKeyException {
+        return decryptUser(user, getKey());
+    }
+
+    public static User decryptUser(User user, SecretKey aesKey) throws FailedCryptionException {
+        String decryptedEmail = decrypt(user.getEmail(), aesKey);
         user.setEmail(decryptedEmail);
         return user;
+    }
+
+    public static SecretKeySpec genKey(String base64Key) {
+        byte[] decodedKey = Base64.getDecoder().decode(base64Key);
+        return new SecretKeySpec(decodedKey, "AES");
     }
 
     private static SecretKey getKey() throws EncryptionKeyException {
         String base64Key = System.getenv("AES_KEY");
 
         // Throw error if key is not found in environmental variables
-        if (base64Key == null) {
-            throw new EncryptionKeyException();
-        }
+        if (base64Key == null) throw new EncryptionKeyException();
 
-        byte[] decodedKey = Base64.getDecoder().decode(base64Key);
-        return new SecretKeySpec(decodedKey, "AES");
+        return genKey(base64Key);
     }
 }

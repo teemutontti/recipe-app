@@ -1,5 +1,7 @@
 package com.example.backend.controllers;
 import java.util.List;
+
+import com.example.backend.entities.BaseEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -8,7 +10,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.example.backend.entities.BaseEntity;
 import com.example.backend.services.BaseService;
 
 /**
@@ -16,10 +17,10 @@ import com.example.backend.services.BaseService;
  * It provides basic CRUD operations for the entity type T.
  * @param <T> Entity type to be used in the controller.
  */
-class BaseController<T extends BaseEntity<T>> {
+class BaseController<T extends BaseEntity<T>, S extends BaseService<T>> {
 
     @Autowired
-    private BaseService<T> service;
+    protected S service;
 
     @PostMapping
     public ResponseEntity<T> create(@RequestBody T entity) {

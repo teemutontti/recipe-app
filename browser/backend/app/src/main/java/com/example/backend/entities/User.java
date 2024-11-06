@@ -2,19 +2,25 @@ package com.example.backend.entities;
 
 import com.example.backend.utils.SecurityUtil;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
 @Table(name = "users")
+@NoArgsConstructor
+@AllArgsConstructor
 public class User implements BaseEntity<User> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-
     private String email;
+
+    @JsonIgnore // Ignoring password field when serializing the object so password isn't shared
     private String password;
 
     @Override

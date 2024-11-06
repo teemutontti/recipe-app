@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import com.example.backend.entities.BaseEntity;
+import org.springframework.stereotype.Service;
 
 /**
  * BaseService
@@ -11,6 +12,7 @@ import com.example.backend.entities.BaseEntity;
  * operations for an entity type T.
  * @param <T> Entity type to be used in the service.
  */
+@Service
 public abstract class BaseService<T extends BaseEntity<T>> {
 
     protected abstract JpaRepository<T, Long> getRepository();

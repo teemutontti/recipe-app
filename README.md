@@ -23,6 +23,3 @@ To get started with RecipeApp, follow these steps:
 ## Usage
 Upon launching the app, you will see a progress indicator for a second or so and then a list of recipe names.
 Views can be change by tapping the bottom navigation tabs.
-
-## License
-This project is licensed under the MIT License.

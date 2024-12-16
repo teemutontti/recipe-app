@@ -19,31 +19,6 @@ As part of a major refactor, I am building a web interface and a shared backend 
 - **"What's in My Fridge"**: Discover recipes based on the ingredients you have available.
 - **Protein Calculator**: Calculate the protein efficiency of foods.
 
-## Technologies Used
-<div>
-  <a href="https://www.java.com/en/">
-    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg" alt="java" width="35" />
-  </a>
-  <a href="https://spring.io/">
-    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/spring/spring-original.svg" alt="spring" width="35"/>
-  </a>
-  <a href="https://www.mysql.com/">
-    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original.svg" alt="mysql" width="35"/>
-  </a>
-  <a href="https://react.dev/">
-    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg" alt="react" width="35"/>
-  </a>
-  <a href="https://www.typescriptlang.org/">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Typescript_logo_2020.svg/2048px-Typescript_logo_2020.svg.png" alt="typescript" width="35"/>
-  </a>
-  <a href="https://nodejs.org/en">
-    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg" alt="nodejs" width="35"/>
-  </a>
-  <a href="https://kotlinlang.org/">
-    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kotlin/kotlin-original.svg" alt="kotlin" width="35"/>
-  </a>
-</div>
-
 ## Getting Started
 To get started with RecipeApp, follow these steps:
 
@@ -68,3 +43,28 @@ I welcome any contributions! Follow these steps:
 4. Push to your fork: `git push origin feature-name`
 5. Submit a pull request.
 -->
+
+## Technologies Used
+<div>
+  <a href="https://www.java.com/en/">
+    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg" alt="java" width="35" />
+  </a>
+  <a href="https://spring.io/">
+    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/spring/spring-original.svg" alt="spring" width="35"/>
+  </a>
+  <a href="https://www.mysql.com/">
+    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mysql/mysql-original.svg" alt="mysql" width="35"/>
+  </a>
+  <a href="https://react.dev/">
+    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg" alt="react" width="35"/>
+  </a>
+  <a href="https://www.typescriptlang.org/">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Typescript_logo_2020.svg/2048px-Typescript_logo_2020.svg.png" alt="typescript" width="35"/>
+  </a>
+  <a href="https://nodejs.org/en">
+    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg" alt="nodejs" width="35"/>
+  </a>
+  <a href="https://kotlinlang.org/">
+    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kotlin/kotlin-original.svg" alt="kotlin" width="35"/>
+  </a>
+</div>

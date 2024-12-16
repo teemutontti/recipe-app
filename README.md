@@ -2,7 +2,9 @@
 RecipeApp is an app that allows users to search different recipes, save own recipes and select favourite recipes.
 The app uses [Spoonacular API](https://spoonacular.com/food-api).
 
-<img alt=recipe-tn src=https://github.com/user-attachments/assets/98edcfab-19b0-4d36-a46d-1b705b132625 width=400 />
+<img src="https://github.com/user-attachments/assets/2c9bddf2-936c-43e8-ad6b-19ee7e836661" width="200" />
+<img src="https://github.com/user-attachments/assets/94060718-e213-4647-983b-c97b2d843b25" width="200" />
+<img src="https://github.com/user-attachments/assets/74f36dad-16d1-4932-8ca3-0e095a957d5a" width="200" />
 
 ## Features
 - **Recipe Management**: Add, edit, delete and browse recipes effortlessly.

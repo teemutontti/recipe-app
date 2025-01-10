@@ -1,4 +1,4 @@
-package com.example.recipeapp.ui.components
+package com.example.recipeapp.ui.components.layout
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.recipeapp.ui.components.misc.UserFeedbackMessage
 import com.example.recipeapp.utils.LocalApplicationContext
 import com.example.recipeapp.utils.Utils.checkInternetConnection
 

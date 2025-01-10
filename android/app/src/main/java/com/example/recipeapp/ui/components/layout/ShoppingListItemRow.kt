@@ -1,16 +1,11 @@
-package com.example.recipeapp.ui.components
+package com.example.recipeapp.ui.components.layout
 
-import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,6 +30,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.example.recipeapp.models.ShoppingListItem
+import com.example.recipeapp.ui.components.misc.SwipeBackgroundElement
+import com.example.recipeapp.ui.components.misc.CheckCircle
 import com.example.recipeapp.viewmodels.ShoppingListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

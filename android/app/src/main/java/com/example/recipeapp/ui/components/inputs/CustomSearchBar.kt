@@ -1,4 +1,4 @@
-package com.example.recipeapp.ui.components
+package com.example.recipeapp.ui.components.inputs
 
 import android.util.Log
 import androidx.compose.foundation.background

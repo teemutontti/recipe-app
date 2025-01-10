@@ -1,4 +1,4 @@
-package com.example.recipeapp.ui.components
+package com.example.recipeapp.ui.components.buttons
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height

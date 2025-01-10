@@ -1,4 +1,4 @@
-package com.example.recipeapp.ui.components
+package com.example.recipeapp.ui.components.buttons
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.recipeapp.R
 import com.example.recipeapp.models.Recipe
+import com.example.recipeapp.ui.components.misc.RecipeImage
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 
 /**

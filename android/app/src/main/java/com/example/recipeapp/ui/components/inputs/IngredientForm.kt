@@ -1,4 +1,4 @@
-package com.example.recipeapp.ui.components
+package com.example.recipeapp.ui.components.inputs
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement

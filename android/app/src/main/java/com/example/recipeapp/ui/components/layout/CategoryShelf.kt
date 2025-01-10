@@ -1,4 +1,4 @@
-package com.example.recipeapp.ui.components
+package com.example.recipeapp.ui.components.layout
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column

@@ -1,4 +1,4 @@
-package com.example.recipeapp.ui.components
+package com.example.recipeapp.ui.components.layout
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.models.Recipe
+import com.example.recipeapp.ui.components.buttons.TodaysSpecialButton
 import com.example.recipeapp.utils.Utils
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 import kotlinx.coroutines.delay

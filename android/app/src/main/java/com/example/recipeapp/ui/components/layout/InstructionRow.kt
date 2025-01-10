@@ -1,4 +1,4 @@
-package com.example.recipeapp.ui.components
+package com.example.recipeapp.ui.components.layout
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,6 +24,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.example.recipeapp.models.Instruction
+import com.example.recipeapp.ui.components.misc.CheckCircle
+import com.example.recipeapp.ui.components.buttons.RemoveButton
 
 /**
  * A composable function that displays a row representing a cooking instruction.

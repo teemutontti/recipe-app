@@ -1,4 +1,4 @@
-package com.example.recipeapp.ui.components
+package com.example.recipeapp.ui.components.misc
 
 import android.net.Uri
 import androidx.compose.foundation.Image

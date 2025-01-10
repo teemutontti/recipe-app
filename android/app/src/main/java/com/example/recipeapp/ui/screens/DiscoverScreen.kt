@@ -22,14 +22,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.recipeapp.ui.components.AddRecipeButton
-import com.example.recipeapp.ui.components.CategoryShelf
-import com.example.recipeapp.ui.components.CustomSearchBar
-import com.example.recipeapp.ui.components.NavBar
-import com.example.recipeapp.ui.components.RecipeShelf
-import com.example.recipeapp.ui.components.SearchPanel
-import com.example.recipeapp.ui.components.TopBar
-import com.example.recipeapp.ui.components.UserFeedbackMessage
+import com.example.recipeapp.ui.components.buttons.AddRecipeButton
+import com.example.recipeapp.ui.components.layout.CategoryShelf
+import com.example.recipeapp.ui.components.inputs.CustomSearchBar
+import com.example.recipeapp.ui.components.navigation.NavBar
+import com.example.recipeapp.ui.components.layout.RecipeShelf
+import com.example.recipeapp.ui.components.layout.SearchPanel
+import com.example.recipeapp.ui.components.layout.TopBar
+import com.example.recipeapp.ui.components.misc.UserFeedbackMessage
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 
 /**

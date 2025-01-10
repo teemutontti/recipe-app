@@ -1,4 +1,4 @@
-package com.example.recipeapp.ui.components
+package com.example.recipeapp.ui.components.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

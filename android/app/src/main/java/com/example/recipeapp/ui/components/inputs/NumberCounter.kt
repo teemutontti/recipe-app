@@ -1,4 +1,4 @@
-package com.example.recipeapp.ui.components
+package com.example.recipeapp.ui.components.inputs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues

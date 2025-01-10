@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.MaterialTheme
@@ -17,8 +16,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.rounded.Checklist
-import androidx.compose.material.icons.rounded.ShoppingCart
+import com.example.recipeapp.ui.components.buttons.NavButton
 
 /**
  * A composable function that displays a bottom navigation bar with buttons for navigation.
@@ -42,16 +42,22 @@ fun NavBar(navController: NavController, selected: String) {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 NavButton(
-                    selected = selected == "cookbook",
-                    onClick = { navController.navigate("cookbook") },
-                    iconVector = Icons.AutoMirrored.Rounded.MenuBook,
-                    text = "Cookbook"
-                )
-                NavButton(
                     selected = selected == "discover",
                     onClick = { navController.navigate("discover") },
                     iconVector = Icons.Filled.Dashboard,
                     text = "Discover"
+                )
+                NavButton(
+                    selected = selected == "logs",
+                    onClick = { navController.navigate("logs") },
+                    iconVector = Icons.Filled.Restaurant,
+                    text = "Logs"
+                )
+                NavButton(
+                    selected = selected == "cookbook",
+                    onClick = { navController.navigate("cookbook") },
+                    iconVector = Icons.AutoMirrored.Rounded.MenuBook,
+                    text = "Cookbook"
                 )
                 NavButton(
                     selected = selected == "shopping_list",

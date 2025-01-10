@@ -11,6 +11,7 @@ import com.example.recipeapp.utils.LocalApplicationContext
 import com.example.recipeapp.ui.screens.RecipeEditorScreen
 import com.example.recipeapp.ui.screens.DiscoverScreen
 import com.example.recipeapp.ui.screens.CookbookScreen
+import com.example.recipeapp.ui.screens.LogsScreen
 import com.example.recipeapp.ui.screens.RecipeScreen
 import com.example.recipeapp.ui.screens.ShoppingListScreen
 import com.example.recipeapp.viewmodels.FavouriteRecipesViewModel
@@ -54,6 +55,9 @@ fun App(applicationContext: Context) {
         NavHost(navController = navController, startDestination = "discover") {
             composable("discover") {
                 DiscoverScreen(navController, viewModels)
+            }
+            composable("logs") {
+                LogsScreen(navController, viewModels)
             }
             composable("cookbook") {
                 CookbookScreen(navController, viewModels)

@@ -19,8 +19,6 @@ public class User implements BaseEntity<User> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String email;
-
-    @JsonIgnore // Ignoring password field when serializing the object so password isn't shared
     private String password;
 
     @Override

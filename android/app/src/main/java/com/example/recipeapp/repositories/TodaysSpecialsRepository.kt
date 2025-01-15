@@ -1,11 +1,12 @@
 package com.example.recipeapp.repositories
 
 import android.content.SharedPreferences
+import androidx.compose.ui.text.toLowerCase
 import com.example.recipeapp.BuildConfig.API_KEY
-import com.example.recipeapp.models.SharedPreferencesManager
+import com.example.recipeapp.utils.SharedPreferencesManager
 import com.example.recipeapp.models.FavouriteRecipe
+import com.example.recipeapp.models.MealType
 import com.example.recipeapp.services.RetrofitInstance
-import com.example.recipeapp.utils.Utils.SPECIAL_MEAL_TYPES
 
 /**
  * Repository class for managing today's specials.
@@ -29,8 +30,8 @@ class TodaysSpecialsRepository(private val prefs: SharedPreferences) {
                 RepositoryResponseHandler(error = "Error with getting saved specials!")
             }
         } else {
-            val newRecipes = SPECIAL_MEAL_TYPES.map {
-                val response = RetrofitInstance().recipeService.getRandomRecipes(API_KEY, it, 1)
+            val newRecipes = MealType.entries.map {
+                val response = RetrofitInstance().recipeService.getRandomRecipes(API_KEY, it.toString().lowercase(), 1)
                 if (response.isSuccessful) {
                     response.body()?.recipes?.get(0)?.toSavable()
                 } else {

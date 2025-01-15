@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.recipeapp.ui.components.misc.UserFeedbackMessage
 import com.example.recipeapp.utils.LocalApplicationContext
-import com.example.recipeapp.utils.Utils.checkInternetConnection
+import com.example.recipeapp.utils.NetworkUtils.checkInternetConnection
 
 /**
  * Composable function that displays a top bar with a title and optional subtitle.

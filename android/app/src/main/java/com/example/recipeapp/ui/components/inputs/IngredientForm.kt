@@ -32,7 +32,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.recipeapp.models.Ingredient
-import com.example.recipeapp.utils.Utils
+import com.example.recipeapp.utils.Constants
+import com.example.recipeapp.utils.ValidatorUtils
 
 /**
  * A composable function that displays a form for adding an ingredient.
@@ -51,9 +52,9 @@ fun IngredientForm(addIngredient: (Ingredient) -> Unit) {
     var unitError by remember { mutableStateOf(false) }
 
     fun handleIngredientSave() {
-        nameError = !Utils.Validator.ingredientName(name)
-        amountError = !Utils.Validator.ingredientAmount(amount)
-        unitError = !Utils.Validator.ingredientUnit(unit)
+        nameError = !ValidatorUtils.ingredientName(name)
+        amountError = !ValidatorUtils.ingredientAmount(amount)
+        unitError = !ValidatorUtils.ingredientUnit(unit)
 
         if (!nameError && !amountError && !unitError) {
             addIngredient(
@@ -104,7 +105,7 @@ fun IngredientForm(addIngredient: (Ingredient) -> Unit) {
     NumberCounter(
         value = amount,
         max = 1000,
-        onNumberChange = { amount = it },
+        onNumberChange = { amount = it.toInt() },
         editable = true
     )
     Spacer(modifier = Modifier.height(16.dp))
@@ -124,7 +125,7 @@ fun IngredientForm(addIngredient: (Ingredient) -> Unit) {
         horizontalArrangement = Arrangement.Start,
         verticalArrangement = Arrangement.Top
     ) {
-        Utils.INGREDIENT_UNITS.forEach {
+         Constants.INGREDIENT_UNITS.forEach {
             TextButton(
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.height(32.dp).padding(2.dp),

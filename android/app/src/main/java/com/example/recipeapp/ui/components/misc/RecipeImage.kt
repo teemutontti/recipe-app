@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.recipeapp.utils.Utils
+import com.example.recipeapp.utils.Constants
 
 /**
  * Composable function that displays a recipe image.
@@ -38,12 +38,12 @@ fun RecipeImage(
     }
 
     val imageModifier: Modifier = Modifier
-        .aspectRatio(Utils.LANDSCAPE_ASPECT_RATIO)
+        .aspectRatio(Constants.LANDSCAPE_ASPECT_RATIO)
         .clip(RoundedCornerShape(8.dp))
         .fillMaxWidth()
 
     val previewImageModifier: Modifier = Modifier
-        .size(Utils.IMAGE_WIDTH.dp, Utils.IMAGE_HEIGHT.dp)
+        .size(Constants.IMAGE_WIDTH.dp, Constants.IMAGE_HEIGHT.dp)
         .clip(RoundedCornerShape(8.dp))
         .fillMaxWidth()
 

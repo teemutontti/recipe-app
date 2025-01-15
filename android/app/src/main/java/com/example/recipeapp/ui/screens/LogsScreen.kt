@@ -2,17 +2,21 @@ package com.example.recipeapp.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.recipeapp.ui.components.misc.MacroWheel
+import com.example.recipeapp.models.MealType
+import com.example.recipeapp.ui.components.buttons.MealButton
+import com.example.recipeapp.ui.components.inputs.DateNavigator
+import com.example.recipeapp.ui.components.layout.MacroWheels
 import com.example.recipeapp.ui.components.navigation.NavBar
 import com.example.recipeapp.ui.components.layout.TopBar
 import com.example.recipeapp.viewmodels.ViewModelWrapper
@@ -27,7 +31,7 @@ fun LogsScreen(navController: NavController, viewModels: ViewModelWrapper) {
     Scaffold(
         topBar = { TopBar("Logs") },
         content = { LogsScreenContent(navController, viewModels, it) },
-        bottomBar = { NavBar(navController, "cookbook") }
+        bottomBar = { NavBar(navController, "logs") }
     )
 }
 
@@ -43,16 +47,45 @@ private fun LogsScreenContent(
     viewModels: ViewModelWrapper,
     paddingValues: PaddingValues,
 ) {
+
+    LaunchedEffect(Unit) {
+        viewModels.logsScreen.loadLogs()
+    }
+
     Column(modifier = Modifier.padding(paddingValues)) {
-        Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-            Column(
-                Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally) {
-                MacroWheel(1500, "Calories", MaterialTheme.colorScheme.secondary)
-                Row {
-                    MacroWheel(50, "Fats", MaterialTheme.colorScheme.errorContainer, "small")
-                    MacroWheel(180, "Carbohydrates", MaterialTheme.colorScheme.primary, "small")
-                    MacroWheel(150, "Protein", MaterialTheme.colorScheme.tertiary, "small")
+        LazyColumn(modifier = Modifier.padding(horizontal = 24.dp)) {
+            item {
+                Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+                    Column(
+                        Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        DateNavigator(viewModels.logsScreen.date) {
+                            viewModels.logsScreen.setDate(it)
+                        }
+                        MacroWheels(viewModels.logsScreen.overallNutrients)
+                        Spacer(modifier = Modifier.padding(vertical = 16.dp))
+                    }
+                }
+            }
+            item {
+                MealButton(MealType.BREAKFAST, viewModels.logsScreen) {
+                    navController.navigate("meal/BREAKFAST")
+                }
+            }
+            item {
+                MealButton(MealType.LUNCH, viewModels.logsScreen) {
+                    navController.navigate("meal/LUNCH")
+                }
+            }
+            item {
+                MealButton(MealType.DINNER, viewModels.logsScreen) {
+                    navController.navigate("meal/DINNER")
+                }
+            }
+            item {
+                MealButton(MealType.SNACKS, viewModels.logsScreen) {
+                    navController.navigate("meal/SNACKS")
                 }
             }
         }

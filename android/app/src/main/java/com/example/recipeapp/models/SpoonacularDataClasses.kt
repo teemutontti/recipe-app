@@ -1,6 +1,6 @@
 package com.example.recipeapp.models
 
-import com.example.recipeapp.utils.Utils.emptyRecipe
+import com.example.recipeapp.utils.ConversionUtils.emptyRecipe
 
 /**
  * Data class representing a Spoonacular recipe.

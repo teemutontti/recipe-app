@@ -8,6 +8,7 @@ import com.example.recipeapp.R
 import com.example.recipeapp.models.Category
 import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.models.FavouriteRecipe
+import com.example.recipeapp.models.Food
 import com.example.recipeapp.models.Fraction
 import com.example.recipeapp.models.PersonalRecipe
 
@@ -152,6 +153,26 @@ object Utils {
             }
         }
         return false
+    }
+
+    fun valueToWheelDrawn(value: Number, max: Number): Float {
+        val percentage = value.toDouble() / max.toDouble()
+        val percentageOfRadius = 360f * percentage
+        return percentageOfRadius.toFloat()
+    }
+
+    fun getEmptyFood(): Food {
+        return Food(
+            "Empty food",
+            "",
+            0,
+            0,
+            0f,
+            0f,
+            0f,
+            -1,
+            -1,
+        )
     }
 }
 

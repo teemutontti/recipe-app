@@ -9,7 +9,7 @@ import com.example.recipeapp.models.Ingredient
 import com.example.recipeapp.models.Instruction
 import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.repositories.RecipeUnderInspectionRepository
-import com.example.recipeapp.utils.Utils.emptyRecipe
+import com.example.recipeapp.utils.ConversionUtils.emptyRecipe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

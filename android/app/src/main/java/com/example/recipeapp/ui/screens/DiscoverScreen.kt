@@ -75,7 +75,11 @@ private fun DiscoverScreenContent(
             Column(modifier = Modifier.padding(horizontal = 24.dp)) {
 
                 /* === SEARCH SECTION === */
-                CustomSearchBar(viewModels.search, showSearchPanel) { showSearchPanel = it }
+                CustomSearchBar(
+                    placeholder = "Search any recipe",
+                    showSearchPanel, { showSearchPanel = it }) {
+                    viewModels.search.search(it)
+                }
                 if (showSearchPanel) SearchPanel(navController, viewModels)
                 Spacer(modifier = Modifier.height(16.dp))
 

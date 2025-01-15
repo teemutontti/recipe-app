@@ -119,7 +119,7 @@ fun RecipeScreen(
 
         // Forming a new ingredient list
         val newIngredients = recipe.ingredients.mapIndexed { index, item ->
-            item.copy(amount = newIngredientAmounts[index])
+            item.copy(amount = newIngredientAmounts[index].toFloat())
         }
 
         // Saving a new recipe with updated amounts to view model
@@ -251,7 +251,7 @@ fun RecipeScreen(
             NumberCounter(
                 value = recipe.servings,
                 suffix = "servings",
-                onNumberChange = ::calculateIngredients,
+                onNumberChange = { calculateIngredients(it.toInt()) },
                 max = 50,
             )
             Spacer(modifier = Modifier.height(24.dp))

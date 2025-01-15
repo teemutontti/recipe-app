@@ -68,7 +68,8 @@ import com.example.recipeapp.ui.components.misc.StepIndicator
 import com.example.recipeapp.models.Ingredient
 import com.example.recipeapp.models.Instruction
 import com.example.recipeapp.ui.components.layout.TopBar
-import com.example.recipeapp.utils.Utils
+import com.example.recipeapp.utils.Constants
+import com.example.recipeapp.utils.ValidatorUtils
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 
@@ -224,8 +225,8 @@ private fun TitleStep(
     var image by remember { mutableStateOf(viewModel.recipe.value.image) }
 
     LaunchedEffect(title, servings, image) {
-        val titleOk = Utils.Validator.recipeTitle(title)
-        val servingsOk = Utils.Validator.recipeServings(servings)
+        val titleOk = ValidatorUtils.recipeTitle(title)
+        val servingsOk = ValidatorUtils.recipeServings(servings)
 
         if (titleOk && servingsOk) {
             val newRecipe = viewModel.recipe.value.copy(
@@ -285,7 +286,7 @@ private fun TitleStep(
     Spacer(modifier = Modifier.height(8.dp))
     NumberCounter(
         value = servings,
-        onNumberChange = { servings = it },
+        onNumberChange = { servings = it.toInt() },
         max = 40
     )
     Spacer(modifier = Modifier.height(24.dp))
@@ -301,7 +302,7 @@ private fun TitleStep(
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.height(Utils.IMAGE_HEIGHT.dp)
+            modifier = Modifier.height(Constants.IMAGE_HEIGHT.dp)
         ) {
             if (image == "") {
                 RecipeImage(painter = painterResource(id = R.drawable.meal))

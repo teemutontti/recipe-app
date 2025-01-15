@@ -38,8 +38,8 @@ class BaseController<T extends BaseEntity<T>, S extends BaseService<T>> {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<T> update(@PathVariable("id") Long id, @RequestBody T food) {
-        return service.update(id, food);
+    public ResponseEntity<T> update(@PathVariable("id") Long id, @RequestBody T item) {
+        return service.update(id, item);
     }
 
     @DeleteMapping("/{id}")

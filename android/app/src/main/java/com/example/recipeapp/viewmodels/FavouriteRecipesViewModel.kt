@@ -9,7 +9,7 @@ import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.models.DatabaseProvider
 import com.example.recipeapp.models.FavouriteRecipe
 import com.example.recipeapp.repositories.FavouriteRecipeRepository
-import com.example.recipeapp.utils.Utils.toRecipe
+import com.example.recipeapp.utils.ConversionUtils.toRecipe
 import kotlinx.coroutines.launch
 
 /**

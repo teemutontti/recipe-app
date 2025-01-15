@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.models.SpoonacularRecipe
 import com.example.recipeapp.repositories.SearchRepository
-import com.example.recipeapp.utils.Utils.emptyRecipe
+import com.example.recipeapp.utils.ConversionUtils.emptyRecipe
 import kotlinx.coroutines.launch
 
 /**

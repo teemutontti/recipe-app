@@ -10,7 +10,7 @@ import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.utils.SharedPreferencesKeys.PREFS_NAME
 import com.example.recipeapp.models.FavouriteRecipe
 import com.example.recipeapp.repositories.TodaysSpecialsRepository
-import com.example.recipeapp.utils.Utils.toRecipe
+import com.example.recipeapp.utils.ConversionUtils.toRecipe
 import kotlinx.coroutines.launch
 
 /**

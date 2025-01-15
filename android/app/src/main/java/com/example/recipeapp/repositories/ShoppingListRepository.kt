@@ -1,8 +1,7 @@
 package com.example.recipeapp.repositories
 
 import android.content.SharedPreferences
-import com.example.recipeapp.models.Ingredient
-import com.example.recipeapp.models.SharedPreferencesManager
+import com.example.recipeapp.utils.SharedPreferencesManager
 import com.example.recipeapp.models.ShoppingListItem
 
 class ShoppingListRepository(private val prefs: SharedPreferences) {

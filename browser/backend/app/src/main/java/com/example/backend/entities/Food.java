@@ -2,6 +2,7 @@ package com.example.backend.entities;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import lombok.Data;
@@ -16,13 +17,13 @@ public class Food implements BaseEntity<Food> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String name; // NOT NULL
+    private String name;
     private String barcode;
     private Integer servingSize;
-    private Integer calories; // NOT NULL
-    private Float carbs;
-    private Float protein;
-    private Float fat;
+    private Double calories;
+    private Double carbs;
+    private Double protein;
+    private Double fat;
     private Integer createdBy;
     private Integer editedBy;
     @CreationTimestamp

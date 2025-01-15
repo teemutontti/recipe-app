@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.ui.components.buttons.TodaysSpecialButton
-import com.example.recipeapp.utils.Utils
+import com.example.recipeapp.utils.Constants
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 import kotlinx.coroutines.delay
 
@@ -70,7 +70,7 @@ fun RecipeShelf(
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         LazyRow(
             state = lazyRowState,
-            modifier = Modifier.width(Utils.IMAGE_WIDTH.dp)
+            modifier = Modifier.width(Constants.IMAGE_WIDTH.dp)
         ) {
             itemsIndexed(recipes) { index, recipe ->
                 Column(modifier = Modifier.fillParentMaxWidth()) {

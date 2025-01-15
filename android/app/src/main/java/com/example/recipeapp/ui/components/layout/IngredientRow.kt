@@ -35,7 +35,7 @@ import com.example.recipeapp.models.Ingredient
 import com.example.recipeapp.models.ShoppingListItem
 import com.example.recipeapp.ui.components.misc.SwipeBackgroundElement
 import com.example.recipeapp.ui.components.buttons.RemoveButton
-import com.example.recipeapp.utils.Utils.convertToFraction
+import com.example.recipeapp.utils.ConversionUtils.convertToFraction
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 
 /**

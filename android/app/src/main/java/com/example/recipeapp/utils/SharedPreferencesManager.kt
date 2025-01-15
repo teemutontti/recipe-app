@@ -1,6 +1,8 @@
-package com.example.recipeapp.models
+package com.example.recipeapp.utils
 
 import android.content.SharedPreferences
+import com.example.recipeapp.models.FavouriteRecipe
+import com.example.recipeapp.models.ShoppingListItem
 import com.example.recipeapp.utils.SharedPreferencesKeys.SHOPPING_LIST
 import com.example.recipeapp.utils.SharedPreferencesKeys.TODAYS_SPECIALS
 import com.example.recipeapp.utils.SharedPreferencesKeys.TODAYS_SPECIALS_LAST_LOAD

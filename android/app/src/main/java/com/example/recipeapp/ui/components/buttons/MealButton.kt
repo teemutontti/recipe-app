@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.example.recipeapp.models.MealType
+import com.example.recipeapp.utils.FormattingUtils.toLowerCaseCapitalizeFirst
 import com.example.recipeapp.viewmodels.LogsScreenViewModel
 
 @Composable
@@ -41,7 +42,7 @@ fun MealButton(
         ) {
             Column {
                 Text(
-                    text = mealType.toString(),
+                    text = toLowerCaseCapitalizeFirst(mealType.toString()),
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onBackground,
                 )

@@ -7,14 +7,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.models.MealType
 import com.example.recipeapp.ui.components.buttons.MealButton
+import com.example.recipeapp.ui.components.dialogs.SharedSnackbar
 import com.example.recipeapp.ui.components.inputs.DateNavigator
 import com.example.recipeapp.ui.components.layout.MacroWheels
 import com.example.recipeapp.ui.components.navigation.NavBar
@@ -31,7 +35,8 @@ fun LogsScreen(navController: NavController, viewModels: ViewModelWrapper) {
     Scaffold(
         topBar = { TopBar("Logs") },
         content = { LogsScreenContent(navController, viewModels, it) },
-        bottomBar = { NavBar(navController, "logs") }
+        bottomBar = { NavBar(navController, "logs") },
+        snackbarHost = { SharedSnackbar(viewModels.logsScreen) }
     )
 }
 

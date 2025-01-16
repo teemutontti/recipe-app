@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.ui.components.buttons.BackButton
+import com.example.recipeapp.ui.components.dialogs.SharedSnackbar
 import com.example.recipeapp.ui.components.layout.TopBar
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 import com.example.recipeapp.ui.components.inputs.CustomSearchBar
@@ -87,7 +88,8 @@ fun AddFoodScreen(
                     Text("Save")
                 }
             }
-        }
+        },
+        snackbarHost = { SharedSnackbar(viewModels.logsScreen) }
     )
 }
 

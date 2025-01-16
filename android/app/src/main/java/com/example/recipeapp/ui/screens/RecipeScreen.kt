@@ -71,7 +71,6 @@ fun RecipeScreen(
 ) {
     // State variables for recipe details
     val recipe by viewModels.inspection.recipe
-    val isLoading by viewModels.inspection.loading
     var imageLoading by remember { mutableStateOf(true) }
     var isFavourite by remember { mutableStateOf(false) }
     var showMore by remember { mutableStateOf(false) }
@@ -144,7 +143,7 @@ fun RecipeScreen(
             .padding(32.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        if (isLoading) LinearProgressIndicator()
+        if (viewModels.inspection.loading) LinearProgressIndicator()
         else {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

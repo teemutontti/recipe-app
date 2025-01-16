@@ -86,8 +86,8 @@ private fun DiscoverScreenContent(
                 /* === TODAY'S SPECIALS SECTION === */
                 Text("Today's Specials", style = MaterialTheme.typography.headlineMedium)
                 Spacer(modifier = Modifier.height(8.dp))
-                if (viewModels.specials.error != null) {
-                    UserFeedbackMessage(viewModels.specials.error!!, "error")
+                if (viewModels.specials.alert != null) {
+                    UserFeedbackMessage(viewModels.specials.alert!!.message, "error")
                 } else if (viewModels.specials.loading) {
                     LinearProgressIndicator()
                 } else {

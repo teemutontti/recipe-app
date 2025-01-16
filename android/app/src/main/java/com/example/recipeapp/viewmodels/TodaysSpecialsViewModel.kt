@@ -3,8 +3,6 @@ package com.example.recipeapp.viewmodels
 import android.app.Application
 import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.utils.SharedPreferencesKeys.PREFS_NAME
@@ -20,7 +18,7 @@ import kotlinx.coroutines.launch
  *
  * @property application The application context associated with the ViewModel.
  */
-class TodaysSpecialsViewModel(application: Application): AndroidViewModel(application) {
+class TodaysSpecialsViewModel(application: Application): BaseViewModel(application) {
     private val repository: TodaysSpecialsRepository
 
     init {
@@ -32,22 +30,17 @@ class TodaysSpecialsViewModel(application: Application): AndroidViewModel(applic
     private val _recipes = mutableStateListOf<FavouriteRecipe>()
     val recipes: List<Recipe> get() = _recipes.map { it.toRecipe() }
 
-    // Loading state encapsulation
-    private val _loading = mutableStateOf(true) // Initializing to true
-    val loading get() = _loading.value
-
-    private val _error = mutableStateOf<String?>(null)
-    val error get() = _error.value
-
     init {
+        setLoading(true)
         viewModelScope.launch {
             val responseHandler = repository.getTodaysSpecials()
             if (responseHandler.success != null) {
                 _recipes.addAll(responseHandler.success)
-            } else {
-                _error.value = responseHandler.error
             }
-            _loading.value = false
+
+            if (responseHandler.error != null) showAlert(responseHandler.error)
+
+            setLoading(false)
         }
     }
 }

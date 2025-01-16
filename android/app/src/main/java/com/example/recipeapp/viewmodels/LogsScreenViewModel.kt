@@ -3,7 +3,6 @@ package com.example.recipeapp.viewmodels
 import android.app.Application
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.models.Food
 import com.example.recipeapp.models.FoodLog
@@ -12,20 +11,18 @@ import com.example.recipeapp.models.MealType
 import com.example.recipeapp.models.NutrientSummary
 import com.example.recipeapp.repositories.FoodRepository
 import com.example.recipeapp.repositories.LogRepository
-import com.example.recipeapp.utils.Constants
+import com.example.recipeapp.utils.AlertType
 import com.example.recipeapp.utils.ConversionUtils.emptyFood
+import com.example.recipeapp.utils.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-class LogsScreenViewModel(application: Application): AndroidViewModel(application) {
+class LogsScreenViewModel(application: Application): BaseViewModel(application) {
     private val logRepository = LogRepository()
     private val foodRepository = FoodRepository()
 
     private var _logs: MutableState<List<Log>> = mutableStateOf(emptyList())
-    val logs get() = _logs.value
-    val setLogs: (List<Log>) -> Unit = { _logs.value = it }
-
     private var _breakfastLogs: MutableState<List<FoodLog>> = mutableStateOf(emptyList())
     val breakfastLogs get() = _breakfastLogs.value
     private var _lunchLogs: MutableState<List<FoodLog>> = mutableStateOf(emptyList())
@@ -39,6 +36,7 @@ class LogsScreenViewModel(application: Application): AndroidViewModel(applicatio
     val foods get() = _foods.value
     val setFoods: (List<Food>) -> Unit = { _foods.value = it }
 
+    // NOTE: Can be exploited by changing the devices date
     private var _date: MutableState<LocalDate> = mutableStateOf(LocalDate.now())
     val date get() = _date.value
     val setDate: (LocalDate) -> Unit = { _date.value = it; loadLogs() }
@@ -46,10 +44,6 @@ class LogsScreenViewModel(application: Application): AndroidViewModel(applicatio
     private var _savableFood: MutableState<Food?> = mutableStateOf(null)
     val savableFood get() = _savableFood.value
     val setSavableFood: (Food?) -> Unit = { _savableFood.value = it }
-
-    private var _editableLogs: MutableState<List<Log>> = mutableStateOf(emptyList())
-    val editableLogs get() = _editableLogs.value
-    val setEditableLogs: (List<Log>) -> Unit = { _editableLogs.value = it }
 
     private var _overallNutrients = mutableStateOf(NutrientSummary(0.0, 0.0, 0.0, 0.0))
     val overallNutrients get() = _overallNutrients.value
@@ -67,75 +61,81 @@ class LogsScreenViewModel(application: Application): AndroidViewModel(applicatio
 
         logs.forEach { log ->
             val food = fetchFoodById(log.food)
+            android.util.Log.d("calculateNutrients", "Log: $log")
             food?.calories?.let { calories += it * (log.amount / 100) }
             food?.fat?.let { fats += it * (log.amount / 100) }
             food?.carbs?.let { carbs += it * (log.amount / 100) }
             food?.protein?.let { protein += it * (log.amount / 100) }
         }
-
         return NutrientSummary(calories, fats, carbs, protein)
     }
 
     fun loadLogs() {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = logRepository.getLogsByDate(_date.value)
-            _logs.value = result ?: emptyList()
+            val result: Result<List<Log>> = logRepository.getLogsByDate(_date.value)
 
-            val nutrientSummary = result?.let { calculateNutrients(it) }
-            if (nutrientSummary != null) setOverallNutrients(nutrientSummary)
+            if (result.isSuccessful()) {
+                _logs.value = result.value ?: emptyList()
 
-            val newBreakfastLogs = result?.filter { it.meal == "BREAKFAST" } ?: emptyList()
-            val newLunchLogs = result?.filter { it.meal == "LUNCH" } ?: emptyList()
-            val newDinnerLogs = result?.filter { it.meal == "DINNER" } ?: emptyList()
-            val newSnacksLogs = result?.filter {
-                it.meal == "SNACKS" || (it.meal != "BREAKFAST"
-                        && it.meal != "LUNCH"
-                        && it.meal != "DINNER")} ?: emptyList()
+                val nutrientSummary = result.value?.let { calculateNutrients(it) }
+                if (nutrientSummary != null) setOverallNutrients(nutrientSummary)
 
-            _breakfastLogs.value = newBreakfastLogs.map {
-                FoodLog(it, fetchFoodById(it.food) ?: emptyFood.copy())
-            }
-            _lunchLogs.value = newLunchLogs.map {
-                FoodLog(it, fetchFoodById(it.food) ?: emptyFood.copy())
-            }
-            _dinnerLogs.value = newDinnerLogs.map {
-                FoodLog(it, fetchFoodById(it.food) ?: emptyFood.copy())
-            }
-            _snacksLogs.value = newSnacksLogs.map {
-                FoodLog(it, fetchFoodById(it.food) ?: emptyFood.copy())
-            }
+                val newBreakfastLogs = result.value?.filter { it.meal == "BREAKFAST" } ?: emptyList()
+                val newLunchLogs = result.value?.filter { it.meal == "LUNCH" } ?: emptyList()
+                val newDinnerLogs = result.value?.filter { it.meal == "DINNER" } ?: emptyList()
+                val newSnacksLogs = result.value?.filter {
+                    it.meal == "SNACKS" || (it.meal != "BREAKFAST"
+                            && it.meal != "LUNCH"
+                            && it.meal != "DINNER")
+                } ?: emptyList()
 
-            val breakfastNutrients = calculateNutrients(newBreakfastLogs)
-            val lunchNutrients = calculateNutrients(newLunchLogs)
-            val dinnerNutrients = calculateNutrients(newDinnerLogs)
-            val snacksNutrients = calculateNutrients(newSnacksLogs)
-
-            val newMealNutrients = MealType.entries.associateWith { mealType ->
-                when (mealType) {
-                    MealType.BREAKFAST -> breakfastNutrients
-                    MealType.LUNCH -> lunchNutrients
-                    MealType.DINNER -> dinnerNutrients
-                    MealType.SNACKS -> snacksNutrients
+                _breakfastLogs.value = newBreakfastLogs.map {
+                    FoodLog(it, fetchFoodById(it.food) ?: emptyFood.copy())
                 }
+                _lunchLogs.value = newLunchLogs.map {
+                    FoodLog(it, fetchFoodById(it.food) ?: emptyFood.copy())
+                }
+                _dinnerLogs.value = newDinnerLogs.map {
+                    FoodLog(it, fetchFoodById(it.food) ?: emptyFood.copy())
+                }
+                _snacksLogs.value = newSnacksLogs.map {
+                    FoodLog(it, fetchFoodById(it.food) ?: emptyFood.copy())
+                }
+
+                val newMealNutrients = MealType.entries.associateWith { mealType ->
+                    when (mealType) {
+                        MealType.BREAKFAST -> calculateNutrients(newBreakfastLogs)
+                        MealType.LUNCH -> calculateNutrients(newLunchLogs)
+                        MealType.DINNER -> calculateNutrients(newDinnerLogs)
+                        MealType.SNACKS -> calculateNutrients(newSnacksLogs)
+                    }
+                }
+                setNutrients(newMealNutrients)
+            } else {
+                showAlert("Error occurred in loading logs (${result.errorCode}).")
             }
-            android.util.Log.d("LogsScreenViewModel", "newBreakfastLogs: $newMealNutrients")
-            setNutrients(newMealNutrients)
         }
     }
 
     fun loadFoods() {
         viewModelScope.launch(Dispatchers.IO) {
             val result = foodRepository.getFoods()
-            _foods.value = result ?: emptyList()
+            if (result.isSuccessful()) {
+                _foods.value = result.value ?: emptyList()
+            }
         }
     }
 
     fun updateLog(log: Log) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = logRepository.updateLog(log)
-            if (result != null) _logs.value = _logs.value.map {
-                if (it.id == log.id) log
-                else it
+            if (result.isSuccessful()) {
+                _logs.value = _logs.value.map {
+                    if (it.id == log.id) log
+                    else it
+                }
+            } else {
+                showAlert("Error occurred while updating log (${result.errorCode}).")
             }
         }
     }
@@ -143,19 +143,22 @@ class LogsScreenViewModel(application: Application): AndroidViewModel(applicatio
     fun saveLog(log: Log) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = logRepository.saveLog(log)
-            if (result) android.util.Log.d("LogScreenViewModel", "Log saved")
-            else android.util.Log.d("LogScreenViewModel", "Log NOT saved")
+            if (result.isSuccessful()) {
+                showAlert("Log saved!", AlertType.INFO)
+            } else {
+                showAlert("Error occurred while saving the log (${result.errorCode}).")
+            }
         }
     }
 
     fun deleteLog(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = logRepository.deleteLog(id)
-            if (result) {
+            if (result.isSuccessful()) {
                 _logs.value = _logs.value.filter { id != it.id }
-                android.util.Log.d("LogScreenViewModel", "Log deleted")
+                showAlert("Log deleted!", AlertType.INFO)
             } else {
-                android.util.Log.d("LogScreenViewModel", "Log NOT deleted")
+                showAlert("Error occurred while deleting the log (${result.errorCode}).")
             }
         }
     }
@@ -163,22 +166,25 @@ class LogsScreenViewModel(application: Application): AndroidViewModel(applicatio
     fun searchFoods(query: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = foodRepository.getFoodsByQuery(query)
-            _foods.value = result ?: emptyList()
+            if (result.isSuccessful()) {
+                _foods.value = result.value ?: emptyList()
+            }
         }
     }
 
     suspend fun fetchFoodById(id: Int): Food?  {
-        return foodRepository.getFoodById(id)
+        val result = foodRepository.getFoodById(id)
+        return if (result.isSuccessful()) result.value else null
     }
 
     fun saveFood(food: Food) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = foodRepository.saveFood(food)
-            if (result) {
+            if (result.isSuccessful()) {
                 loadFoods()
-                android.util.Log.d("LogScreenViewModel", "Food saved")
+                showAlert("Food saved!", AlertType.INFO)
             } else {
-                android.util.Log.d("LogScreenViewModel", "Food NOT saved")
+                showAlert("Error occurred while saving the food (${result.errorCode}).")
             }
         }
     }

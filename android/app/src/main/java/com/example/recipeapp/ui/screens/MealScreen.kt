@@ -30,6 +30,7 @@ import com.example.recipeapp.models.NutrientSummary
 import com.example.recipeapp.ui.components.buttons.AddButton
 import com.example.recipeapp.ui.components.buttons.BackButton
 import com.example.recipeapp.ui.components.buttons.MealLogButton
+import com.example.recipeapp.ui.components.dialogs.SharedSnackbar
 import com.example.recipeapp.ui.components.layout.MealNutrients
 import com.example.recipeapp.ui.components.layout.NutrientColumn
 import com.example.recipeapp.ui.components.layout.TopBar
@@ -52,6 +53,7 @@ fun MealScreen(
                 mealType = mealType,
             )
         },
+        snackbarHost = { SharedSnackbar(viewModels.logsScreen) }
     )
 }
 

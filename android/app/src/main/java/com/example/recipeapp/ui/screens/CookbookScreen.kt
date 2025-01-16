@@ -97,8 +97,8 @@ private fun PersonalRecipesTab(navController: NavController, viewModels: ViewMod
         Column(modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())) {
-            if (viewModels.personal.error != null) {
-                UserFeedbackMessage(viewModels.personal.error!!, "error")
+            if (viewModels.personal.alert != null) {
+                UserFeedbackMessage(viewModels.personal.alert!!.message, "error")
             } else if (viewModels.personal.loading) {
                 LinearProgressIndicator()
             } else {
@@ -135,8 +135,8 @@ private fun PersonalRecipesTab(navController: NavController, viewModels: ViewMod
 @Composable
 private fun FavouriteRecipesTab(navController: NavController, viewModels: ViewModelWrapper) {
     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-        if (viewModels.favourite.error != null) {
-            UserFeedbackMessage(viewModels.personal.error!!, "error")
+        if (viewModels.personal.alert != null) {
+            UserFeedbackMessage(viewModels.personal.alert!!.message, "error")
         } else if (viewModels.favourite.loading) {
             LinearProgressIndicator()
         } else {

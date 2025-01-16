@@ -4,13 +4,11 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.compose.runtime.mutableStateListOf
-import androidx.lifecycle.AndroidViewModel
-import com.example.recipeapp.models.Ingredient
 import com.example.recipeapp.models.ShoppingListItem
 import com.example.recipeapp.repositories.ShoppingListRepository
 import com.example.recipeapp.utils.SharedPreferencesKeys.PREFS_NAME
 
-class ShoppingListViewModel(application: Application): AndroidViewModel(application) {
+class ShoppingListViewModel(application: Application): BaseViewModel(application) {
     private val prefs: SharedPreferences
     private val repository: ShoppingListRepository
     private val _items = mutableStateListOf<ShoppingListItem>()

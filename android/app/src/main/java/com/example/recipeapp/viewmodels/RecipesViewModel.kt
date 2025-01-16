@@ -10,8 +10,6 @@ import com.example.recipeapp.models.Recipe
  */
 interface RecipesViewModel {
     val recipes: List<Recipe>
-    val loading: Boolean
-    val error: String?
     fun loadData()
     fun add(r: Recipe)
     fun delete(r: Recipe)

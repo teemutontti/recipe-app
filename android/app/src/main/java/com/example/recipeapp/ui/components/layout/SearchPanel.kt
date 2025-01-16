@@ -27,9 +27,9 @@ import com.example.recipeapp.viewmodels.ViewModelWrapper
  */
 @Composable
 fun SearchPanel(navController: NavController, viewModels: ViewModelWrapper) {
-    if (viewModels.search.error != null) {
+    if (viewModels.search.alert != null) {
         Spacer(modifier = Modifier.height(8.dp))
-        UserFeedbackMessage(viewModels.search.error!!, "error")
+        UserFeedbackMessage(viewModels.search.alert!!.message, "error")
     } else {
         Column(
             modifier = Modifier

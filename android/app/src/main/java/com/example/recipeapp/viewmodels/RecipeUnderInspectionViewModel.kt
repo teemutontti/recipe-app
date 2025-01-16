@@ -3,7 +3,6 @@ package com.example.recipeapp.viewmodels
 import android.app.Application
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.models.Ingredient
 import com.example.recipeapp.models.Instruction
@@ -22,13 +21,14 @@ import kotlinx.coroutines.launch
  *
  * @property application The application context associated with the ViewModel.
  */
-class RecipeUnderInspectionViewModel(application: Application): AndroidViewModel(application) {
+class RecipeUnderInspectionViewModel(
+    application: Application
+): BaseViewModel(application) {
+
     private val repository: RecipeUnderInspectionRepository = RecipeUnderInspectionRepository()
     private var _recipe: MutableState<Recipe> = mutableStateOf(emptyRecipe)
-    private var _loading: MutableState<Boolean> = mutableStateOf(true)
 
     val recipe: MutableState<Recipe> get() = _recipe
-    val loading: MutableState<Boolean> get() = _loading
 
     /**
      * Sets the recipe being inspected to the provided [newRecipe].
@@ -39,7 +39,7 @@ class RecipeUnderInspectionViewModel(application: Application): AndroidViewModel
         viewModelScope.launch {
             _recipe.value = newRecipe ?: emptyRecipe
             delay(125) // Adding small delay to get rid of loading bar flashing
-            _loading.value = false
+            setLoading(false)
         }
     }
 
@@ -49,7 +49,7 @@ class RecipeUnderInspectionViewModel(application: Application): AndroidViewModel
      * @param id The ID of the recipe to fetch.
      */
     fun fetchRecipe(id: Int) {
-        _loading.value = true
+        setLoading(true)
         viewModelScope.launch(Dispatchers.IO) {
             val newRecipe = repository.fetchRecipe(id)?.toRecipe()
             setRecipe(newRecipe)

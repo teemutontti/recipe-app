@@ -2,8 +2,6 @@ package com.example.recipeapp.viewmodels
 
 import android.app.Application
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.models.Recipe
 import com.example.recipeapp.models.SpoonacularRecipe
@@ -19,19 +17,15 @@ import kotlinx.coroutines.launch
  *
  * @property application The application context associated with the ViewModel.
  */
-class SearchViewModel(application: Application): AndroidViewModel(application) {
+class SearchViewModel(
+    application: Application
+): BaseViewModel(application) {
+
     private val repository: SearchRepository = SearchRepository()
 
     // Search results state encapsulation
     private val _searchResults = mutableStateListOf<SpoonacularRecipe>()
     val searchResults: List<Recipe?> get() = _searchResults.map { it.toRecipe() ?: emptyRecipe } ?: listOf()
-
-    // Loading state encapsulation
-    private val _loading = mutableStateOf(true)
-    val loading get() = _loading.value
-
-    private val _error = mutableStateOf<String?>(null)
-    val error get() = _error.value
 
     /**
      * Updates the search results with the provided [newSearchResult].
@@ -50,14 +44,16 @@ class SearchViewModel(application: Application): AndroidViewModel(application) {
      * @param query The search query string.
      */
     fun search(query: String) {
+        setLoading(true)
         viewModelScope.launch {
             val responseHandler = repository.search(query)
             if (responseHandler.success != null) {
                 update(responseHandler.success)
-            } else {
-                _error.value = responseHandler.error
             }
-            _loading.value = false
+
+            if (responseHandler.error != null) showAlert(responseHandler.error)
+
+            setLoading(false)
         }
     }
 }

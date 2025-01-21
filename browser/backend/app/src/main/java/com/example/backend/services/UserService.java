@@ -1,6 +1,7 @@
 package com.example.backend.services;
 import java.util.ArrayList;
 import java.util.List;
+
 import com.example.backend.exceptions.FailedDecryptionException;
 import com.example.backend.exceptions.FailedEncryptionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +35,13 @@ public class UserService extends BaseService<User> {
             User encryptedUser = SecurityUtil.encryptUser(user);
 
             User data = getRepository().save(encryptedUser);
+
+            // NOTE: Temporary fix for not sharing the hashed password
+            data.setPassword("REDACTED");
+
             return new ResponseEntity<>(data, HttpStatus.CREATED);
 
         } catch (Exception e) {
-            System.err.println(e);
-            System.err.println("User encryption failed!");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -46,16 +49,20 @@ public class UserService extends BaseService<User> {
     @Override
     public ResponseEntity<List<User>> getAll() {
         try {
-            List<User> users = (List<User>) getRepository().findAll();
+            List<User> users = getRepository().findAll();
             List<User> decryptedUsers = new ArrayList<>();
 
             // Decrypting user data
             for (User user: users) {
                 try {
                     User decryptedUser = SecurityUtil.decryptUser(user);
+
+                    // NOTE: Temporary fix for not sharing the hashed password
+                    decryptedUser.setPassword("REDACTED");
+
                     decryptedUsers.add(decryptedUser);
                 } catch (FailedDecryptionException e) {
-                    System.err.println("Decryption failed for user " + user.getId());
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
             }
             return new ResponseEntity<>(decryptedUsers, HttpStatus.OK);
@@ -75,6 +82,10 @@ public class UserService extends BaseService<User> {
 
             try {
                 User decryptedUser = SecurityUtil.decryptUser(existingUser);
+
+                // NOTE: Temporary fix for not sharing the hashed password
+                decryptedUser.setPassword("REDACTED");
+
                 return new ResponseEntity<>(decryptedUser, HttpStatus.OK);
             } catch (FailedDecryptionException e) {
                 System.err.print("Decryption failed for user " + existingUser.getId());
@@ -96,9 +107,11 @@ public class UserService extends BaseService<User> {
 
             try {
                 User encryptedUser = SecurityUtil.encryptUser(user);
-                existingUser.update(encryptedUser);
+                User data = getRepository().save(encryptedUser);
 
-                User data = getRepository().save(existingUser);
+                // NOTE: Temporary fix for not sharing the hashed password
+                data.setPassword("REDACTED");
+
                 return new ResponseEntity<>(data, HttpStatus.OK);
             } catch (FailedEncryptionException e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -116,6 +129,9 @@ public class UserService extends BaseService<User> {
         }
 
         if (SecurityUtil.checkPassword(password, existingUser.getPassword())) {
+            // NOTE: Temporary fix for not sharing the hashed password
+            existingUser.setPassword("REDACTED");
+
             return new ResponseEntity<>(existingUser, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

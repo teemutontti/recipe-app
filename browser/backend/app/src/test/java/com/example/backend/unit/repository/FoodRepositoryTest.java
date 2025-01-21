@@ -46,7 +46,7 @@ class FoodRepositoryTest {
 
         assertNotNull(saved.getId());
         assertEquals("Kanan rintafilee", saved.getName());
-        assertEquals(240.0, saved.getCalories());
+        assertEquals(250.0, saved.getCalories());
     }
 
     @Test

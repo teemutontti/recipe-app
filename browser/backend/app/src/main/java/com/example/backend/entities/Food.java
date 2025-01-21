@@ -19,7 +19,7 @@ public class Food implements BaseEntity<Food> {
     private Integer id;
     private String name;
     private String barcode;
-    private Integer servingSize;
+    private Integer servingSize = 100;
     private Double calories;
     private Double carbs;
     private Double protein;

@@ -1,8 +1,8 @@
 package com.example.backend.services;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.example.backend.entities.BaseEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,34 +12,60 @@ import org.springframework.stereotype.Service;
  * @param <T> Entity type to be used in the service.
  */
 @Service
-public abstract class BaseService<T extends BaseEntity<T>> {
+public abstract class BaseService<T> {
 
     protected abstract JpaRepository<T, Long> getRepository();
 
-    public T create(T entity) {
-        System.out.println("\n\n" + entity + "\n\n");
-        return getRepository().save(entity);
-    }
-
-    public List<T> getAll() {
-        return getRepository().findAll();
-    }
-
-    public T getById(Long id) {
-        return getRepository().findById(id).orElse(null);
-    }
-
-    public T update(Long id, T entity) {
-        T existingEntity = getRepository().findById(id).orElse(null);
-
-        if (existingEntity != null) {
-            existingEntity.update(entity);
-            return getRepository().save(existingEntity);
+    public ResponseEntity<T> create(T entity) {
+        try {
+            T data = getRepository().save(entity);
+            return new ResponseEntity<>(data, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return null;
     }
 
-    public void delete(Long id) {
-        getRepository().deleteById(id);
+    public ResponseEntity<List<T>> getAll() {
+        try {
+            List<T> data = (List<T>) getRepository().findAll();
+            return new ResponseEntity<>(data, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<T> getById(Long id) {
+        try {
+            T data = getRepository().findById(id).orElse(null);
+            if (data == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(data, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<T> update(Long id, T entity) {
+        try {
+            T existingEntity = getRepository().findById(id).orElse(null);
+
+            if (existingEntity != null) {
+                T data = getRepository().save(entity);
+                return new ResponseEntity<>(data, HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<T> delete(Long id) {
+        try {
+            getRepository().deleteById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

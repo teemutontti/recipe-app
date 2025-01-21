@@ -2,7 +2,6 @@ package com.example.backend.controllers;
 import com.example.backend.dto.LoginRequest;
 import com.example.backend.exceptions.EncryptionKeyException;
 import com.example.backend.exceptions.FailedCryptionException;
-import com.example.backend.exceptions.FailedDecryptionException;
 import com.example.backend.services.UserService;
 import com.example.backend.utils.SecurityUtil;
 import org.springframework.http.HttpStatus;

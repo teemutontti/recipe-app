@@ -3,7 +3,6 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import com.example.backend.entities.BaseEntity;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Service;
  * @param <T> Entity type to be used in the service.
  */
 @Service
-public abstract class BaseService<T extends BaseEntity<T>> {
+public abstract class BaseService<T> {
 
     protected abstract JpaRepository<T, Long> getRepository();
 
@@ -52,8 +51,7 @@ public abstract class BaseService<T extends BaseEntity<T>> {
             T existingEntity = getRepository().findById(id).orElse(null);
 
             if (existingEntity != null) {
-                existingEntity.update(entity);
-                T data = getRepository().save(existingEntity);
+                T data = getRepository().save(entity);
                 return new ResponseEntity<>(data, HttpStatus.OK);
             }
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

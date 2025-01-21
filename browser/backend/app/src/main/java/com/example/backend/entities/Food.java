@@ -12,42 +12,38 @@ import lombok.Data;
 @Table(name = "foods")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Food implements BaseEntity<Food> {
+public class Food {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Column(nullable = false)
     private String name;
+
     private String barcode;
+
+    @Column(nullable = false)
     private Integer servingSize = 100;
+
+    @Column(nullable = false)
     private Double calories;
+
     private Double carbs;
     private Double protein;
     private Double fat;
-    private Integer createdBy;
-    private Integer editedBy;
-    @CreationTimestamp
-    private String created;
-    @UpdateTimestamp
-    private String edited;
 
-    @Override
-    public boolean update(Food food) {
-        try {
-            if (food.getName() != null) { setName(food.getName()); }
-            if (food.getCalories() != null) { setCalories(food.getCalories()); }
-            if (food.getBarcode() != null) { setBarcode(food.getBarcode()); }
-            if (food.getServingSize() != null) { setServingSize(food.getServingSize()); }
-            if (food.getCarbs() != null) { setCarbs(food.getCarbs()); }
-            if (food.getProtein() != null) { setProtein(food.getProtein()); }
-            if (food.getFat() != null) { setFat(food.getFat()); }
-            if (food.getCreatedBy() != null) { setCreatedBy(food.getCreatedBy()); }
-            if (food.getEditedBy() != null) { setEditedBy(food.getEditedBy()); }
-            if (food.getCreated() != null) { setCreated(food.getCreated()); }
-            if (food.getEdited() != null) { setEdited(food.getEdited()); }
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
+    @Column(nullable = false)
+    private Integer createdBy;
+
+    @Column(nullable = false)
+    private Integer editedBy;
+
+    @CreationTimestamp
+    @Column(nullable = false)
+    private String created;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private String edited;
 }

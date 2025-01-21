@@ -1,7 +1,5 @@
 package com.example.backend.entities;
 
-import com.example.backend.utils.SecurityUtil;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,28 +10,16 @@ import lombok.NoArgsConstructor;
 @Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
-public class User implements BaseEntity<User> {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
     private String password;
 
-    @Override
-    public boolean update(User user) {
-        try {
-            if (user.getEmail() != null) {
-                String encryptedEmail = SecurityUtil.encrypt(user.getEmail());
-                setEmail(encryptedEmail);
-            }
-            if (user.getPassword() != null) {
-                String hashedPassword = SecurityUtil.hashPassword(user.getPassword());
-                setPassword(hashedPassword);
-            }
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
 }

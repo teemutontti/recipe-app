@@ -25,11 +25,11 @@ import androidx.compose.ui.unit.dp
 fun NutrientInputRow(
     text: String,
     value: String,
-    onChange: (String) -> Unit,
     width: Dp = 96.dp,
     suffixText: String?,
     keyboardType: KeyboardType = KeyboardType.Number,
     fillMaxWidth: Boolean = true,
+    onChange: ((String) -> Unit)? = null,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -44,7 +44,8 @@ fun NutrientInputRow(
         Spacer(modifier = Modifier.padding(horizontal = 8.dp))
         TextField(
             value = value,
-            onValueChange = { onChange(it) },
+            readOnly = onChange == null,
+            onValueChange = { if (onChange != null) onChange(it) },
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = keyboardType),
             colors = TextFieldDefaults.colors(

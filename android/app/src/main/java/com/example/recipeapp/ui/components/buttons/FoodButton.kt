@@ -1,4 +1,4 @@
-package com.example.recipeapp.ui.components.layout
+package com.example.recipeapp.ui.components.buttons
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.example.recipeapp.models.Food
 
 @Composable
-fun FoodRow(food: Food) {
+fun FoodButton(food: Food, onClick: () -> Unit) {
     val nutrientString = "${food.carbs.toInt()}/${food.protein.toInt()}/${food.fat.toInt()}"
     var checked by remember { mutableStateOf(false) }
 
@@ -32,9 +32,9 @@ fun FoodRow(food: Food) {
     }
 
     Row(Modifier.fillMaxWidth()) {
-        Checkbox(checked, onCheckedChange = { handleClick() }, modifier = Modifier.padding(0.dp))
+        Checkbox(checked, onCheckedChange = { handleClick() })
         TextButton(
-            onClick = { handleClick() },
+            onClick = { onClick() },
             shape = RoundedCornerShape(4.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.background,

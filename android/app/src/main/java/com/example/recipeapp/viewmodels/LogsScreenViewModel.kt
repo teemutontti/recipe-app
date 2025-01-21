@@ -53,6 +53,10 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
     val nutrients get() = _mealNutrients.value
     val setNutrients: (Map<MealType, NutrientSummary>) -> Unit = { _mealNutrients.value = it }
 
+    private var _selectedFood = mutableStateOf<Food?>(null)
+    val selectedFood get() = _selectedFood.value
+    val setSelectedFood: (Food?) -> Unit = { _selectedFood.value = it }
+
     private suspend fun calculateNutrients(logs: List<Log>): NutrientSummary {
         var calories = 0.0
         var fats = 0.0

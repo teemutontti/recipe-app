@@ -36,7 +36,6 @@ public class SecurityUtilTest {
     void testEncrypt() throws FailedCryptionException {
         String str = "secret_text";
         String encryptedStr = SecurityUtil.encrypt(str, SECRET_KEY);
-
         assertNotEquals(str, encryptedStr);
     }
 
@@ -45,7 +44,6 @@ public class SecurityUtilTest {
         String str = "secret_text";
         String encryptedStr = SecurityUtil.encrypt(str, SECRET_KEY);
         String decryptedStr = SecurityUtil.decrypt(encryptedStr, SECRET_KEY);
-
         assertEquals(str, decryptedStr);
     }
 
@@ -53,7 +51,6 @@ public class SecurityUtilTest {
     void testEncryptUser() throws FailedCryptionException {
         User user = new User(1, "test@gmail.com", "password");
         User decryptedUser = SecurityUtil.encryptUser(user, SECRET_KEY);
-
         assertNotEquals("test@gmail.com", decryptedUser.getEmail());
     }
 
@@ -62,7 +59,6 @@ public class SecurityUtilTest {
         User user = new User(1, "test@gmail.com", "password");
         User encryptedUser = SecurityUtil.encryptUser(user, SECRET_KEY);
         User decryptedUser = SecurityUtil.decryptUser(encryptedUser, SECRET_KEY);
-
         assertEquals("test@gmail.com", decryptedUser.getEmail());
     }
 }

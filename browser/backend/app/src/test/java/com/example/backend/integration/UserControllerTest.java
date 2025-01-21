@@ -1,4 +1,4 @@
-package com.example.backend;
+package com.example.backend.integration;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

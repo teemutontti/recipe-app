@@ -73,9 +73,10 @@ fun FoodForm(viewModel: LogsScreenViewModel) {
         )
         Spacer(modifier = Modifier.padding(vertical = 24.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            NutrientInputRow("Nutrients per", servingSize, { servingSize = it },
+            NutrientInputRow("Nutrients per", servingSize,
                 suffixText = "g",
-                fillMaxWidth = false
+                fillMaxWidth = false,
+                onChange = { servingSize = it }
             )
         }
         TitledContainer(
@@ -84,10 +85,18 @@ fun FoodForm(viewModel: LogsScreenViewModel) {
             backgroundColor = MaterialTheme.colorScheme.background,
         ) {
             Column(modifier = Modifier.padding(start = 8.dp)) {
-                NutrientInputRow("Calories *", calories, { calories = it }, 120.dp, "kcal")
-                NutrientInputRow("Carbohydrates", carbs, { carbs = it }, suffixText = "g")
-                NutrientInputRow("Protein", protein, { protein = it }, suffixText = "g")
-                NutrientInputRow("Fat", fat, { fat = it }, suffixText = "g")
+                NutrientInputRow("Calories *", calories, 120.dp, "kcal") {
+                    calories = it
+                }
+                NutrientInputRow("Carbohydrates", carbs, suffixText = "g") {
+                    carbs = it
+                }
+                NutrientInputRow("Protein", protein, suffixText = "g") {
+                    protein = it
+                }
+                NutrientInputRow("Fat", fat, suffixText = "g") {
+                    { fat = it }
+                }
             }
         }
         Spacer(modifier = Modifier.padding(vertical = 16.dp))

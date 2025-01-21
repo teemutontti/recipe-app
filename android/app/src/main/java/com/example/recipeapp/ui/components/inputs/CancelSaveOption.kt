@@ -16,15 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.recipeapp.models.Food
 
 @Composable
-fun CancelSaveOption(onCancel: () -> Unit, onSave: () -> Unit) {
+fun CancelSaveOption(onClose: () -> Unit, onSave: () -> Unit) {
     Row {
         Button(
             modifier = Modifier.weight(1f).height(44.dp),
-            onClick = { onCancel() },
+            onClick = { onClose() },
             border = BorderStroke(2.dp, MaterialTheme.colorScheme.surface),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent,

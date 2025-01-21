@@ -69,8 +69,9 @@ fun App(applicationContext: Context) {
             composable("add_food") {
                 AddFoodScreen(navController, viewModels)
             }
-            composable("food_editor") {
-                FoodEditorScreen(navController, viewModels)
+            composable("food_editor/{mode}") {
+                val mode = it.arguments?.getString("mode")
+                FoodEditorScreen(navController, viewModels, mode ?: "VIEW")
             }
             composable("cookbook") {
                 CookbookScreen(navController, viewModels)

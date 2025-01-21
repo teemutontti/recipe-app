@@ -31,11 +31,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.recipeapp.models.FoodLog
 import com.example.recipeapp.ui.components.buttons.BackButton
 import com.example.recipeapp.ui.components.dialogs.SharedSnackbar
 import com.example.recipeapp.ui.components.layout.TopBar
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 import com.example.recipeapp.ui.components.inputs.CustomSearchBar
+import com.example.recipeapp.ui.components.buttons.FoodButton
 import com.example.recipeapp.ui.components.misc.ItemDivider
 
 @Composable
@@ -129,9 +131,12 @@ private fun AddFoodContent(
                 search = { viewModels.logsScreen.searchFoods(it) },
             )
             Spacer(modifier = Modifier.height(8.dp))
-            LazyColumn {
+            LazyColumn(Modifier.padding(horizontal = 8.dp)) {
                 itemsIndexed(viewModels.logsScreen.foods) {index, food ->
-                    Text(text = food.name)
+                    FoodButton(food) {
+                        viewModels.logsScreen.setSelectedFood(food)
+                        navController.navigate("food_editor/EDIT")
+                    }
                     if (index < viewModels.logsScreen.foods.size - 1) ItemDivider()
                 }
             }

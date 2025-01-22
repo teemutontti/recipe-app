@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,23 +26,12 @@ class FoodRepositoryTest {
 
     @BeforeEach
     public void setup() {
-        testFood = new Food(1, "Kanan rintafilee", "1234567890", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+        testFood = new Food(1, "Kanan rintafilee", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
         repository.deleteAll();
     }
 
     @Test
-    public void testFindById() {
-        Food saved = repository.save(testFood);
-
-        Long savedId = Long.valueOf(saved.getId());
-        Optional<Food> found = repository.findById(savedId);
-
-        assertTrue(found.isPresent());
-        assertEquals(saved.getId(), found.get().getId());
-    }
-
-    @Test
-    public void testSaveUser() {
+    public void testSaveFood_ReturnsSavedFood() {
         Food saved = repository.save(testFood);
 
         assertNotNull(saved.getId());
@@ -50,25 +40,85 @@ class FoodRepositoryTest {
     }
 
     @Test
-    public void testUpdateUser() {
+    public void testFindById_ReturnsFood() {
         Food saved = repository.save(testFood);
 
-        saved.setName("Kalkkunan rintafilee");
-        saved.setCalories(124.0);
-        Food updated = repository.save(saved);
+        Food found = repository.findById(Long.valueOf(saved.getId())).get();
 
-        assertEquals("Kalkkunan rintafilee", updated.getName());
-        assertEquals(124.0, updated.getCalories());
+        assertNotNull(found);
+        assertTrue(found.getId() > 0);
+        assertEquals("Kanan rintafilee", found.getName());
+        assertEquals(250.0, found.getCalories());
     }
 
     @Test
-    public void testDelete() {
+    public void testFindAll_ReturnsMultipleFoods() {
+        Food food1 = new Food(1, "Kana", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+        Food food2 = new Food(2, "Riisi", "", 100, 285.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+
+        repository.save(food1);
+        repository.save(food2);
+
+        List<Food> found = repository.findAll();
+
+        assertEquals(2, found.size());
+        assertEquals("Kana", found.get(0).getName());
+        assertEquals("Riisi", found.get(1).getName());
+    }
+
+    @Test
+    public void testUpdateFood_ReturnsFood() {
+        Food saved = repository.save(testFood);
+
+        saved.setName("Laktoositon maito");
+        saved.setCalories(35.0);
+        Food updated = repository.save(saved);
+
+        assertEquals(saved.getId(), updated.getId());
+        assertEquals("Laktoositon maito", updated.getName());
+        assertEquals(35.0, updated.getCalories());
+    }
+
+    @Test
+    public void testDeleteFood_ReturnsEmptyList() {
         Food saved = repository.save(testFood);
 
         repository.delete(saved);
-        Long savedId = Long.valueOf(saved.getId());
-        Optional<Food> found = repository.findById(savedId);
+        Optional<Food> found = repository.findById(Long.valueOf(saved.getId()));
 
         assertFalse(found.isPresent());
+        assertEquals(0, repository.findAll().size());
+    }
+
+    @Test
+    public void testFindFoodsByName_ReturnsFoods() {
+        Food food1 = new Food(1, "Kanan rintafilee", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+        Food food2 = new Food(2, "Riisi", "", 100, 285.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+        Food food3 = new Food(3, "Kalkkunaleike", "", 100, 175.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+
+        repository.save(food1);
+        repository.save(food2);
+        repository.save(food3);
+
+        List<Food> found = repository.findFoodsByNameContainingIgnoreCase("kA");
+
+        assertEquals(2, found.size());
+        assertEquals("Kanan rintafilee", found.get(0).getName());
+        assertEquals("Kalkkunaleike", found.get(1).getName());
+    }
+
+    @Test
+    public void testFindFoodsByName_ReturnsEmptyList() {
+        Food food1 = new Food(1, "Kanan rintafilee", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+        Food food2 = new Food(2, "Riisi", "", 100, 285.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+        Food food3 = new Food(3, "Kalkkunaleike", "", 100, 175.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+
+        repository.save(food1);
+        repository.save(food2);
+        repository.save(food3);
+
+        List<Food> found = repository.findFoodsByNameContainingIgnoreCase("mai");
+
+        assertEquals(0, found.size());
     }
 }

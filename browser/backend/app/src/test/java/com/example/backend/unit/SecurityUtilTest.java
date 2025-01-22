@@ -2,16 +2,17 @@ package com.example.backend.unit;
 
 import com.example.backend.entities.User;
 import com.example.backend.exceptions.FailedCryptionException;
-import com.example.backend.exceptions.FailedEncryptionException;
 import com.example.backend.utils.SecurityUtil;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 import javax.crypto.SecretKey;
 
+@ActiveProfiles("test")
 public class SecurityUtilTest {
 
     private final String TEST_KEY = "zGgUBphf34jh0gUacOo6Qu3knI8bXxYjKfbaDzq9Nts=";

@@ -1,7 +1,7 @@
 package com.example.backend.services;
+
 import java.util.ArrayList;
 import java.util.List;
-
 import com.example.backend.exceptions.FailedDecryptionException;
 import com.example.backend.exceptions.FailedEncryptionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +25,11 @@ public class UserService extends BaseService<User> {
 
     @Override
     public ResponseEntity<User> create(User user) {
-
-        // Hashing password
-        String hashedPassword = SecurityUtil.hashPassword(user.getPassword());
-        user.setPassword(hashedPassword);
-
         try {
+            // Hashing password
+            String hashedPassword = SecurityUtil.hashPassword(user.getPassword());
+            user.setPassword(hashedPassword);
+
             // Encrypting personal information
             User encryptedUser = SecurityUtil.encryptUser(user);
 
@@ -39,7 +38,9 @@ public class UserService extends BaseService<User> {
             // NOTE: Temporary fix for not sharing the hashed password
             data.setPassword("REDACTED");
 
-            return new ResponseEntity<>(data, HttpStatus.CREATED);
+            User decryptedUser = SecurityUtil.decryptUser(data);
+
+            return new ResponseEntity<>(decryptedUser, HttpStatus.CREATED);
 
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -88,10 +89,8 @@ public class UserService extends BaseService<User> {
 
                 return new ResponseEntity<>(decryptedUser, HttpStatus.OK);
             } catch (FailedDecryptionException e) {
-                System.err.print("Decryption failed for user " + existingUser.getId());
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -112,7 +111,9 @@ public class UserService extends BaseService<User> {
                 // NOTE: Temporary fix for not sharing the hashed password
                 data.setPassword("REDACTED");
 
-                return new ResponseEntity<>(data, HttpStatus.OK);
+                User decryptedUser = SecurityUtil.decryptUser(data);
+
+                return new ResponseEntity<>(decryptedUser, HttpStatus.OK);
             } catch (FailedEncryptionException e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }

@@ -22,4 +22,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    public void setEmail(String email) {
+        if (email.length() > 5 && email.contains("@")) {
+            this.email = email;
+        }
+    }
 }

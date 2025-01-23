@@ -65,26 +65,6 @@ public class SecurityUtil {
         }
     }
 
-    public static User encryptUser(User user) throws FailedCryptionException, EncryptionKeyException {
-        return encryptUser(user, getKey());
-    }
-
-    public static User encryptUser(User user, SecretKey aesKey) throws FailedCryptionException {
-        String encryptedEmail = encrypt(user.getEmail(), aesKey);
-        user.setEmail(encryptedEmail);
-        return user;
-    }
-
-    public static User decryptUser(User user) throws FailedCryptionException, EncryptionKeyException {
-        return decryptUser(user, getKey());
-    }
-
-    public static User decryptUser(User user, SecretKey aesKey) throws FailedCryptionException {
-        String decryptedEmail = decrypt(user.getEmail(), aesKey);
-        user.setEmail(decryptedEmail);
-        return user;
-    }
-
     public static SecretKeySpec genKey(String base64Key) {
         byte[] decodedKey = Base64.getDecoder().decode(base64Key);
         return new SecretKeySpec(decodedKey, "AES");

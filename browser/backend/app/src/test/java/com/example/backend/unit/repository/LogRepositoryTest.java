@@ -90,9 +90,9 @@ class LogRepositoryTest {
 
     @Test
     public void testFindByDate_ReturnsMultipleLogs() {
-        Log log1 = new Log(1, LocalDate.of(2025, 1, 15), Time.valueOf("09:00:00"), "BREAKFAST", 1, 1, 22);
-        Log log2 = new Log(2, LocalDate.of(2025, 1, 15), Time.valueOf("13:00:00"), "LUNCH", 1, 2, 150);
-        Log log3 = new Log(3, LocalDate.of(2025, 1, 20), Time.valueOf("13:00:00"), "LUNCH", 1, 2, 150);
+        Log log1 = new Log(null, LocalDate.of(2025, 1, 15), Time.valueOf("09:00:00"), "BREAKFAST", 1, 1, 22);
+        Log log2 = new Log(null, LocalDate.of(2025, 1, 15), Time.valueOf("13:00:00"), "LUNCH", 1, 2, 150);
+        Log log3 = new Log(null, LocalDate.of(2025, 1, 20), Time.valueOf("13:00:00"), "LUNCH", 1, 2, 150);
 
         repository.save(log1);
         repository.save(log2);

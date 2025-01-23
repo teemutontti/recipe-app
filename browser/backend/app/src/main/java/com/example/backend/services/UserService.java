@@ -2,6 +2,8 @@ package com.example.backend.services;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.backend.dto.UserDto;
 import com.example.backend.exceptions.FailedDecryptionException;
 import com.example.backend.exceptions.FailedEncryptionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,55 +15,51 @@ import com.example.backend.repositories.UserRepository;
 import com.example.backend.utils.SecurityUtil;
 
 @Service
-public class UserService extends BaseService<User> {
+public class UserService {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository repository;
 
-    @Override
-    protected UserRepository getRepository() {
-        return userRepository;
-    }
-
-    @Override
-    public ResponseEntity<User> create(User user) {
+    public ResponseEntity<User> create(UserDto userDto) {
         try {
-            // Hashing password
-            String hashedPassword = SecurityUtil.hashPassword(user.getPassword());
-            user.setPassword(hashedPassword);
+            System.out.println("IN SERVICE");
+            User user = new User(
+                null,
+                SecurityUtil.encrypt(userDto.getEmail()),
+                SecurityUtil.hashPassword(userDto.getPassword())
+            );
+            System.out.println("Before save: " + user);
 
-            // Encrypting personal information
-            User encryptedUser = SecurityUtil.encryptUser(user);
+            User data = repository.save(user);
 
-            User data = getRepository().save(encryptedUser);
+            System.out.println("After save: " + data);
 
-            // NOTE: Temporary fix for not sharing the hashed password
-            data.setPassword("REDACTED");
+            data.setEmail(SecurityUtil.decrypt(data.getEmail()));
 
-            User decryptedUser = SecurityUtil.decryptUser(data);
+            System.out.println("data");
 
-            return new ResponseEntity<>(decryptedUser, HttpStatus.CREATED);
+            data.setPassword(null);
+
+            return new ResponseEntity<>(data, HttpStatus.CREATED);
 
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @Override
     public ResponseEntity<List<User>> getAll() {
         try {
-            List<User> users = getRepository().findAll();
+            List<User> users = repository.findAll();
             List<User> decryptedUsers = new ArrayList<>();
 
             // Decrypting user data
             for (User user: users) {
+                System.out.println(user);
                 try {
-                    User decryptedUser = SecurityUtil.decryptUser(user);
+                    user.setEmail(SecurityUtil.decrypt(user.getEmail()));
+                    user.setPassword(null);
 
-                    // NOTE: Temporary fix for not sharing the hashed password
-                    decryptedUser.setPassword("REDACTED");
-
-                    decryptedUsers.add(decryptedUser);
+                    decryptedUsers.add(user);
                 } catch (FailedDecryptionException e) {
                     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
@@ -73,21 +71,17 @@ public class UserService extends BaseService<User> {
         }
     }
 
-    @Override
     public ResponseEntity<User> getById(Long id) {
         try {
-            User existingUser = getRepository().findById(id).orElse(null);
-            if (existingUser == null) {
+            User user = repository.findById(id).orElse(null);
+            if (user == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
             try {
-                User decryptedUser = SecurityUtil.decryptUser(existingUser);
-
-                // NOTE: Temporary fix for not sharing the hashed password
-                decryptedUser.setPassword("REDACTED");
-
-                return new ResponseEntity<>(decryptedUser, HttpStatus.OK);
+                user.setEmail(SecurityUtil.decrypt(user.getEmail()));
+                user.setPassword(null);
+                return new ResponseEntity<>(user, HttpStatus.OK);
             } catch (FailedDecryptionException e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -96,24 +90,21 @@ public class UserService extends BaseService<User> {
         }
     }
 
-    @Override
-    public ResponseEntity<User> update(Long id, User user) {
+    public ResponseEntity<User> update(Long id, UserDto userDto) {
         try {
-            User existingUser = getRepository().findById(id).orElse(null);
+            System.out.println("IN SERVICE");
+            User existingUser = repository.findById(id).orElse(null);
             if (existingUser == null) {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 
+
             try {
-                User encryptedUser = SecurityUtil.encryptUser(user);
-                User data = getRepository().save(encryptedUser);
-
-                // NOTE: Temporary fix for not sharing the hashed password
-                data.setPassword("REDACTED");
-
-                User decryptedUser = SecurityUtil.decryptUser(data);
-
-                return new ResponseEntity<>(decryptedUser, HttpStatus.OK);
+                userDto.setEmail(SecurityUtil.encrypt(userDto.getEmail()));
+                User data = repository.save(userDto.toUser());
+                System.out.println(data);
+                data.setPassword(null);
+                return new ResponseEntity<>(data, HttpStatus.OK);
             } catch (FailedEncryptionException e) {
                 return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
@@ -123,19 +114,27 @@ public class UserService extends BaseService<User> {
     }
 
     public ResponseEntity<User> login(Long id, String password) {
-        User existingUser = getRepository().findById(id).orElse(null);
+        User existingUser = repository.findById(id).orElse(null);
 
         if (existingUser == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         if (SecurityUtil.checkPassword(password, existingUser.getPassword())) {
-            // NOTE: Temporary fix for not sharing the hashed password
-            existingUser.setPassword("REDACTED");
+            existingUser.setPassword(null);
 
             return new ResponseEntity<>(existingUser, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    public ResponseEntity<User> delete(Long id) {
+        try {
+            repository.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

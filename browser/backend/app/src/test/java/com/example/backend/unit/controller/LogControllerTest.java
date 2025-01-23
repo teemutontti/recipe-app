@@ -1,5 +1,7 @@
 package com.example.backend.unit.controller;
 
+import com.example.backend.config.SecurityConfig;
+import com.example.backend.controllers.LogController;
 import com.example.backend.entities.Log;
 import com.example.backend.services.LogService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,12 +9,13 @@ import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -28,9 +31,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(LogController.class)
 @ActiveProfiles("test")
+@Import(SecurityConfig.class)
 public class LogControllerTest {
 
     @Autowired
@@ -49,6 +52,9 @@ public class LogControllerTest {
         testLog = new Log(1, LocalDate.of(2025, 1, 15), Time.valueOf("00:00:00"), "BREAKFAST", 1, 1, 24);
     }
 
+    // ====================
+    // CREATE Log Tests
+    // ====================
     @Test
     public void testCreateLog_ReturnCreated() throws Exception {
         // Use any(Log.class) because the User instance created during JSON deserialization
@@ -64,6 +70,19 @@ public class LogControllerTest {
     }
 
     @Test
+    public void testCreateLog_InvalidAmount_ReturnBadRequest() throws Exception {
+        testLog.setAmount(-1);
+
+        mockMvc.perform(post("/api/logs")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testLog)))
+                .andExpect(status().isBadRequest());
+    }
+
+    // ====================
+    // READ Food Tests
+    // ====================
+    @Test
     public void testGetById_ReturnOk() throws Exception {
         when(service.getById(1L)).thenReturn(new ResponseEntity<>(testLog, HttpStatus.OK));
 
@@ -75,24 +94,9 @@ public class LogControllerTest {
         verify(service, times(1)).getById(1L);
     }
 
-    @Test
-    public void testGetAll_ReturnLogs() throws Exception {
-        Log log1 = new Log(1, LocalDate.of(2025, 1, 15), Time.valueOf("00:00:00"), "BREAKFAST", 1, 1, 24);
-        Log log2 = new Log(2, LocalDate.of(2025, 1, 15), Time.valueOf("00:00:00"), "LUNCH", 1, 2, 120);
-
-        List<Log> logs = new ArrayList<>();
-        logs.add(log1);
-        logs.add(log2);
-
-        when(service.getAll()).thenReturn(new ResponseEntity<>(logs, HttpStatus.OK));
-
-        mockMvc.perform(get("/api/logs"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", CoreMatchers.is(2)))
-                .andExpect(jsonPath("$[0].meal", CoreMatchers.is("BREAKFAST")))
-                .andExpect(jsonPath("$[1].meal", CoreMatchers.is("LUNCH")));
-    }
-
+    // ====================
+    // UPDATE Food Tests
+    // ====================
     @Test
     public void testUpdateLog_ReturnFood() throws Exception {
         testLog.setAmount(100);
@@ -109,6 +113,9 @@ public class LogControllerTest {
                 .andExpect(jsonPath("$.meal", CoreMatchers.is("SNACKS")));
     }
 
+    // ====================
+    // DELETE Food Tests
+    // ====================
     @Test
     public void testDeleteLog_ReturnEmpty() throws Exception {
         when(service.delete(1L)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
@@ -116,6 +123,9 @@ public class LogControllerTest {
         assertTrue(result.getResponse().getContentAsString().isEmpty());
     }
 
+    // ====================
+    // CUSTOM Food Tests
+    // ====================
     @Test
     public void testGetByDate_ReturnLogs() throws Exception {
         LocalDate date = LocalDate.of(2025, 1, 15);

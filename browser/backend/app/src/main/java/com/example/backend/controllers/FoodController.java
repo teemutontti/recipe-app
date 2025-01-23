@@ -1,19 +1,69 @@
 package com.example.backend.controllers;
-import com.example.backend.entities.Log;
-import com.example.backend.services.FoodService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import com.example.backend.entities.Food;
 
-import java.time.LocalDate;
+import com.example.backend.services.FoodService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import com.example.backend.entities.Food;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/foods")
-public class FoodController extends BaseController<Food, FoodService> {
+public class FoodController {
+
+    @Autowired
+    protected FoodService service;
+
+    @PostMapping
+    public ResponseEntity<Food> create(@Valid @RequestBody Food entity) {
+        return service.create(entity);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Food>> getAll() {
+        return service.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Food> getById(@PathVariable("id") Long id) {
+        return service.getById(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Food> delete(@PathVariable("id") Long id) {
+        return service.delete(id);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Food> update(@PathVariable("id") Long id, @Valid @RequestBody Food updated) {
+        ResponseEntity<Food> response = service.getById(id);
+
+        if (!response.hasBody()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Food existingFood = response.getBody();
+
+        if (existingFood == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        existingFood.setName(updated.getName());
+        existingFood.setCalories(updated.getCalories());
+        existingFood.setBarcode(updated.getBarcode());
+        existingFood.setServingSize(updated.getServingSize());
+        existingFood.setCarbs(updated.getCarbs());
+        existingFood.setProtein(updated.getProtein());
+        existingFood.setFat(updated.getFat());
+        existingFood.setEditedBy(updated.getEditedBy());
+        existingFood.setEdited(updated.getEdited());
+        // NOTE: Not updating createdBy and created
+
+        return service.update(id, existingFood);
+    }
+
     @GetMapping("/query")
     public ResponseEntity<List<Food>> getFoodsByQuery(@RequestParam String query) {
         return service.getFoodsByQuery(query);

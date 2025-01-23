@@ -49,8 +49,8 @@ class UserRepositoryTest {
 
     @Test
     public void testFindAll_ReturnsMultipleUsers() {
-        User user1 = new User(1, "maija.meikalainen@gmail.com", "password");
-        User user2 = new User(2, "essi.esimerkki@gmail.com", "qwerty");
+        User user1 = new User(null, "maija.meikalainen@gmail.com", "password");
+        User user2 = new User(null, "essi.esimerkki@gmail.com", "qwerty");
 
         repository.save(user1);
         repository.save(user2);

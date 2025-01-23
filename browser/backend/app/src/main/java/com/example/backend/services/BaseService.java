@@ -1,4 +1,5 @@
 package com.example.backend.services;
+
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
  * @param <T> Entity type to be used in the service.
  */
 @Service
+@Deprecated
 public abstract class BaseService<T> {
 
     protected abstract JpaRepository<T, Long> getRepository();

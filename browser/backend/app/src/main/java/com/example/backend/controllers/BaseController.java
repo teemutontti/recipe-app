@@ -1,6 +1,7 @@
 package com.example.backend.controllers;
-import java.util.List;
 
+import java.util.List;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,13 +17,14 @@ import com.example.backend.services.BaseService;
  * It provides basic CRUD operations for the entity type T.
  * @param <T> Entity type to be used in the controller.
  */
+@Deprecated
 class BaseController<T, S extends BaseService<T>> {
 
     @Autowired
     protected S service;
 
     @PostMapping
-    public ResponseEntity<T> create(@RequestBody T entity) {
+    public ResponseEntity<T> create(@Valid @RequestBody T entity) {
         return service.create(entity);
     }
 
@@ -37,7 +39,7 @@ class BaseController<T, S extends BaseService<T>> {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<T> update(@PathVariable("id") Long id, @RequestBody T item) {
+    public ResponseEntity<T> update(@PathVariable("id") Long id, @Valid @RequestBody T item) {
         return service.update(id, item);
     }
 

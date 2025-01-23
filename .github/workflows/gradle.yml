@@ -46,3 +46,9 @@ jobs:
 
     - name: Run tests with Gradle
       run: ./gradlew test
+
+    - name: Upload test results as artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-reports
+        path: app/build/reports/tests/test/

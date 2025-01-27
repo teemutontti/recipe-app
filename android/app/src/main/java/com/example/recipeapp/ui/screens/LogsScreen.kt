@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.models.MealType
 import com.example.recipeapp.ui.components.buttons.MealButton
-import com.example.recipeapp.ui.components.dialogs.SharedSnackbar
 import com.example.recipeapp.ui.components.inputs.DateNavigator
 import com.example.recipeapp.ui.components.layout.MacroWheels
 import com.example.recipeapp.ui.components.navigation.NavBar
@@ -32,11 +31,20 @@ import com.example.recipeapp.viewmodels.ViewModelWrapper
  */
 @Composable
 fun LogsScreen(navController: NavController, viewModels: ViewModelWrapper) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(viewModels.logsScreen.alert) {
+        viewModels.logsScreen.alert?.let {
+            snackbarHostState.showSnackbar(it.message)
+            viewModels.logsScreen.clearAlert()
+        }
+    }
+
     Scaffold(
         topBar = { TopBar("Logs") },
         content = { LogsScreenContent(navController, viewModels, it) },
         bottomBar = { NavBar(navController, "logs") },
-        snackbarHost = { SharedSnackbar(viewModels.logsScreen) }
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     )
 }
 

@@ -1,5 +1,6 @@
 package com.example.recipeapp.ui.components.inputs
 
+import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,7 +27,7 @@ fun NutrientTextField(
     if (editable) {
         TextField(
             value = value,
-            onValueChange = { if (onChange != null) onChange(it) },
+            onValueChange = { if (onChange != null) { onChange(it) } },
             singleLine = true,
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = keyboardType),
             colors = TextFieldDefaults.colors(

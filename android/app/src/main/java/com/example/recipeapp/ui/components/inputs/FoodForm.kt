@@ -95,7 +95,7 @@ fun FoodForm(viewModel: LogsScreenViewModel) {
                     protein = it
                 }
                 NutrientInputRow("Fat", fat, suffixText = "g") {
-                    { fat = it }
+                    fat = it
                 }
             }
         }

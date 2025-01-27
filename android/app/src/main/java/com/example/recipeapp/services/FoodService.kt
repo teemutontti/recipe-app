@@ -1,6 +1,7 @@
 package com.example.recipeapp.services
 
 import com.example.recipeapp.models.Food
+import com.example.recipeapp.models.PaginatedResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -10,7 +11,10 @@ import retrofit2.http.Query
 
 interface FoodService {
     @GET("api/foods")
-    suspend fun getFoods(): Response<List<Food>>
+    suspend fun getFoods(
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+    ): Response<PaginatedResponse<Food>>
 
     @GET("api/foods/{id}")
     suspend fun getFoodById(@Path("id") id: Int): Response<Food>

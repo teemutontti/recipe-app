@@ -38,6 +38,8 @@ fun NutrientInputRow(
     ) {
         Text(text, style = MaterialTheme.typography.bodyLarge)
         Spacer(modifier = Modifier.padding(horizontal = 8.dp))
-        NutrientTextField(value, width, suffixText, keyboardType, editable) { onChange }
+        NutrientTextField(value, width, suffixText, keyboardType, editable) {
+            if (onChange != null) onChange(it)
+        }
     }
 }

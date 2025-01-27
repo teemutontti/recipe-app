@@ -15,6 +15,7 @@ import com.example.recipeapp.utils.AlertType
 import com.example.recipeapp.utils.ConversionUtils.emptyFood
 import com.example.recipeapp.utils.Result
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -57,6 +58,9 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
     val selectedFood get() = _selectedFood.value
     val setSelectedFood: (Food?) -> Unit = { _selectedFood.value = it }
 
+    private var foodPage = 0
+    private val foodPageSize = 20
+
     private suspend fun calculateNutrients(logs: List<Log>): NutrientSummary {
         var calories = 0.0
         var fats = 0.0
@@ -82,6 +86,7 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
                 _logs.value = result.value ?: emptyList()
 
                 val nutrientSummary = result.value?.let { calculateNutrients(it) }
+                android.util.Log.d("nutrientSummary", nutrientSummary.toString())
                 if (nutrientSummary != null) setOverallNutrients(nutrientSummary)
 
                 val newBreakfastLogs = result.value?.filter { it.meal == "BREAKFAST" } ?: emptyList()
@@ -122,11 +127,30 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
     }
 
     fun loadFoods() {
+        foodPage = 0 // Reset food page
+
         viewModelScope.launch(Dispatchers.IO) {
-            val result = foodRepository.getFoods()
+            val result = foodRepository.getFoods(foodPage, foodPageSize)
             if (result.isSuccessful()) {
                 _foods.value = result.value ?: emptyList()
+            } else {
+                showAlert("Error occurred while loading foods (${result.errorCode}).")
             }
+        }
+    }
+
+    fun loadMoreFoods() {
+        if (loading) return
+
+        setLoading(true)
+
+        viewModelScope.launch(Dispatchers.IO) {
+            foodPage++
+            val result = foodRepository.getFoods(foodPage, foodPageSize)
+            if (result.isSuccessful()) {
+                _foods.value += result.value ?: emptyList()
+            }
+            setLoading(false)
         }
     }
 
@@ -138,6 +162,7 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
                     if (it.id == log.id) log
                     else it
                 }
+                showAlert("Log updated!", AlertType.INFO)
             } else {
                 showAlert("Error occurred while updating log (${result.errorCode}).")
             }

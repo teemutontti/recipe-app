@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -26,11 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.models.FoodLog
 import com.example.recipeapp.models.MealType
-import com.example.recipeapp.models.NutrientSummary
 import com.example.recipeapp.ui.components.buttons.AddButton
 import com.example.recipeapp.ui.components.buttons.BackButton
 import com.example.recipeapp.ui.components.buttons.MealLogButton
-import com.example.recipeapp.ui.components.dialogs.SharedSnackbar
 import com.example.recipeapp.ui.components.layout.MealNutrients
 import com.example.recipeapp.ui.components.layout.NutrientColumn
 import com.example.recipeapp.ui.components.layout.TopBar
@@ -43,6 +43,15 @@ fun MealScreen(
     viewModels: ViewModelWrapper,
     mealType: MealType,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(viewModels.logsScreen.alert) {
+        viewModels.logsScreen.alert?.let {
+            snackbarHostState.showSnackbar(it.message)
+            viewModels.logsScreen.clearAlert()
+        }
+    }
+
     Scaffold(
         topBar = { TopBar(subtitle = { BackButton(navController) }) },
         content = {
@@ -53,7 +62,7 @@ fun MealScreen(
                 mealType = mealType,
             )
         },
-        snackbarHost = { SharedSnackbar(viewModels.logsScreen) }
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     )
 }
 
@@ -75,8 +84,12 @@ private fun MealScreenContent(
         }
     }
 
-    Box(modifier = Modifier.padding(paddingValues).fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
-        Column(modifier = Modifier.padding(horizontal = 40.dp).fillMaxSize()) {
+    Box(modifier = Modifier
+        .padding(paddingValues)
+        .fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
+        Column(modifier = Modifier
+            .padding(horizontal = 40.dp)
+            .fillMaxSize()) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(
                     text = toLowerCaseCapitalizeFirst(mealType.toString()),

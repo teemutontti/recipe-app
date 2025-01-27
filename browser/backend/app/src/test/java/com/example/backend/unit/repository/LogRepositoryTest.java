@@ -104,4 +104,21 @@ class LogRepositoryTest {
         List<Log> found2 = repository.findByDate(LocalDate.of(2025, 1, 20));
         assertEquals(1, found2.size());
     }
+
+    @Test
+    public void testFindByUserId_ReturnsMultipleLogs() {
+        Log log1 = new Log(null, LocalDate.of(2025, 1, 15), Time.valueOf("09:00:00"), "BREAKFAST", 1, 1, 22);
+        Log log2 = new Log(null, LocalDate.of(2025, 1, 15), Time.valueOf("13:00:00"), "LUNCH", 2, 2, 150);
+        Log log3 = new Log(null, LocalDate.of(2025, 1, 20), Time.valueOf("13:00:00"), "LUNCH", 1, 2, 150);
+
+        repository.save(log1);
+        repository.save(log2);
+        repository.save(log3);
+
+        List<Log> found1 = repository.findByUserId(1);
+        assertEquals(2, found1.size());
+
+        List<Log> found2 = repository.findByUserId(2);
+        assertEquals(1, found2.size());
+    }
 }

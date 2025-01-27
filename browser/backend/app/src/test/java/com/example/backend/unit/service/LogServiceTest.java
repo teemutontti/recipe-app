@@ -130,4 +130,22 @@ public class LogServiceTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(2, response.getBody().size());
     }
+
+    @Test
+    public void testFindLogsByUser_ReturnsMultipleLogs() {
+        LocalDate date = LocalDate.of(2025, 1, 15);
+        Log log1 = new Log(1, date, Time.valueOf("09:00:00"), "BREAKFAST", 19, 1, 22);
+        Log log2 = new Log(2, date, Time.valueOf("09:00:00"), "LUNCH", 19, 2, 120);
+
+        List<Log> logs = new ArrayList<>();
+        logs.add(log1);
+        logs.add(log2);
+
+        when(repository.findByUserId(eq(19))).thenReturn(logs);
+
+        ResponseEntity<List<Log>> response = service.getLogsByUserId(19);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(2, response.getBody().size());
+    }
 }

@@ -76,4 +76,13 @@ public class LogService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public ResponseEntity<List<Log>> getLogsByUserId(Integer id) {
+        try {
+            List<Log> logs = repository.findByUserId(id);
+            return new ResponseEntity<>(logs, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

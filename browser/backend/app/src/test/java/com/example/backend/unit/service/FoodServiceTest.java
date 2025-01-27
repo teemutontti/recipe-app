@@ -8,6 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
@@ -61,6 +65,7 @@ public class FoodServiceTest {
 
     @Test
     public void testGetAll_ReturnsMultipleFoods() {
+        // Arrange
         Food food1 = new Food(1, "Kana", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
         Food food2 = new Food(2, "Riisi", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
 
@@ -68,12 +73,17 @@ public class FoodServiceTest {
         foods.add(food1);
         foods.add(food2);
 
-        when(repository.findAll()).thenReturn(foods);
+        Pageable pageable = PageRequest.of(1, 10);
+        Page<Food> mockPage = new PageImpl<>(foods, pageable, foods.size());
 
-        ResponseEntity<List<Food>> response = service.getAll();
+        when(repository.findAll(any(Pageable.class))).thenReturn(mockPage);
 
+        // Act
+        ResponseEntity<Page<Food>> response = service.getAll(1, 10);
+
+        // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody().size());
+        assertEquals(2, response.getBody().getContent().size());
     }
 
     @Test

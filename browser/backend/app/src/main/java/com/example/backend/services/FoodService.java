@@ -3,6 +3,9 @@ package com.example.backend.services;
 import com.example.backend.entities.Food;
 import com.example.backend.repositories.FoodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -23,9 +26,9 @@ public class FoodService {
         }
     }
 
-    public ResponseEntity<List<Food>> getAll() {
+    public ResponseEntity<Page<Food>> getAll(Integer page, Integer size) {
         try {
-            List<Food> data = repository.findAll();
+            Page<Food> data = repository.findAll(PageRequest.of(page, size));
             return new ResponseEntity<>(data, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

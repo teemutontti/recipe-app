@@ -14,12 +14,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import java.util.Arrays;
+import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -93,6 +99,27 @@ class FoodControllerTest {
     // ====================
     // READ Food Tests
     // ====================
+    @Test
+    void testGetAll_ReturnsFoods() throws Exception {
+        // Arrange
+        Food food1 = new Food(1, "Kana", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+        Food food2 = new Food(2, "Riisi", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+
+        List<Food> foods = Arrays.asList(food1, food2);
+        Pageable pageable = PageRequest.of(1, 10);
+        Page<Food> mockPage = new PageImpl<>(foods, pageable, foods.size());
+
+        // Mock service layer
+        when(service.getAll(any(Integer.class), any(Integer.class)))
+                .thenReturn(new ResponseEntity<>(mockPage, HttpStatus.OK));
+
+        // Act and Assert
+        mockMvc.perform(get("/api/foods"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()", CoreMatchers.is(2)))
+                .andExpect(jsonPath("$.content[0].name", CoreMatchers.is("Kana")))
+                .andExpect(jsonPath("$.content[1].name", CoreMatchers.is("Riisi")));
+    }
     @Test
     void testGetById_ReturnOk() throws Exception {
         when(service.getById(1L)).thenReturn(new ResponseEntity<>(testFood, HttpStatus.OK));

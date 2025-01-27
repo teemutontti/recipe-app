@@ -3,6 +3,9 @@ package com.example.backend.controllers;
 import com.example.backend.services.FoodService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +25,12 @@ public class FoodController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Food>> getAll() {
-        return service.getAll();
+    public ResponseEntity<Page<Food>> getAll(
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "size", defaultValue = "10") Integer size
+    ) {
+        System.out.println("page: " + page + ", size: " + size);
+        return service.getAll(page, size);
     }
 
     @GetMapping("/{id}")

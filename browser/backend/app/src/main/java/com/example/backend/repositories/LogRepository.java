@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface LogRepository extends JpaRepository<Log, Long> {
     List<Log> findByDate(LocalDate date);
+    List<Log> findByUserId(Integer id);
 }

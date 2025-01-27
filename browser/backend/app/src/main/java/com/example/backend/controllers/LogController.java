@@ -46,4 +46,9 @@ public class LogController {
         LocalDate parsedDate = LocalDate.parse(date);
         return service.getLogsByDate(parsedDate);
     }
+
+    @GetMapping("/by-user")
+    public ResponseEntity<List<Log>> getLogsByUserId(@PathVariable("id") Integer id) {
+        return service.getLogsByUserId(id);
+    }
 }

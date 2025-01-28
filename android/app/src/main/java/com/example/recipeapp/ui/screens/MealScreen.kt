@@ -1,5 +1,6 @@
 package com.example.recipeapp.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -30,10 +32,12 @@ import com.example.recipeapp.models.FoodLog
 import com.example.recipeapp.models.MealType
 import com.example.recipeapp.ui.components.buttons.AddButton
 import com.example.recipeapp.ui.components.buttons.BackButton
+import com.example.recipeapp.ui.components.buttons.FoodButton
 import com.example.recipeapp.ui.components.buttons.MealLogButton
 import com.example.recipeapp.ui.components.layout.MealNutrients
 import com.example.recipeapp.ui.components.layout.NutrientColumn
 import com.example.recipeapp.ui.components.layout.TopBar
+import com.example.recipeapp.ui.components.misc.ItemDivider
 import com.example.recipeapp.utils.FormattingUtils.toLowerCaseCapitalizeFirst
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 
@@ -41,7 +45,6 @@ import com.example.recipeapp.viewmodels.ViewModelWrapper
 fun MealScreen(
     navController: NavController,
     viewModels: ViewModelWrapper,
-    mealType: MealType,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -59,10 +62,10 @@ fun MealScreen(
                 navController = navController,
                 paddingValues = it,
                 viewModels = viewModels,
-                mealType = mealType,
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton = { AddButton { navController.navigate("add_food") } }
     )
 }
 
@@ -71,12 +74,17 @@ private fun MealScreenContent(
     navController: NavController,
     paddingValues: PaddingValues,
     viewModels: ViewModelWrapper,
-    mealType: MealType,
 ) {
     var logs: List<FoodLog> by remember { mutableStateOf(emptyList()) }
 
-    LaunchedEffect(mealType) {
-        logs = when (mealType) {
+    LaunchedEffect(
+        viewModels.logsScreen.selectedMeal,
+        viewModels.logsScreen.breakfastLogs,
+        viewModels.logsScreen.lunchLogs,
+        viewModels.logsScreen.dinnerLogs,
+        viewModels.logsScreen.snacksLogs,
+    ) {
+        logs = when (viewModels.logsScreen.selectedMeal) {
             MealType.BREAKFAST -> viewModels.logsScreen.breakfastLogs
             MealType.LUNCH -> viewModels.logsScreen.lunchLogs
             MealType.DINNER -> viewModels.logsScreen.dinnerLogs
@@ -92,24 +100,46 @@ private fun MealScreenContent(
             .fillMaxSize()) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(
-                    text = toLowerCaseCapitalizeFirst(mealType.toString()),
+                    toLowerCaseCapitalizeFirst(viewModels.logsScreen.selectedMeal.toString()),
                     style = MaterialTheme.typography.headlineLarge,
                 )
-                viewModels.logsScreen.nutrients[mealType]?.let {
+                viewModels.logsScreen.nutrients[viewModels.logsScreen.selectedMeal]?.let {
                     NutrientColumn("Calories", it.calories, suffix = "kcal")
                 }
             }
             Spacer(modifier = Modifier.padding(vertical = 8.dp))
-            viewModels.logsScreen.nutrients[mealType]?.let {
+            viewModels.logsScreen.nutrients[viewModels.logsScreen.selectedMeal]?.let {
                 MealNutrients(it.carbs, it.protein, it.fats)
             }
             Spacer(modifier = Modifier.padding(vertical = 16.dp))
-            LazyColumn {
-                items(logs) {
-                    MealLogButton(it)
+
+            Box {
+                LazyColumn {
+                    items(logs) {
+                        MealLogButton(it,
+                            onClick = {
+                                viewModels.logsScreen.setSelectedFood(it.food)
+                                viewModels.logsScreen.setSelectedLog(it.log)
+                                viewModels.logsScreen.setCurrentAmount(it.log.amount.toString())
+                                navController.navigate("food_editor/UPDATE")
+                            },
+                            onDelete = {
+                                it.log.id?.let { logId -> viewModels.logsScreen.deleteLog(logId) }
+                            }
+                        )
+                    }
+                }
+                if (viewModels.logsScreen.loading) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)),
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
             }
         }
-        AddButton { navController.navigate("add_food") }
     }
 }

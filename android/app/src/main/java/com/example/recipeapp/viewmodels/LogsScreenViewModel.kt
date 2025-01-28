@@ -58,6 +58,18 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
     val selectedFood get() = _selectedFood.value
     val setSelectedFood: (Food?) -> Unit = { _selectedFood.value = it }
 
+    private var _selectedMeal = mutableStateOf<MealType?>(null)
+    val selectedMeal get() = _selectedMeal.value
+    val setSelectedMeal: (MealType?) -> Unit = { _selectedMeal.value = it }
+
+    private var _selectedLog = mutableStateOf<Log?>(null)
+    val selectedLog get() = _selectedLog.value
+    val setSelectedLog: (Log?) -> Unit = { _selectedLog.value = it }
+
+    private var _currentAmount = mutableStateOf("100")
+    val currentAmount get() = _currentAmount.value
+    val setCurrentAmount: (String) -> Unit = { _currentAmount.value = it }
+
     private var foodPage = 0
     private val foodPageSize = 20
 
@@ -68,8 +80,7 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
         var protein = 0.0
 
         logs.forEach { log ->
-            val food = fetchFoodById(log.food)
-            android.util.Log.d("calculateNutrients", "Log: $log")
+            val food = fetchFoodById(log.foodId)
             food?.calories?.let { calories += it * (log.amount / 100) }
             food?.fat?.let { fats += it * (log.amount / 100) }
             food?.carbs?.let { carbs += it * (log.amount / 100) }
@@ -78,7 +89,9 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
         return NutrientSummary(calories, fats, carbs, protein)
     }
 
-    fun loadLogs() {
+    fun loadLogs(triggerLoading: Boolean = true) {
+        if (triggerLoading) setLoading(true)
+
         viewModelScope.launch(Dispatchers.IO) {
             val result: Result<List<Log>> = logRepository.getLogsByDate(_date.value)
 
@@ -86,7 +99,6 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
                 _logs.value = result.value ?: emptyList()
 
                 val nutrientSummary = result.value?.let { calculateNutrients(it) }
-                android.util.Log.d("nutrientSummary", nutrientSummary.toString())
                 if (nutrientSummary != null) setOverallNutrients(nutrientSummary)
 
                 val newBreakfastLogs = result.value?.filter { it.meal == "BREAKFAST" } ?: emptyList()
@@ -99,16 +111,16 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
                 } ?: emptyList()
 
                 _breakfastLogs.value = newBreakfastLogs.map {
-                    FoodLog(it, fetchFoodById(it.food) ?: emptyFood.copy())
+                    FoodLog(it, fetchFoodById(it.foodId) ?: emptyFood.copy())
                 }
                 _lunchLogs.value = newLunchLogs.map {
-                    FoodLog(it, fetchFoodById(it.food) ?: emptyFood.copy())
+                    FoodLog(it, fetchFoodById(it.foodId) ?: emptyFood.copy())
                 }
                 _dinnerLogs.value = newDinnerLogs.map {
-                    FoodLog(it, fetchFoodById(it.food) ?: emptyFood.copy())
+                    FoodLog(it, fetchFoodById(it.foodId) ?: emptyFood.copy())
                 }
                 _snacksLogs.value = newSnacksLogs.map {
-                    FoodLog(it, fetchFoodById(it.food) ?: emptyFood.copy())
+                    FoodLog(it, fetchFoodById(it.foodId) ?: emptyFood.copy())
                 }
 
                 val newMealNutrients = MealType.entries.associateWith { mealType ->
@@ -123,6 +135,7 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
             } else {
                 showAlert("Error occurred in loading logs (${result.errorCode}).")
             }
+            if (triggerLoading) setLoading(false)
         }
     }
 
@@ -141,7 +154,6 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
 
     fun loadMoreFoods() {
         if (loading) return
-
         setLoading(true)
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -162,6 +174,7 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
                     if (it.id == log.id) log
                     else it
                 }
+                loadLogs(false)
                 showAlert("Log updated!", AlertType.INFO)
             } else {
                 showAlert("Error occurred while updating log (${result.errorCode}).")
@@ -170,13 +183,18 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
     }
 
     fun saveLog(log: Log) {
+        setLoading(true)
+
         viewModelScope.launch(Dispatchers.IO) {
             val result = logRepository.saveLog(log)
             if (result.isSuccessful()) {
                 showAlert("Log saved!", AlertType.INFO)
+                loadLogs()
             } else {
                 showAlert("Error occurred while saving the log (${result.errorCode}).")
+                setLoading(false)
             }
+
         }
     }
 
@@ -185,9 +203,11 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
             val result = logRepository.deleteLog(id)
             if (result.isSuccessful()) {
                 _logs.value = _logs.value.filter { id != it.id }
+                loadLogs(false)
                 showAlert("Log deleted!", AlertType.INFO)
             } else {
                 showAlert("Error occurred while deleting the log (${result.errorCode}).")
+                setLoading(false)
             }
         }
     }

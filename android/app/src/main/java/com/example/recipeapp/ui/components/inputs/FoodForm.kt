@@ -31,6 +31,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.recipeapp.models.Food
 import com.example.recipeapp.ui.components.layout.TitledContainer
+import com.example.recipeapp.utils.FormattingUtils
 import com.example.recipeapp.viewmodels.LogsScreenViewModel
 
 @Composable
@@ -51,9 +52,15 @@ fun FoodForm(viewModel: LogsScreenViewModel) {
                 barcode = barcode,
                 servingSize = servingSize.toInt(),
                 calories = calories.toInt(),
-                carbs = if (carbs.isNotEmpty()) carbs.toFloat() else 0.0f,
-                protein = if (protein.isNotEmpty()) protein.toFloat() else 0.0f,
-                fat = if (fat.isNotEmpty()) fat.toFloat() else 0.0f,
+                carbs = if (carbs.isNotEmpty()) {
+                    FormattingUtils.stringToFloat(carbs)
+                } else 0.0f,
+                protein = if (protein.isNotEmpty()) {
+                    FormattingUtils.stringToFloat(protein)
+                } else 0.0f,
+                fat = if (fat.isNotEmpty()) {
+                    FormattingUtils.stringToFloat(fat)
+                } else 0.0f,
                 createdBy = 1,
                 editedBy = 1,
             )

@@ -1,6 +1,5 @@
 package com.example.recipeapp.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.recipeapp.models.Log
 import com.example.recipeapp.ui.components.buttons.BackButton
 import com.example.recipeapp.ui.components.layout.TopBar
 import com.example.recipeapp.viewmodels.ViewModelWrapper
@@ -38,7 +38,11 @@ import com.example.recipeapp.ui.components.inputs.NutrientInputRow
 import com.example.recipeapp.ui.components.inputs.NutrientTextField
 import com.example.recipeapp.ui.components.layout.NutrientColumn
 import com.example.recipeapp.ui.components.layout.TitledContainer
+import com.example.recipeapp.utils.FormattingUtils
 import com.example.recipeapp.viewmodels.LogsScreenViewModel
+import kotlinx.coroutines.delay
+import java.time.LocalDate
+import java.time.LocalTime
 
 /**
  * Composable function for displaying the Food Editor screen.
@@ -66,7 +70,7 @@ fun FoodEditorScreen(
             when (mode) {
                 "ADD" -> AddMode(it, viewModels.logsScreen)
                 "EDIT" -> EditMode(it, viewModels.logsScreen)
-                "UPDATE" -> UpdateMode(it, viewModels.logsScreen)
+                "UPDATE" -> EditMode(it, viewModels.logsScreen)
                 else -> ViewMode(it, viewModels.logsScreen)
             }
         },
@@ -88,11 +92,36 @@ fun FoodEditorScreen(
                         }
                     "EDIT" ->
                         CancelSaveOption(onClose = { navController.navigateUp() }) {
-                            /*TODO*/
+                            viewModels.logsScreen.selectedFood?.let {
+                                val log = it.id?.let { it1 ->
+                                    Log(
+                                        date = viewModels.logsScreen.date.toString(),
+                                        // TODO: Make time changeable
+                                        time = FormattingUtils.formatLocalTimeToString(
+                                            LocalTime.now()
+                                        ),
+                                        meal = viewModels.logsScreen.selectedMeal.toString(),
+                                        userId = 1,
+                                        foodId = it1,
+                                        amount = viewModels.logsScreen.currentAmount.toDouble(),
+                                    )
+                                }
+                                if (log != null) {
+                                    viewModels.logsScreen.saveLog(log)
+                                    repeat(2) { navController.popBackStack() }
+                                }
+                            }
                         }
                     "UPDATE" ->
                         CancelSaveOption(onClose = { navController.navigateUp() }) {
-                            /*TODO*/
+                            val newAmount = viewModels.logsScreen.currentAmount.toDoubleOrNull()
+                            if (newAmount != null) {
+                                val updatedLog = viewModels.logsScreen.selectedLog?.copy(amount = newAmount)
+                                if (updatedLog != null) {
+                                    viewModels.logsScreen.updateLog(updatedLog)
+                                    navController.popBackStack()
+                                }
+                            }
                         }
                     else -> null
                 }
@@ -122,18 +151,15 @@ private fun EditMode(
     viewModel: LogsScreenViewModel,
 ) {
     var calculatedNutrientSummary by remember { mutableStateOf(NutrientSummary(0.0, 0.0, 0.0, 0.0)) }
-    var currentAmount by remember { mutableStateOf("100") }
 
-    LaunchedEffect(currentAmount) {
-        if (viewModel.selectedFood != null && currentAmount.isNotEmpty()) {
-            val multiplier = (currentAmount.toDouble() / 100)
+    LaunchedEffect(viewModel.currentAmount) {
+        if (viewModel.selectedFood != null && viewModel.currentAmount.isNotEmpty()) {
+            val multiplier = (viewModel.currentAmount.toDouble() / 100)
 
             val calories = viewModel.selectedFood!!.calories * multiplier
             val fats = viewModel.selectedFood!!.fat * multiplier
             val carbs = viewModel.selectedFood!!.carbs * multiplier
             val protein = viewModel.selectedFood!!.protein * multiplier
-
-            Log.d("EditMode", "$calories $fats $carbs $protein")
 
             calculatedNutrientSummary = NutrientSummary(calories, fats, carbs, protein)
         }
@@ -146,10 +172,8 @@ private fun EditMode(
                     "${viewModel.selectedFood?.name}",
                     style = MaterialTheme.typography.headlineLarge
                 )
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
-                }
-
+                // TODO: Add functionality to request update
+                // TODO: Add functionality to request delete
             }
             Text(
                 text = "${viewModel.selectedFood?.barcode}",
@@ -158,17 +182,34 @@ private fun EditMode(
             )
             Spacer(modifier = Modifier.padding(vertical = 24.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                NutrientColumn(nutrient = "Calories", value = calculatedNutrientSummary.calories)
-                NutrientTextField(value = currentAmount) {
-                    currentAmount = it
+                NutrientColumn(
+                    nutrient = "Calories",
+                    value = calculatedNutrientSummary.calories,
+                    suffix = "kcal",
+                )
+                NutrientTextField(value = viewModel.currentAmount) {
+                    viewModel.setCurrentAmount(it)
                 }
             }
+            Spacer(modifier = Modifier.padding(vertical = 8.dp))
             Row {
-                NutrientColumn(nutrient = "Carbs", value = calculatedNutrientSummary.carbs)
+                NutrientColumn(
+                    nutrient = "Carbs",
+                    value = calculatedNutrientSummary.carbs,
+                    style = MaterialTheme.typography.titleLarge
+                )
                 Spacer(modifier = Modifier.padding(horizontal = 8.dp))
-                NutrientColumn(nutrient = "Protein", value = calculatedNutrientSummary.protein)
+                NutrientColumn(
+                    nutrient = "Protein",
+                    value = calculatedNutrientSummary.protein,
+                    style = MaterialTheme.typography.titleLarge,
+                )
                 Spacer(modifier = Modifier.padding(horizontal = 8.dp))
-                NutrientColumn(nutrient = "Fat", value = calculatedNutrientSummary.fats)
+                NutrientColumn(
+                    nutrient = "Fat",
+                    value = calculatedNutrientSummary.fats,
+                    style = MaterialTheme.typography.titleLarge,
+                )
             }
             Spacer(modifier = Modifier.padding(vertical = 24.dp))
             TitledContainer(
@@ -207,20 +248,6 @@ private fun EditMode(
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun UpdateMode(
-    paddingValues: PaddingValues,
-    viewModel: LogsScreenViewModel,
-) {
-    Column(modifier = Modifier.padding(paddingValues)) {
-        Column(modifier = Modifier.padding(horizontal = 40.dp)) {
-            Text("Add food", style = MaterialTheme.typography.headlineLarge)
-            Spacer(modifier = Modifier.height(24.dp))
-            FoodForm(viewModel)
         }
     }
 }

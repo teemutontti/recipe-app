@@ -33,7 +33,8 @@ fun MealButton(
 
     TextButton(
         onClick = { onClick() },
-        modifier = Modifier.clip(RoundedCornerShape(4.dp)).padding(8.dp, 4.dp)
+        modifier = Modifier.padding(8.dp, 4.dp),
+        shape = RoundedCornerShape(4.dp),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,

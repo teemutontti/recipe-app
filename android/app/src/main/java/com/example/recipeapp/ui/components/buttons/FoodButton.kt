@@ -8,15 +8,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -24,15 +19,9 @@ import com.example.recipeapp.models.Food
 
 @Composable
 fun FoodButton(food: Food, onClick: () -> Unit) {
-    val nutrientString = "${food.carbs.toInt()}/${food.protein.toInt()}/${food.fat.toInt()}"
-    var checked by remember { mutableStateOf(false) }
+    val nutrientString = "${food.carbs.toInt()} / ${food.protein.toInt()} / ${food.fat.toInt()}"
 
-    fun handleClick() {
-        checked = !checked
-    }
-
-    Row(Modifier.fillMaxWidth()) {
-        Checkbox(checked, onCheckedChange = { handleClick() })
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         TextButton(
             onClick = { onClick() },
             shape = RoundedCornerShape(4.dp),

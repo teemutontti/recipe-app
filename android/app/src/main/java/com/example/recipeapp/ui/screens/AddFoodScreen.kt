@@ -137,8 +137,6 @@ private fun AddFoodContent(
                         Text(text = "Add food")
                     }
                 }
-                Text(text = viewModels.logsScreen.foods.size.toString())
-
             }
             Spacer(modifier = Modifier.height(16.dp))
             CustomSearchBar(
@@ -151,7 +149,6 @@ private fun AddFoodContent(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Box {
-
                 LazyColumn(
                     modifier = Modifier.padding(horizontal = 8.dp),
                     state = listState,

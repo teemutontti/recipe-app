@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.models.MealType
+import com.example.recipeapp.ui.components.buttons.AddButton
 import com.example.recipeapp.ui.components.buttons.MealButton
 import com.example.recipeapp.ui.components.inputs.DateNavigator
 import com.example.recipeapp.ui.components.layout.MacroWheels
@@ -44,7 +45,8 @@ fun LogsScreen(navController: NavController, viewModels: ViewModelWrapper) {
         topBar = { TopBar("Logs") },
         content = { LogsScreenContent(navController, viewModels, it) },
         bottomBar = { NavBar(navController, "logs") },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton = { AddButton { navController.navigate("add_food") } }
     )
 }
 
@@ -83,22 +85,26 @@ private fun LogsScreenContent(
             }
             item {
                 MealButton(MealType.BREAKFAST, viewModels.logsScreen) {
-                    navController.navigate("meal/BREAKFAST")
+                    viewModels.logsScreen.setSelectedMeal(MealType.BREAKFAST)
+                    navController.navigate("meal")
                 }
             }
             item {
                 MealButton(MealType.LUNCH, viewModels.logsScreen) {
-                    navController.navigate("meal/LUNCH")
+                    viewModels.logsScreen.setSelectedMeal(MealType.LUNCH)
+                    navController.navigate("meal")
                 }
             }
             item {
                 MealButton(MealType.DINNER, viewModels.logsScreen) {
-                    navController.navigate("meal/DINNER")
+                    viewModels.logsScreen.setSelectedMeal(MealType.DINNER)
+                    navController.navigate("meal")
                 }
             }
             item {
                 MealButton(MealType.SNACKS, viewModels.logsScreen) {
-                    navController.navigate("meal/SNACKS")
+                    viewModels.logsScreen.setSelectedMeal(MealType.SNACKS)
+                    navController.navigate("meal")
                 }
             }
         }

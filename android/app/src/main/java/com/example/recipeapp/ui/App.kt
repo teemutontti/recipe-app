@@ -85,11 +85,8 @@ fun App(applicationContext: Context) {
             composable("shopping_list") {
                 ShoppingListScreen(navController, viewModels)
             }
-            composable("meal/{type}") {
-                val mealType = it.arguments?.getString("type")
-                MealScreen(navController, viewModels,
-                    MealType.valueOf(mealType ?: "SNACKS")
-                )
+            composable("meal") {
+                MealScreen(navController, viewModels)
             }
         }
     }

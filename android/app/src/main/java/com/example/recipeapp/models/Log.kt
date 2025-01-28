@@ -5,7 +5,7 @@ data class Log(
     val date: String,
     val time: String,
     val meal: String,
-    val user: Int,
-    val food: Int,
+    val userId: Int,
+    val foodId: Int,
     var amount: Double,
 )

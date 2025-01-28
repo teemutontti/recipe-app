@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,7 +25,7 @@ class LogRepositoryTest {
 
     @BeforeEach
     public void setup() {
-        testLog = new Log(1, LocalDate.of(2025, 1, 15), Time.valueOf("09:00:00"), "BREAKFAST", 1, 1, 22);
+        testLog = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(9,0, 0), "BREAKFAST", 1, 1, 22.0);
         repository.deleteAll();
     }
 
@@ -51,8 +52,8 @@ class LogRepositoryTest {
 
     @Test
     public void testFindAll_ReturnsMultipleLogs() {
-        Log log1 = new Log(1, LocalDate.of(2025, 1, 15), Time.valueOf("09:00:00"), "BREAKFAST", 1, 1, 22);
-        Log log2 = new Log(2, LocalDate.of(2025, 1, 15), Time.valueOf("13:00:00"), "LUNCH", 1, 2, 150);
+        Log log1 = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(9,0, 0), "BREAKFAST", 1, 1, 22.0);
+        Log log2 = new Log(2, LocalDate.of(2025, 1, 15), LocalTime.of(13,0, 0), "LUNCH", 1, 2, 150.0);
 
         repository.save(log1);
         repository.save(log2);
@@ -68,7 +69,7 @@ class LogRepositoryTest {
     public void testUpdateUser_ReturnsLog() {
         Log saved = repository.save(testLog);
 
-        saved.setAmount(120);
+        saved.setAmount(120.0);
         saved.setMeal("SNACKS");
         Log updated = repository.save(saved);
 
@@ -90,9 +91,9 @@ class LogRepositoryTest {
 
     @Test
     public void testFindByDate_ReturnsMultipleLogs() {
-        Log log1 = new Log(null, LocalDate.of(2025, 1, 15), Time.valueOf("09:00:00"), "BREAKFAST", 1, 1, 22);
-        Log log2 = new Log(null, LocalDate.of(2025, 1, 15), Time.valueOf("13:00:00"), "LUNCH", 1, 2, 150);
-        Log log3 = new Log(null, LocalDate.of(2025, 1, 20), Time.valueOf("13:00:00"), "LUNCH", 1, 2, 150);
+        Log log1 = new Log(null, LocalDate.of(2025, 1, 15), LocalTime.of(9,0, 0), "BREAKFAST", 1, 1, 22.0);
+        Log log2 = new Log(null, LocalDate.of(2025, 1, 15), LocalTime.of(13,0, 0), "LUNCH", 1, 2, 150.0);
+        Log log3 = new Log(null, LocalDate.of(2025, 1, 20), LocalTime.of(13,0, 0), "LUNCH", 1, 2, 150.0);
 
         repository.save(log1);
         repository.save(log2);
@@ -107,9 +108,9 @@ class LogRepositoryTest {
 
     @Test
     public void testFindByUserId_ReturnsMultipleLogs() {
-        Log log1 = new Log(null, LocalDate.of(2025, 1, 15), Time.valueOf("09:00:00"), "BREAKFAST", 1, 1, 22);
-        Log log2 = new Log(null, LocalDate.of(2025, 1, 15), Time.valueOf("13:00:00"), "LUNCH", 2, 2, 150);
-        Log log3 = new Log(null, LocalDate.of(2025, 1, 20), Time.valueOf("13:00:00"), "LUNCH", 1, 2, 150);
+        Log log1 = new Log(null, LocalDate.of(2025, 1, 15), LocalTime.of(9,0, 0), "BREAKFAST", 1, 1, 22.0);
+        Log log2 = new Log(null, LocalDate.of(2025, 1, 15), LocalTime.of(13,0, 0), "LUNCH", 2, 2, 150.0);
+        Log log3 = new Log(null, LocalDate.of(2025, 1, 20), LocalTime.of(13,0, 0), "LUNCH", 1, 2, 150.0);
 
         repository.save(log1);
         repository.save(log2);

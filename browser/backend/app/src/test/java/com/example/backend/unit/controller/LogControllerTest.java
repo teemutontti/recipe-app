@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -49,7 +50,7 @@ public class LogControllerTest {
 
     @BeforeEach
     public void setup() {
-        testLog = new Log(1, LocalDate.of(2025, 1, 15), Time.valueOf("00:00:00"), "BREAKFAST", 1, 1, 24);
+        testLog = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(0,0,0), "BREAKFAST", 1, 1, 24.0);
     }
 
     // ====================
@@ -71,7 +72,7 @@ public class LogControllerTest {
 
     @Test
     public void testCreateLog_InvalidAmount_ReturnBadRequest() throws Exception {
-        testLog.setAmount(-1);
+        testLog.setAmount(-1.0);
 
         mockMvc.perform(post("/api/logs")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -99,7 +100,7 @@ public class LogControllerTest {
     // ====================
     @Test
     public void testUpdateLog_ReturnFood() throws Exception {
-        testLog.setAmount(100);
+        testLog.setAmount(100.0);
         testLog.setMeal("SNACKS");
 
         // Use eq(1L) to match the exact ID and any(Log.class) to allow any User instance.
@@ -109,7 +110,7 @@ public class LogControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testLog)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.amount", CoreMatchers.is(100)))
+                .andExpect(jsonPath("$.amount", CoreMatchers.is(100.0)))
                 .andExpect(jsonPath("$.meal", CoreMatchers.is("SNACKS")));
     }
 
@@ -130,8 +131,8 @@ public class LogControllerTest {
     public void testGetByDate_ReturnLogs() throws Exception {
         LocalDate date = LocalDate.of(2025, 1, 15);
 
-        Log log1 = new Log(1, date, Time.valueOf("00:00:00"), "BREAKFAST", 1, 1, 24);
-        Log log2 = new Log(2, date, Time.valueOf("00:00:00"), "LUNCH", 1, 2, 120);
+        Log log1 = new Log(1, date, LocalTime.of(0,0, 0), "BREAKFAST", 1, 1, 24.0);
+        Log log2 = new Log(2, date, LocalTime.of(0,0, 0), "LUNCH", 1, 2, 120.0);
 
         List<Log> logs = new ArrayList<>();
         logs.add(log1);

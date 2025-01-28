@@ -20,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +42,7 @@ public class LogServiceTest {
 
     @BeforeEach
     public void setup() {
-        testLog = new Log(1, LocalDate.of(2025, 1, 15), Time.valueOf("09:00:00"), "BREAKFAST", 1, 1, 22);
+        testLog = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(9,0, 0), "BREAKFAST", 1, 1, 22.0);
         repository.deleteAll();
     }
 
@@ -71,8 +72,8 @@ public class LogServiceTest {
 
     @Test
     public void testFindAll_ReturnsMultipleLogs() {
-        Log log1 = new Log(1, LocalDate.of(2025, 1, 15), Time.valueOf("09:00:00"), "BREAKFAST", 1, 1, 22);
-        Log log2 = new Log(2, LocalDate.of(2025, 1, 15), Time.valueOf("09:00:00"), "LUNCH", 1, 2, 120);
+        Log log1 = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "BREAKFAST", 1, 1, 22.0);
+        Log log2 = new Log(2, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "LUNCH", 1, 2, 120.0);
 
         List<Log> logs = new ArrayList<>();
         logs.add(log1);
@@ -92,7 +93,7 @@ public class LogServiceTest {
         when(repository.save(any(Log.class))).thenReturn(testLog);
 
         testLog.setMeal("LUNCH");
-        testLog.setAmount(54);
+        testLog.setAmount(54.0);
         ResponseEntity<Log> response = service.update(1L, testLog);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -116,8 +117,8 @@ public class LogServiceTest {
     @Test
     public void testFindLogsByDate_ReturnsMultipleLogs() {
         LocalDate date = LocalDate.of(2025, 1, 15);
-        Log log1 = new Log(1, date, Time.valueOf("09:00:00"), "BREAKFAST", 1, 1, 22);
-        Log log2 = new Log(2, date, Time.valueOf("09:00:00"), "LUNCH", 1, 2, 120);
+        Log log1 = new Log(1, date, LocalTime.of(9,0, 0), "BREAKFAST", 1, 1, 22.0);
+        Log log2 = new Log(2, date, LocalTime.of(9,0, 0), "LUNCH", 1, 2, 120.0);
 
         List<Log> logs = new ArrayList<>();
         logs.add(log1);
@@ -134,8 +135,8 @@ public class LogServiceTest {
     @Test
     public void testFindLogsByUser_ReturnsMultipleLogs() {
         LocalDate date = LocalDate.of(2025, 1, 15);
-        Log log1 = new Log(1, date, Time.valueOf("09:00:00"), "BREAKFAST", 19, 1, 22);
-        Log log2 = new Log(2, date, Time.valueOf("09:00:00"), "LUNCH", 19, 2, 120);
+        Log log1 = new Log(1, date, LocalTime.of(9,0, 0), "BREAKFAST", 19, 1, 22.0);
+        Log log2 = new Log(2, date, LocalTime.of(9,0, 0), "LUNCH", 19, 2, 120.0);
 
         List<Log> logs = new ArrayList<>();
         logs.add(log1);

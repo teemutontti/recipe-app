@@ -2,6 +2,8 @@ package com.example.backend.entities;
 
 import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -29,7 +31,7 @@ public class Log {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     @Column(nullable = false)
     @NotNull
-    private Time time;
+    private LocalTime time;
 
     @Column(nullable = false)
     @NotNull
@@ -46,5 +48,5 @@ public class Log {
     @Column(nullable = false)
     @NotNull
     @Min(value = 0)
-    private Integer amount;
+    private Double amount;
 }

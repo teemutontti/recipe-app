@@ -30,7 +30,7 @@ fun LogRow(log: Log, viewModel: LogsScreenViewModel) {
     var food: Food? by remember { mutableStateOf(null) }
 
     LaunchedEffect(log) {
-        food = viewModel.fetchFoodById(log.food)
+        food = viewModel.fetchFoodById(log.foodId)
     }
 
     Row(

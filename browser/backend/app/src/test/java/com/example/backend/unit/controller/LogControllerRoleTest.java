@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,8 +48,8 @@ public class LogControllerRoleTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void testGetAll_AsAdmin_ReturnLogs() throws Exception {
-        Log log1 = new Log(1, LocalDate.of(2025, 1, 15), Time.valueOf("00:00:00"), "BREAKFAST", 1, 1, 24);
-        Log log2 = new Log(2, LocalDate.of(2025, 1, 15), Time.valueOf("00:00:00"), "LUNCH", 1, 2, 120);
+        Log log1 = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "BREAKFAST", 1, 1, 24.0);
+        Log log2 = new Log(2, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "LUNCH", 1, 2, 120.0);
 
         List<Log> logs = new ArrayList<>();
         logs.add(log1);

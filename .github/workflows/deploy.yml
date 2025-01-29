@@ -31,9 +31,6 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: ./gradlew build
 
-      - name: Verify JAR exists
-        run: ls -lah app/build/libs/  # Debugging step
-
       - name: Set up Docker Builder
         uses: docker/setup-buildx-action@v2
 

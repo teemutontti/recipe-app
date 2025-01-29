@@ -22,8 +22,14 @@ jobs:
       - name: Grant execute permission to gradlew
         run: chmod +x ./browser/backend/gradlew
 
-      - name: Build project with Gradle
-        run: ./gradlew clean build --no-daemon
+      - name: Build with Gradle
+        working-directory: ./browser/backend
+        env:
+          AES_KEY: ${{ secrets.AES_KEY }}
+          DB_URL: ${{ secrets.DB_HOST }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: ./gradlew build
 
       - name: Verify JAR exists
         run: ls -lah app/build/libs/  # Debugging step

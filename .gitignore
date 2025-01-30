@@ -15,6 +15,9 @@ captures/
 *.apk
 output.json
 
+# Certs file
+certs/
+
 # IntelliJ
 *.iml
 .idea/

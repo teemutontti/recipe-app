@@ -5,6 +5,7 @@ import com.example.backend.controllers.UserController;
 import com.example.backend.dto.UserDto;
 import com.example.backend.entities.User;
 import com.example.backend.services.UserService;
+import com.example.backend.utils.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -42,6 +45,9 @@ public class UserControllerRoleTest {
 
     @MockBean
     private UserService service;
+
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -68,7 +74,8 @@ public class UserControllerRoleTest {
     @Test
     @WithMockUser(roles = "USER")
     public void testGetById_AsUser_ReturnUnauthorized() throws Exception {
-        mockMvc.perform(get("/api/users/{id}", 1)).andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/users/{id}", 1))
+                .andExpect(status().isForbidden());
     }
 
     @Test

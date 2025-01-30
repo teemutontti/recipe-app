@@ -1,17 +1,22 @@
 package com.example.backend.unit.service;
 
+import com.example.backend.config.RsaKeyConfig;
+import com.example.backend.config.SecurityConfig;
 import com.example.backend.dto.UserDto;
 import com.example.backend.entities.User;
 import com.example.backend.exceptions.EncryptionKeyException;
 import com.example.backend.exceptions.FailedCryptionException;
 import com.example.backend.repositories.UserRepository;
 import com.example.backend.services.UserService;
+import com.example.backend.utils.JwtTokenUtil;
 import com.example.backend.utils.SecurityUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,6 +28,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Import(SecurityConfig.class)
 public class UserServiceTest {
 
     @InjectMocks
@@ -30,6 +36,9 @@ public class UserServiceTest {
 
     @Mock
     private UserRepository repository;
+
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
 
     private UserDto testUser;
 
@@ -113,25 +122,49 @@ public class UserServiceTest {
     public void testLoginSuccess() {
         // Service expects a hashed password
         testUser.setPassword(SecurityUtil.hashPassword(testUser.getPassword()));
-        when(repository.findById(1L)).thenReturn(Optional.of(testUser.toUser()));
+        when(repository.findByEmail(any(String.class))).thenReturn(Optional.of(testUser.toUser()));
 
-        ResponseEntity<User> response = service.login(1L, "password");
+        ResponseEntity<Boolean> response = service.login("test@gmail.com", "password");
+
+        System.out.println(response);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals("test@gmail.com", response.getBody().getEmail());
-        assertNull(response.getBody().getPassword());
+        assertNull(response.getBody());
     }
 
     @Test
-    public void testLoginFail() {
+    public void testLoginFail() throws Exception {
         // Service expects a hashed password
         testUser.setPassword(SecurityUtil.hashPassword(testUser.getPassword()));
         when(repository.findById(1L)).thenReturn(Optional.of(testUser.toUser()));
 
-        ResponseEntity<User> response = service.login(1L, "wrong_password");
+        ResponseEntity<Boolean> response = service.login("test@gmail.com", "wrong_password");
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    public void testIsEmailTaken_ReturnOk() throws Exception {
+        testUser.setEmail(SecurityUtil.encrypt(testUser.getEmail()));
+        when(repository.findByEmail(anyString()))
+                .thenReturn(Optional.of(testUser.toUser()));
+
+        ResponseEntity<Boolean> response = service.isEmailTaken("test@gmail.com");
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNull(response.getBody());
+    }
+
+    @Test
+    public void testIsEmailTaken_ReturnNotFound() throws Exception {
+        testUser.setEmail(SecurityUtil.encrypt(testUser.getEmail()));
+        when(repository.findByEmail(anyString()))
+                .thenReturn(Optional.empty());
+
+        ResponseEntity<Boolean> response = service.isEmailTaken("test@gmail.com");
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNull(response.getBody());
     }
 }

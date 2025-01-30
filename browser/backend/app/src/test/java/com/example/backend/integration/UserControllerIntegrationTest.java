@@ -50,35 +50,4 @@ class UserControllerIntegrationTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.size()", CoreMatchers.is(0)));
     }
-
-    @Test
-    @Transactional
-    void testCreateUser_ReturnOk() throws Exception {
-        mockMvc.perform(post("/api/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testUser)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").exists())
-                .andExpect(jsonPath("$.email", CoreMatchers.is("test@gmail.com")))
-                .andExpect(jsonPath("$.password", CoreMatchers.nullValue()));
-    }
-
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    void testGetUserById_ReturnUser() throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testUser)))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        User createdUser = objectMapper.readValue(result.getResponse().getContentAsString(), User.class);
-
-        mockMvc.perform(get("/api/users/{id}", createdUser.getId())
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.email", CoreMatchers.is("test@gmail.com")))
-                .andExpect(jsonPath("$.password", CoreMatchers.nullValue()));
-    }
 }

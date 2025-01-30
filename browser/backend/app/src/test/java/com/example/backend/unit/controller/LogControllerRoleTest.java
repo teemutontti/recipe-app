@@ -4,6 +4,7 @@ import com.example.backend.config.SecurityConfig;
 import com.example.backend.controllers.LogController;
 import com.example.backend.entities.Log;
 import com.example.backend.services.LogService;
+import com.example.backend.utils.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +45,9 @@ public class LogControllerRoleTest {
 
     @MockBean
     private LogService service;
+
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
 
     @Test
     @WithMockUser(roles = "ADMIN")

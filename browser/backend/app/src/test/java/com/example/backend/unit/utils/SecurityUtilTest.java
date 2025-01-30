@@ -1,4 +1,4 @@
-package com.example.backend.unit;
+package com.example.backend.unit.utils;
 
 import com.example.backend.exceptions.FailedCryptionException;
 import com.example.backend.utils.SecurityUtil;

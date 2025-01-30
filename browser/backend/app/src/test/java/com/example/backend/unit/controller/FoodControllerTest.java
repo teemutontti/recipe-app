@@ -4,7 +4,9 @@ import com.example.backend.config.SecurityConfig;
 import com.example.backend.controllers.FoodController;
 import com.example.backend.entities.Food;
 import com.example.backend.services.FoodService;
+import com.example.backend.utils.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.JOSEException;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,14 +23,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import java.util.Arrays;
 import java.util.List;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -44,13 +49,16 @@ class FoodControllerTest {
     @MockBean
     private FoodService service;
 
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     private Food testFood;
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws JOSEException {
         testFood = new Food(1, "Kanan rintafilee", "1234567890", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "2025-01-01", "2025-01-01");
     }
 
@@ -63,7 +71,7 @@ class FoodControllerTest {
         // won't match the exact instance in the test setup.
         when(service.create(any(Food.class))).thenReturn(new ResponseEntity<>(testFood, HttpStatus.CREATED));
 
-        mockMvc.perform(post("/api/foods")
+        mockMvc.perform(post("/api/foods").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testFood)))
                 .andExpect(status().isCreated())
@@ -89,10 +97,16 @@ class FoodControllerTest {
                 break;
         }
 
-        mockMvc.perform(post("/api/foods")
+        mockMvc.perform(post("/api/foods").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testFood)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testCreateFood_WithoutAuth_ReturnForbidden() throws Exception {
+        mockMvc.perform(post("/api/foods"))
+                .andExpect(status().isForbidden());
     }
 
 
@@ -114,17 +128,22 @@ class FoodControllerTest {
                 .thenReturn(new ResponseEntity<>(mockPage, HttpStatus.OK));
 
         // Act and Assert
-        mockMvc.perform(get("/api/foods"))
+        mockMvc.perform(get("/api/foods").with(jwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.size()", CoreMatchers.is(2)))
                 .andExpect(jsonPath("$.content[0].name", CoreMatchers.is("Kana")))
                 .andExpect(jsonPath("$.content[1].name", CoreMatchers.is("Riisi")));
     }
     @Test
+    void testGetAll_WithoutAuth_ReturnForbidden() throws Exception {
+        mockMvc.perform(get("/api/foods"))
+                .andExpect(status().isForbidden());
+    }
+    @Test
     void testGetById_ReturnOk() throws Exception {
         when(service.getById(1L)).thenReturn(new ResponseEntity<>(testFood, HttpStatus.OK));
 
-        mockMvc.perform(get("/api/foods/1"))
+        mockMvc.perform(get("/api/foods/1").with(jwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", CoreMatchers.is(testFood.getName())))
                 .andExpect(jsonPath("$.calories", CoreMatchers.is(testFood.getCalories())));
@@ -133,7 +152,13 @@ class FoodControllerTest {
     @Test
     void testGetById_ReturnNotFound() throws Exception {
         when(service.getById(13L)).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-        mockMvc.perform(get("/api/foods/{id}", 13)).andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/foods/{id}", 13).with(jwt())).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testGetById_WithoutAuth_ReturnForbidden() throws Exception {
+        mockMvc.perform(get("/api/foods/{id}", 13))
+                .andExpect(status().isForbidden());
     }
 
     // ====================
@@ -153,7 +178,7 @@ class FoodControllerTest {
         when(service.getById(eq(1L))).thenReturn(new ResponseEntity<>(testFood, HttpStatus.OK));
         when(service.update(eq(1L), any(Food.class))).thenReturn(new ResponseEntity<>(testFood, HttpStatus.OK));
 
-        mockMvc.perform(patch("/api/foods/1")
+        mockMvc.perform(patch("/api/foods/1").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testFood)))
                 .andExpect(status().isOk())
@@ -199,7 +224,7 @@ class FoodControllerTest {
                 break;
         }
 
-        mockMvc.perform(post("/api/foods")
+        mockMvc.perform(post("/api/foods").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testFood)))
                 .andExpect(status().isOk());
@@ -209,7 +234,7 @@ class FoodControllerTest {
     void testUpdateFood_InvalidObject_ReturnsNotFound() throws Exception {
         testFood.setCalories(-100.0);
 
-        mockMvc.perform(patch("/api/foods/1")
+        mockMvc.perform(patch("/api/foods/1").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testFood)))
                 .andExpect(status().isBadRequest());
@@ -219,10 +244,16 @@ class FoodControllerTest {
     void testUpdateFood_InvalidId_ReturnsNotFound() throws Exception {
         when(service.getById(eq(99L))).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
-        mockMvc.perform(patch("/api/foods/99")
+        mockMvc.perform(patch("/api/foods/99").with(jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testFood)))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testUpdateFood_WithoutAuth_ReturnForbidden() throws Exception {
+        mockMvc.perform(patch("/api/foods/99"))
+                .andExpect(status().isForbidden());
     }
 
     // ====================
@@ -231,7 +262,9 @@ class FoodControllerTest {
     @Test
     void testDeleteFood_ReturnOk() throws Exception {
         when(service.delete(1L)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
-        MvcResult result = mockMvc.perform(delete("/api/foods/1")).andExpect(status().isOk()).andReturn();
+        MvcResult result = mockMvc.perform(delete("/api/foods/1").with(jwt()))
+                .andExpect(status().isOk()).andReturn();
+
         assertTrue(result.getResponse().getContentAsString().isEmpty());
     }
 }

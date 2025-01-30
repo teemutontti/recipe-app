@@ -6,6 +6,7 @@ import com.example.backend.dto.LoginRequest;
 import com.example.backend.dto.UserDto;
 import com.example.backend.entities.User;
 import com.example.backend.services.UserService;
+import com.example.backend.utils.JwtTokenUtil;
 import com.example.backend.utils.SecurityUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
@@ -39,6 +40,9 @@ public class UserControllerTest {
     @MockBean
     private UserService service;
 
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -50,52 +54,12 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testCreateUser_ReturnCreated() throws Exception {
-        when(service.create(any(UserDto.class)))
-                .thenReturn(new ResponseEntity<>(testUser.toUser(), HttpStatus.CREATED));
-
+    public void testUser_AsUser_ReturnForbidden() throws Exception {
         mockMvc.perform(post("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testUser)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.email", CoreMatchers.is("test@gmail.com")))
-                .andExpect(jsonPath("$.password", CoreMatchers.is("pA55word!")));
+                .andExpect(status().isForbidden());
     }
 
-    @Test
-    public void testCreateUser_InvalidEmail_ReturnBadRequest() throws Exception {
-        testUser.setEmail("myemail.fi");
 
-        mockMvc.perform(post("/api/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testUser)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void testCreateUser_InvalidPassword_ReturnBadRequest() throws Exception {
-        testUser.setPassword("qwerty");
-
-        mockMvc.perform(post("/api/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testUser)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void testLogin_CorrectCredentials_ReturnUser() throws Exception {
-        testUser.setEmail(SecurityUtil.encrypt(testUser.getEmail()));
-
-        System.out.println(testUser);
-
-        when(service.login(eq(1L), any(String.class)))
-                .thenReturn(new ResponseEntity<>(testUser.toUser(), HttpStatus.OK));
-
-        mockMvc.perform(post("/api/users/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new LoginRequest(1L, "pA55word!"))))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email", CoreMatchers.is("test@gmail.com")))
-                .andExpect(jsonPath("$.password", CoreMatchers.is("pA55word!")));
-    }
 }

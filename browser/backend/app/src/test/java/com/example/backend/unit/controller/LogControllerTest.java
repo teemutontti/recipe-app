@@ -4,6 +4,7 @@ import com.example.backend.config.SecurityConfig;
 import com.example.backend.controllers.LogController;
 import com.example.backend.entities.Log;
 import com.example.backend.services.LogService;
+import com.example.backend.utils.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -43,6 +45,9 @@ public class LogControllerTest {
     @MockBean
     private LogService service;
 
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -57,6 +62,7 @@ public class LogControllerTest {
     // CREATE Log Tests
     // ====================
     @Test
+    @WithMockUser
     public void testCreateLog_ReturnCreated() throws Exception {
         // Use any(Log.class) because the User instance created during JSON deserialization
         // won't match the exact instance in the test setup.
@@ -71,6 +77,7 @@ public class LogControllerTest {
     }
 
     @Test
+    @WithMockUser
     public void testCreateLog_InvalidAmount_ReturnBadRequest() throws Exception {
         testLog.setAmount(-1.0);
 
@@ -80,10 +87,17 @@ public class LogControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void testCreateLog_WithoutAuth_ReturnForbidden() throws Exception {
+        mockMvc.perform(post("/api/logs"))
+                .andExpect(status().isForbidden());
+    }
+
     // ====================
     // READ Food Tests
     // ====================
     @Test
+    @WithMockUser
     public void testGetById_ReturnOk() throws Exception {
         when(service.getById(1L)).thenReturn(new ResponseEntity<>(testLog, HttpStatus.OK));
 
@@ -95,10 +109,17 @@ public class LogControllerTest {
         verify(service, times(1)).getById(1L);
     }
 
+    @Test
+    public void testGetById_WithoutAuth_ReturnForbidden() throws Exception {
+        mockMvc.perform(get("/api/logs/{id}", 1))
+                .andExpect(status().isForbidden());
+    }
+
     // ====================
     // UPDATE Food Tests
     // ====================
     @Test
+    @WithMockUser
     public void testUpdateLog_ReturnFood() throws Exception {
         testLog.setAmount(100.0);
         testLog.setMeal("SNACKS");
@@ -114,20 +135,35 @@ public class LogControllerTest {
                 .andExpect(jsonPath("$.meal", CoreMatchers.is("SNACKS")));
     }
 
+    @Test
+    public void testUpdateLog_WithoutAuth_ReturnForbidden() throws Exception {
+        mockMvc.perform(patch("/api/logs/1"))
+                .andExpect(status().isForbidden());
+    }
+
     // ====================
     // DELETE Food Tests
     // ====================
     @Test
+    @WithMockUser
     public void testDeleteLog_ReturnEmpty() throws Exception {
         when(service.delete(1L)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
         MvcResult result = mockMvc.perform(delete("/api/logs/1")).andExpect(status().isOk()).andReturn();
         assertTrue(result.getResponse().getContentAsString().isEmpty());
     }
 
+    @Test
+    public void testDeleteLog_WithoutAuth_ReturnForbidden() throws Exception {
+        mockMvc.perform(delete("/api/logs/1"))
+                .andExpect(status().isForbidden());
+
+    }
+
     // ====================
     // CUSTOM Food Tests
     // ====================
     @Test
+    @WithMockUser
     public void testGetByDate_ReturnLogs() throws Exception {
         LocalDate date = LocalDate.of(2025, 1, 15);
 
@@ -144,5 +180,11 @@ public class LogControllerTest {
                 .param("date", date.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()", CoreMatchers.is(2)));
+    }
+
+    @Test
+    public void testGetByDate_WithoutAuth_ReturnForbidden() throws Exception {
+        mockMvc.perform(get("/api/logs/by-date"))
+                .andExpect(status().isForbidden());
     }
 }

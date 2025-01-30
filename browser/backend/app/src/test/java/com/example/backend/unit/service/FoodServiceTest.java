@@ -1,19 +1,24 @@
 package com.example.backend.unit.service;
 
+import com.example.backend.config.SecurityConfig;
 import com.example.backend.entities.Food;
 import com.example.backend.repositories.FoodRepository;
 import com.example.backend.services.FoodService;
+import com.example.backend.utils.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +28,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Import(SecurityConfig.class)
 public class FoodServiceTest {
 
     @InjectMocks
@@ -30,6 +36,9 @@ public class FoodServiceTest {
 
     @Mock
     private FoodRepository repository;
+
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
 
     private Food testFood;
 
@@ -40,6 +49,7 @@ public class FoodServiceTest {
     }
 
     @Test
+    @WithMockUser
     public void testSaveFood_ReturnsFood() {
         when(repository.save(any(Food.class))).thenReturn(testFood);
 

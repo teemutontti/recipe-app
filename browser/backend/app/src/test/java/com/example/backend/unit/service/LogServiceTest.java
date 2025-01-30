@@ -1,5 +1,6 @@
 package com.example.backend.unit.service;
 
+import com.example.backend.config.SecurityConfig;
 import com.example.backend.entities.Log;
 import com.example.backend.entities.User;
 import com.example.backend.exceptions.EncryptionKeyException;
@@ -8,12 +9,15 @@ import com.example.backend.repositories.LogRepository;
 import com.example.backend.repositories.UserRepository;
 import com.example.backend.services.LogService;
 import com.example.backend.services.UserService;
+import com.example.backend.utils.JwtTokenUtil;
 import com.example.backend.utils.SecurityUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
@@ -30,6 +34,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Import(SecurityConfig.class)
 public class LogServiceTest {
 
     @InjectMocks
@@ -37,6 +42,9 @@ public class LogServiceTest {
 
     @Mock
     private LogRepository repository;
+
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
 
     private Log testLog;
 

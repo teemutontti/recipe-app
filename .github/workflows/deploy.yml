@@ -1,10 +1,12 @@
 name: Build and Deploy Docker image to Azure
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Java CI with Gradle"]
+    types:
+      - completed
     branches:
       - devel
-  workflow_dispatch:
 
 jobs:
   build:

@@ -48,6 +48,8 @@ jobs:
       run: ./gradlew test
       env:
         AES_KEY: ${{ secrets.AES_KEY }}
+        RSA_PRIVATE_KEY: ${{ secrets.RSA_PRIVATE_KEY }}
+        RSA_PUBLIC_KEY: ${{ secrets.RSA_PUBLIC_KEY }}
 
     - name: Upload test results as artifacts
       uses: actions/upload-artifact@v4

@@ -29,7 +29,6 @@ public class FoodController {
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "size", defaultValue = "10") Integer size
     ) {
-        System.out.println("page: " + page + ", size: " + size);
         return service.getAll(page, size);
     }
 

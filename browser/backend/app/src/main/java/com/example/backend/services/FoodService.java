@@ -29,6 +29,7 @@ public class FoodService {
     public ResponseEntity<Page<Food>> getAll(Integer page, Integer size) {
         try {
             Page<Food> data = repository.findAll(PageRequest.of(page, size));
+            System.out.println("IN FOOD SERVICE");
             return new ResponseEntity<>(data, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

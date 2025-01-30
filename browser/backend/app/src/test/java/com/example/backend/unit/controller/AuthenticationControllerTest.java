@@ -1,0 +1,79 @@
+package com.example.backend.unit.controller;
+
+import com.example.backend.config.SecurityConfig;
+import com.example.backend.controllers.AuthenticationController;
+import com.example.backend.dto.LoginRequest;
+import com.example.backend.dto.UserDto;
+import com.example.backend.services.UserService;
+import com.example.backend.utils.JwtTokenUtil;
+import com.example.backend.utils.SecurityUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(AuthenticationController.class)
+@ActiveProfiles("test")
+@Import(SecurityConfig.class)
+public class AuthenticationControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private UserService service;
+
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private UserDto testUser;
+
+    @BeforeEach
+    public void setup() {
+        testUser = new UserDto(null, "test@gmail.com", "pA55word!");
+    }
+
+    @Test
+    public void testRegister_ReturnCreated() throws Exception {
+        when(service.isEmailTaken(anyString())).thenReturn(new ResponseEntity<>(false, HttpStatus.NOT_FOUND));
+        when(service.create(any(UserDto.class))).thenReturn(new ResponseEntity<>(testUser.toUser(), HttpStatus.CREATED));
+        when(jwtTokenUtil.generateToken(anyString())).thenReturn("mock-jwt-token");
+
+        mockMvc.perform(post("/api/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testUser)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$", CoreMatchers.is("mock-jwt-token")));
+    }
+
+    @Test
+    public void testLogin_ReturnOk() throws Exception {
+        testUser.setEmail(SecurityUtil.encrypt(testUser.getEmail()));
+
+        when(service.login(anyString(), anyString())).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+        when(jwtTokenUtil.generateToken(anyString())).thenReturn("mock-jwt-token");
+
+        mockMvc.perform(post("/api/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new LoginRequest("test@gmail.com", "pA55word!"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", CoreMatchers.is("mock-jwt-token")));
+    }
+}

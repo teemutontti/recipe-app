@@ -2,7 +2,6 @@ package com.example.backend.services;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import com.example.backend.dto.UserDto;
 import com.example.backend.exceptions.FailedDecryptionException;
 import com.example.backend.exceptions.FailedEncryptionException;
@@ -22,22 +21,15 @@ public class UserService {
 
     public ResponseEntity<User> create(UserDto userDto) {
         try {
-            System.out.println("IN SERVICE");
             User user = new User(
                 null,
                 SecurityUtil.encrypt(userDto.getEmail()),
                 SecurityUtil.hashPassword(userDto.getPassword())
             );
-            System.out.println("Before save: " + user);
 
             User data = repository.save(user);
 
-            System.out.println("After save: " + data);
-
             data.setEmail(SecurityUtil.decrypt(data.getEmail()));
-
-            System.out.println("data");
-
             data.setPassword(null);
 
             return new ResponseEntity<>(data, HttpStatus.CREATED);
@@ -113,19 +105,23 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<User> login(Long id, String password) {
-        User existingUser = repository.findById(id).orElse(null);
+    public ResponseEntity<Boolean> login(String email, String password) {
+        try {
+            String encryptedEmail = SecurityUtil.encrypt(email);
+            User existingUser = repository.findByEmail(encryptedEmail).orElse(null);
 
-        if (existingUser == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+            if (existingUser == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
 
-        if (SecurityUtil.checkPassword(password, existingUser.getPassword())) {
-            existingUser.setPassword(null);
-
-            return new ResponseEntity<>(existingUser, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            if (SecurityUtil.checkPassword(password, existingUser.getPassword())) {
+                existingUser.setPassword(null);
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -133,6 +129,20 @@ public class UserService {
         try {
             repository.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<Boolean> isEmailTaken(String email) {
+        try {
+            String encryptedEmail = SecurityUtil.encrypt(email);
+            User found = repository.findByEmail(encryptedEmail).orElse(null);
+            if (found != null) {
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

@@ -1,6 +1,7 @@
 package com.example.backend.controllers;
 
-import com.example.backend.dto.LoginRequest;
+import com.example.backend.dto.AuthRequest;
+import com.example.backend.dto.AuthResponse;
 import com.example.backend.dto.UserDto;
 import com.example.backend.entities.User;
 import com.example.backend.services.UserService;
@@ -27,30 +28,29 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> signIn(@Valid @RequestBody LoginRequest loginRequest) throws JOSEException {
-        ResponseEntity<Boolean> response = userService.isEmailTaken(loginRequest.getEmail());
+    public ResponseEntity<AuthResponse> signIn(@Valid @RequestBody AuthRequest authRequest) throws JOSEException {
+        ResponseEntity<Boolean> response = userService.isEmailTaken(authRequest.getEmail());
         if (response.getStatusCode() == HttpStatus.NOT_FOUND) {
 
-            UserDto newUser = new UserDto(null, loginRequest.getEmail(), loginRequest.getPassword());
+            UserDto newUser = new UserDto(null, authRequest.getEmail(), authRequest.getPassword());
             ResponseEntity<User> created = userService.create(newUser);
 
             if (created != null) {
-                String token = jwtTokenUtil.generateToken(loginRequest.getEmail());
-                return new ResponseEntity<>(token, HttpStatus.CREATED);
+                String token = jwtTokenUtil.generateToken(authRequest.getEmail());
+                return new ResponseEntity<>(new AuthResponse(token), HttpStatus.CREATED);
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) throws JOSEException {
-        ResponseEntity<Boolean> response = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) throws JOSEException {
+        ResponseEntity<Boolean> response = userService.login(authRequest.getEmail(), authRequest.getPassword());
 
         if (response.getStatusCode() == HttpStatus.OK) {
-            String token = jwtTokenUtil.generateToken(loginRequest.getEmail());
-            return new ResponseEntity<>(token, HttpStatus.OK);
+            String token = jwtTokenUtil.generateToken(authRequest.getEmail());
+            return new ResponseEntity<>(new AuthResponse(token), HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-
 }

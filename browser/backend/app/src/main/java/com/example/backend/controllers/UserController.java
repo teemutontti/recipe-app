@@ -1,14 +1,9 @@
 package com.example.backend.controllers;
 
-import com.example.backend.dto.LoginRequest;
 import com.example.backend.dto.UserDto;
-import com.example.backend.exceptions.EncryptionKeyException;
-import com.example.backend.exceptions.FailedCryptionException;
 import com.example.backend.services.UserService;
-import com.example.backend.utils.SecurityUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.backend.entities.User;

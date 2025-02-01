@@ -31,7 +31,7 @@ jobs:
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           RSA_PRIVATE_KEY: ${{ secrets.RSA_PRIVATE_KEY }}
-          RSA_PUBLIC_KEY: ${{ secrets.RRA_PUBLIC_KEY }}
+          RSA_PUBLIC_KEY: ${{ secrets.RSA_PUBLIC_KEY }}
         run: ./gradlew build
 
       - name: Set up Docker Builder

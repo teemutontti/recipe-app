@@ -2,7 +2,7 @@ package com.example.backend.unit.controller;
 
 import com.example.backend.config.SecurityConfig;
 import com.example.backend.controllers.AuthenticationController;
-import com.example.backend.dto.LoginRequest;
+import com.example.backend.dto.AuthRequest;
 import com.example.backend.dto.UserDto;
 import com.example.backend.services.UserService;
 import com.example.backend.utils.JwtTokenUtil;
@@ -60,7 +60,7 @@ public class AuthenticationControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testUser)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$", CoreMatchers.is("mock-jwt-token")));
+                .andExpect(jsonPath("$.token", CoreMatchers.is("mock-jwt-token")));
     }
 
     @Test
@@ -72,8 +72,8 @@ public class AuthenticationControllerTest {
 
         mockMvc.perform(post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new LoginRequest("test@gmail.com", "pA55word!"))))
+                .content(objectMapper.writeValueAsString(new AuthRequest("test@gmail.com", "pA55word!"))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", CoreMatchers.is("mock-jwt-token")));
+                .andExpect(jsonPath("$.token", CoreMatchers.is("mock-jwt-token")));
     }
 }

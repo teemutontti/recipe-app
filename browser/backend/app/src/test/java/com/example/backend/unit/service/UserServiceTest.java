@@ -124,12 +124,13 @@ public class UserServiceTest {
         testUser.setPassword(SecurityUtil.hashPassword(testUser.getPassword()));
         when(repository.findByEmail(any(String.class))).thenReturn(Optional.of(testUser.toUser()));
 
-        ResponseEntity<Boolean> response = service.login("test@gmail.com", "password");
-
-        System.out.println(response);
+        ResponseEntity<User> response = service.login("test@gmail.com", "password");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNull(response.getBody());
+        assertNotNull(response.getBody());
+        //assertTrue(response.getBody().getId() > 0);
+        assertEquals("test@gmail.com", response.getBody().getEmail());
+        assertNull(response.getBody().getPassword());
     }
 
     @Test
@@ -138,7 +139,7 @@ public class UserServiceTest {
         testUser.setPassword(SecurityUtil.hashPassword(testUser.getPassword()));
         when(repository.findById(1L)).thenReturn(Optional.of(testUser.toUser()));
 
-        ResponseEntity<Boolean> response = service.login("test@gmail.com", "wrong_password");
+        ResponseEntity<User> response = service.login("test@gmail.com", "wrong_password");
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNull(response.getBody());

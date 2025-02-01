@@ -66,9 +66,8 @@ public class UserService {
     public ResponseEntity<User> getById(Long id) {
         try {
             User user = repository.findById(id).orElse(null);
-            if (user == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+
+            if (user == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
             try {
                 user.setEmail(SecurityUtil.decrypt(user.getEmail()));
@@ -86,15 +85,12 @@ public class UserService {
         try {
             System.out.println("IN SERVICE");
             User existingUser = repository.findById(id).orElse(null);
-            if (existingUser == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
 
+            if (existingUser == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
             try {
                 userDto.setEmail(SecurityUtil.encrypt(userDto.getEmail()));
                 User data = repository.save(userDto.toUser());
-                System.out.println(data);
                 data.setPassword(null);
                 return new ResponseEntity<>(data, HttpStatus.OK);
             } catch (FailedEncryptionException e) {
@@ -105,18 +101,17 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<Boolean> login(String email, String password) {
+    public ResponseEntity<User> login(String email, String password) {
         try {
             String encryptedEmail = SecurityUtil.encrypt(email);
             User existingUser = repository.findByEmail(encryptedEmail).orElse(null);
 
-            if (existingUser == null) {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+            if (existingUser == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
             if (SecurityUtil.checkPassword(password, existingUser.getPassword())) {
                 existingUser.setPassword(null);
-                return new ResponseEntity<>(HttpStatus.OK);
+                System.out.println("EXISTING USER: " + existingUser);
+                return new ResponseEntity<>(existingUser, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
             }

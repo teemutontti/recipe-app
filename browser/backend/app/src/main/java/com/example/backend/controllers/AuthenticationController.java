@@ -8,6 +8,7 @@ import com.example.backend.services.UserService;
 import com.example.backend.utils.JwtTokenUtil;
 import com.nimbusds.jose.JOSEException;
 import jakarta.validation.Valid;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,9 +36,13 @@ public class AuthenticationController {
             UserDto newUser = new UserDto(null, authRequest.getEmail(), authRequest.getPassword());
             ResponseEntity<User> created = userService.create(newUser);
 
-            if (created != null) {
-                String token = jwtTokenUtil.generateToken(authRequest.getEmail());
-                return new ResponseEntity<>(new AuthResponse(token), HttpStatus.CREATED);
+            if (created.getStatusCode() == HttpStatus.CREATED) {
+                User user = created.getBody();
+                if (user != null) {
+                    String token = jwtTokenUtil.generateToken(authRequest.getEmail());
+                    AuthResponse authResponse = new AuthResponse(token, user.getId(), user.getEmail());
+                    return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
+                }
             }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -45,11 +50,15 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) throws JOSEException {
-        ResponseEntity<Boolean> response = userService.login(authRequest.getEmail(), authRequest.getPassword());
-
+        ResponseEntity<User> response = userService.login(authRequest.getEmail(), authRequest.getPassword());
         if (response.getStatusCode() == HttpStatus.OK) {
-            String token = jwtTokenUtil.generateToken(authRequest.getEmail());
-            return new ResponseEntity<>(new AuthResponse(token), HttpStatus.OK);
+
+            User user = response.getBody();
+            if (user != null) {
+                String token = jwtTokenUtil.generateToken(authRequest.getEmail());
+                AuthResponse authResponse = new AuthResponse(token, user.getId(), user.getEmail());
+                return new ResponseEntity<>(authResponse, HttpStatus.OK);
+            }
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }

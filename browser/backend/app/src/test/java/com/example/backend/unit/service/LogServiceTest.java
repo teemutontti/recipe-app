@@ -132,9 +132,9 @@ public class LogServiceTest {
         logs.add(log1);
         logs.add(log2);
 
-        when(repository.findByDate(date)).thenReturn(logs);
+        when(repository.findByDateAndUserId(date, 1)).thenReturn(logs);
 
-        ResponseEntity<List<Log>> response = service.getLogsByDate(date);
+        ResponseEntity<List<Log>> response = service.getLogsByDateAndUser(date, 1);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(2, response.getBody().size());

@@ -174,10 +174,11 @@ public class LogControllerTest {
         logs.add(log1);
         logs.add(log2);
 
-        when(service.getLogsByDate(date)).thenReturn(new ResponseEntity<>(logs, HttpStatus.OK));
+        when(service.getLogsByDateAndUser(date, 1)).thenReturn(new ResponseEntity<>(logs, HttpStatus.OK));
 
         mockMvc.perform(get("/api/logs/by-date")
-                .param("date", date.toString()))
+                .param("date", date.toString())
+                .param("userId", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()", CoreMatchers.is(2)));
     }

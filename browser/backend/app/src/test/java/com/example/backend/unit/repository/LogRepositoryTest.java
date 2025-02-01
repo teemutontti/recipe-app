@@ -99,10 +99,12 @@ class LogRepositoryTest {
         repository.save(log2);
         repository.save(log3);
 
-        List<Log> found1 = repository.findByDate(LocalDate.of(2025, 1, 15));
+        LocalDate date1 = LocalDate.of(2025, 1, 15);
+        List<Log> found1 = repository.findByDateAndUserId(date1, 1);
         assertEquals(2, found1.size());
 
-        List<Log> found2 = repository.findByDate(LocalDate.of(2025, 1, 20));
+        LocalDate date2 = LocalDate.of(2025, 1, 20);
+        List<Log> found2 = repository.findByDateAndUserId(date2, 1);
         assertEquals(1, found2.size());
     }
 

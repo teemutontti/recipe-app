@@ -42,9 +42,9 @@ public class LogController {
     }
 
     @GetMapping("/by-date")
-    public ResponseEntity<List<Log>> getLogsByDate(@RequestParam String date) {
+    public ResponseEntity<List<Log>> getLogsByDateAndUser(@RequestParam String date, @RequestParam Integer userId) {
         LocalDate parsedDate = LocalDate.parse(date);
-        return service.getLogsByDate(parsedDate);
+        return service.getLogsByDateAndUser(parsedDate, userId);
     }
 
     @GetMapping("/by-user")

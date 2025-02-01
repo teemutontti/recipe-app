@@ -68,9 +68,9 @@ public class LogService {
         }
     }
 
-    public ResponseEntity<List<Log>> getLogsByDate(LocalDate date) {
+    public ResponseEntity<List<Log>> getLogsByDateAndUser(LocalDate date, Integer userId) {
         try {
-            List<Log> logs = repository.findByDate(date);
+            List<Log> logs = repository.findByDateAndUserId(date, userId);
             return new ResponseEntity<>(logs, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

@@ -16,6 +16,7 @@ materialIconsCore = "1.6.7"
 retrofit = "2.9.0"
 navigationCompose = "2.7.7"
 roomRuntime = "2.6.1"
+securityCrypto = "1.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -26,6 +27,7 @@ androidx-material-icons-extended-v167 = { module = "androidx.compose.material:ma
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
 coil-compose-v260 = { module = "io.coil-kt:coil-compose", version.ref = "coilComposeVersion" }
 converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterJson" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

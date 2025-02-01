@@ -14,14 +14,15 @@ import com.example.recipeapp.repositories.LogRepository
 import com.example.recipeapp.utils.AlertType
 import com.example.recipeapp.utils.ConversionUtils.emptyFood
 import com.example.recipeapp.utils.Result
+import com.example.recipeapp.utils.SharedPreferencesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class LogsScreenViewModel(application: Application): BaseViewModel(application) {
-    private val logRepository = LogRepository()
-    private val foodRepository = FoodRepository()
+    private val logRepository = LogRepository(this.encryptedSharedPreferences)
+    private val foodRepository = FoodRepository(this.encryptedSharedPreferences)
 
     private var _logs: MutableState<List<Log>> = mutableStateOf(emptyList())
     private var _breakfastLogs: MutableState<List<FoodLog>> = mutableStateOf(emptyList())

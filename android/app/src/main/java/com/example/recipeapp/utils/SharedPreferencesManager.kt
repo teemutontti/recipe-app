@@ -3,9 +3,12 @@ package com.example.recipeapp.utils
 import android.content.SharedPreferences
 import com.example.recipeapp.models.FavouriteRecipe
 import com.example.recipeapp.models.ShoppingListItem
+import com.example.recipeapp.models.User
+import com.example.recipeapp.utils.SharedPreferencesKeys.AUTH_TOKEN
 import com.example.recipeapp.utils.SharedPreferencesKeys.SHOPPING_LIST
 import com.example.recipeapp.utils.SharedPreferencesKeys.TODAYS_SPECIALS
 import com.example.recipeapp.utils.SharedPreferencesKeys.TODAYS_SPECIALS_LAST_LOAD
+import com.example.recipeapp.utils.SharedPreferencesKeys.USER
 import com.google.gson.Gson
 import java.time.LocalDate
 
@@ -59,5 +62,29 @@ object SharedPreferencesManager {
 
     fun saveShoppingList(prefs: SharedPreferences, ingredients: List<ShoppingListItem>) {
         prefs.edit().putString(SHOPPING_LIST, Gson().toJson(ingredients)).apply()
+    }
+
+    fun saveAuthToken(prefs: SharedPreferences, token: String) {
+        prefs.edit().putString(AUTH_TOKEN, token).apply()
+    }
+
+    fun getAuthToken(prefs: SharedPreferences): String? {
+        return prefs.getString(AUTH_TOKEN, null)
+    }
+
+    fun saveUser(prefs: SharedPreferences, user: User) {
+        prefs.edit().putString(USER, Gson().toJson(user)).apply()
+    }
+
+    fun getUser(prefs: SharedPreferences): User? {
+        val json: String? = prefs.getString(USER, null)
+        if (json != null) {
+            return Gson().fromJson(json, User::class.java)
+        }
+        return null
+    }
+
+    fun clearPrefs(prefs: SharedPreferences) {
+        prefs.edit().clear().apply()
     }
 }

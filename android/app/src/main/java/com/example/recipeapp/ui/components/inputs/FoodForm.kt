@@ -61,8 +61,8 @@ fun FoodForm(viewModel: LogsScreenViewModel) {
                 fat = if (fat.isNotEmpty()) {
                     FormattingUtils.stringToFloat(fat)
                 } else 0.0f,
-                createdBy = 1,
-                editedBy = 1,
+                createdBy = viewModel.getUserId(),
+                editedBy = viewModel.getUserId(),
             )
             viewModel.setSavableFood(food)
         }

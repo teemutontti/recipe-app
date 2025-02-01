@@ -101,7 +101,7 @@ fun FoodEditorScreen(
                                             LocalTime.now()
                                         ),
                                         meal = viewModels.logsScreen.selectedMeal.toString(),
-                                        userId = 1,
+                                        userId = viewModels.logsScreen.getUserId(),
                                         foodId = it1,
                                         amount = viewModels.logsScreen.currentAmount.toDouble(),
                                     )

@@ -7,17 +7,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.recipeapp.models.MealType
 import com.example.recipeapp.utils.LocalApplicationContext
 import com.example.recipeapp.ui.screens.RecipeEditorScreen
 import com.example.recipeapp.ui.screens.DiscoverScreen
 import com.example.recipeapp.ui.screens.CookbookScreen
 import com.example.recipeapp.ui.screens.FoodEditorScreen
 import com.example.recipeapp.ui.screens.AddFoodScreen
+import com.example.recipeapp.ui.screens.LoginScreen
 import com.example.recipeapp.ui.screens.LogsScreen
 import com.example.recipeapp.ui.screens.MealScreen
 import com.example.recipeapp.ui.screens.RecipeScreen
 import com.example.recipeapp.ui.screens.ShoppingListScreen
+import com.example.recipeapp.viewmodels.AuthViewModel
 import com.example.recipeapp.viewmodels.FavouriteRecipesViewModel
 import com.example.recipeapp.viewmodels.LogsScreenViewModel
 import com.example.recipeapp.viewmodels.PersonalRecipesViewModel
@@ -47,6 +48,7 @@ fun App(applicationContext: Context) {
     val todaysSpecialsViewModel: TodaysSpecialsViewModel = viewModel()
     val shoppingListViewModel: ShoppingListViewModel = viewModel()
     val logsScreenViewModel: LogsScreenViewModel = viewModel()
+    val authViewModel: AuthViewModel = viewModel()
 
     val viewModels = ViewModelWrapper(
         favourite = favouriteRecipesViewModel,
@@ -56,10 +58,14 @@ fun App(applicationContext: Context) {
         specials = todaysSpecialsViewModel,
         shopping = shoppingListViewModel,
         logsScreen = logsScreenViewModel,
+        authViewModel = authViewModel,
     )
 
     CompositionLocalProvider(LocalApplicationContext provides applicationContext) {
-        NavHost(navController = navController, startDestination = "discover") {
+        NavHost(navController = navController, startDestination = "login") {
+            composable("login") {
+                LoginScreen(navController, viewModels)
+            }
             composable("discover") {
                 DiscoverScreen(navController, viewModels)
             }

@@ -15,7 +15,7 @@ android {
         minSdk = 26
         targetSdk = 34
         versionCode = 5
-        versionName = "1.1.0"
+        versionName = "1.2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -95,4 +95,5 @@ dependencies {
     kapt(libs.androidx.room.compiler) // Room annotation processor
     implementation(libs.androidx.room.ktx) // Needed for coroutine support
     implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.security.crypto)
 }

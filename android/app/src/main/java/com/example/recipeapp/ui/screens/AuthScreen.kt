@@ -1,0 +1,169 @@
+package com.example.recipeapp.ui.screens
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.recipeapp.models.Auth
+import com.example.recipeapp.viewmodels.ViewModelWrapper
+
+@Composable
+fun LoginScreen(
+    navController: NavController,
+    viewModels: ViewModelWrapper,
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(viewModels.logsScreen.alert) {
+        viewModels.logsScreen.alert?.let {
+            snackbarHostState.showSnackbar(it.message)
+            viewModels.logsScreen.clearAlert()
+        }
+    }
+
+    Scaffold(
+        content = {
+            LoginScreenContent(
+                navController = navController,
+                paddingValues = it,
+                viewModels = viewModels,
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    )
+}
+
+@Composable
+private fun LoginScreenContent(
+    navController: NavController,
+    paddingValues: PaddingValues,
+    viewModels: ViewModelWrapper,
+) {
+    var mode by remember { mutableStateOf("LOGIN") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+
+    fun navigateToMainScreen() {
+        navController.navigate("discover") {
+            popUpTo("login") { inclusive = true } // Remove login from stack
+        }
+    }
+
+    fun toggleMode() {
+        mode = if (mode == "LOGIN") "REGISTER" else "LOGIN"
+    }
+    
+    fun handleLogin() {
+        val auth = Auth(email, password)
+        if (mode == "LOGIN") {
+            viewModels.authViewModel.login(auth) { navigateToMainScreen() }
+        } else {
+            viewModels.authViewModel.register(auth) { navigateToMainScreen() }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (viewModels.authViewModel.checkAuthToken()) {
+            navigateToMainScreen()
+        }
+        viewModels.logsScreen.setLoading(false)
+    }
+
+    Column(modifier = Modifier.padding(paddingValues)) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 40.dp)
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            if (viewModels.authViewModel.loading) CircularProgressIndicator()
+            else {
+                Text(text = "Recipe App", style = MaterialTheme.typography.headlineLarge)
+                Spacer(modifier = Modifier.padding(vertical = 24.dp))
+                TextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(text = "Email") },
+                    value = email,
+                    onValueChange = { email = it },
+                )
+                Spacer(modifier = Modifier.padding(vertical = 8.dp))
+                TextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(text = "Password") },
+                    value = password,
+                    onValueChange = { password = it },
+                    singleLine = true,
+                    visualTransformation =
+                        if (passwordVisible) VisualTransformation.None
+                        else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                imageVector =
+                                    if (passwordVisible) Icons.Filled.VisibilityOff
+                                    else Icons.Filled.Visibility
+                                ,
+                                contentDescription =
+                                    if (passwordVisible) "Hide password"
+                                    else "Show password"
+                            )
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.padding(vertical = 16.dp))
+                Button(onClick = { handleLogin() }, modifier = Modifier
+                    .fillMaxWidth()
+                    .height(44.dp)) {
+                    if (viewModels.logsScreen.loading) {
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(text = if (mode == "LOGIN") "Login" else "Register")
+                    }
+                }
+                TextButton(onClick = { toggleMode() }) {
+                    Text(text = if (mode == "LOGIN") "Register" else "Login")
+                }
+            }
+        }
+    }
+}

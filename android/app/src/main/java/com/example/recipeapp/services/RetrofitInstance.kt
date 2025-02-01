@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitInstance {
     private val baseUrlSpoonacular = "https://api.spoonacular.com/"
-    private val baseUrlDb = "http://10.0.2.2:8080"
+    private val baseUrlDb = "https://recipeapp-api-amejacd4cjf2gqep.swedencentral-01.azurewebsites.net"
 
     private val retrofitSpoonacular = Retrofit.Builder()
         .baseUrl(baseUrlSpoonacular)
@@ -20,4 +20,5 @@ class RetrofitInstance {
     val recipeService: RecipeService = retrofitSpoonacular.create(RecipeService::class.java)
     val logsService: LogService = retrofitDatabase.create(LogService::class.java)
     val foodService: FoodService = retrofitDatabase.create(FoodService::class.java)
+    val authService: AuthService = retrofitDatabase.create(AuthService::class.java)
 }

@@ -1,17 +1,20 @@
 package com.example.recipeapp.repositories
 
-import android.util.Log
+import android.content.SharedPreferences
 import com.example.recipeapp.models.Food
 import com.example.recipeapp.services.RetrofitInstance
 import com.example.recipeapp.utils.Result
+import com.example.recipeapp.utils.SharedPreferencesManager
 
-class FoodRepository {
+class FoodRepository(private val encryptedPrefs: SharedPreferences) {
+    private val token: String? = SharedPreferencesManager.getAuthToken(encryptedPrefs)
+    private val userId: Int? = SharedPreferencesManager.getUser(encryptedPrefs)?.id
     private val retrofitInstance = RetrofitInstance()
     private val service = retrofitInstance.foodService
 
     suspend fun getFoods(page: Int, size: Int): Result<List<Food>> {
         return try {
-            val response = service.getFoods(page, size)
+            val response = service.getFoods(page, size, "Bearer $token")
             if (response.isSuccessful) {
                 val data = response.body()?.content
                 Result.success(data ?: emptyList())
@@ -24,7 +27,7 @@ class FoodRepository {
 
     suspend fun getFoodById(id: Int): Result<Food> {
         return try {
-            val response = service.getFoodById(id)
+            val response = service.getFoodById(id, "Bearer $token")
             if (response.isSuccessful && response.body() != null) Result.success(response.body())
             else Result.fail(response.code())
         } catch (e: Exception) {
@@ -34,7 +37,7 @@ class FoodRepository {
 
     suspend fun getFoodsByQuery(query: String): Result<List<Food>> {
         return try {
-            val response = service.getFoodByQuery(query)
+            val response = service.getFoodByQuery(query, "Bearer $token")
             if (response.isSuccessful && response.body() != null) Result.success(response.body())
             else Result.fail(response.code())
         } catch (e: Exception) {
@@ -44,7 +47,7 @@ class FoodRepository {
 
     suspend fun saveFood(food: Food): Result<Boolean> {
         return try {
-            val response = service.saveFood(food)
+            val response = service.saveFood(food, "Bearer $token")
             if (response.isSuccessful) Result.success(true)
             else Result.fail(response.code())
         } catch (e: Exception) {

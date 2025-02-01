@@ -20,4 +20,5 @@ data class ViewModelWrapper (
     val specials: TodaysSpecialsViewModel,
     val shopping: ShoppingListViewModel,
     val logsScreen: LogsScreenViewModel,
+    val authViewModel: AuthViewModel,
 )

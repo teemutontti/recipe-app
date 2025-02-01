@@ -13,6 +13,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -73,6 +74,13 @@ private fun DiscoverScreenContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())) {
             Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+
+                TextButton(onClick = {
+                    viewModels.authViewModel.logout()
+                    navController.navigate("login")
+                }) {
+                    Text(text = "Logout")
+                }
 
                 /* === SEARCH SECTION === */
                 CustomSearchBar(

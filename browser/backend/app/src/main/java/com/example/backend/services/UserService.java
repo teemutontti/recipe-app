@@ -83,7 +83,6 @@ public class UserService {
 
     public ResponseEntity<User> update(Long id, UserDto userDto) {
         try {
-            System.out.println("IN SERVICE");
             User existingUser = repository.findById(id).orElse(null);
 
             if (existingUser == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -110,7 +109,7 @@ public class UserService {
 
             if (SecurityUtil.checkPassword(password, existingUser.getPassword())) {
                 existingUser.setPassword(null);
-                System.out.println("EXISTING USER: " + existingUser);
+                existingUser.setEmail(email);
                 return new ResponseEntity<>(existingUser, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

@@ -16,10 +16,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.recipeapp.models.Food
+import kotlin.math.roundToInt
 
 @Composable
 fun FoodButton(food: Food, onClick: () -> Unit) {
-    val nutrientString = "${food.carbs.toInt()} / ${food.protein.toInt()} / ${food.fat.toInt()}"
+    val nutrientString = "${food.carbs.roundToInt()} / ${food.protein.roundToInt()} / ${food.fat.roundToInt()}"
 
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         TextButton(
@@ -31,7 +32,9 @@ fun FoodButton(food: Food, onClick: () -> Unit) {
             )
         ) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Column {
+                Column(
+                    modifier = Modifier.weight(0.8f)
+                ) {
                     Text(text = food.name, style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.padding(vertical = 2.dp))
                     Text(
@@ -42,7 +45,7 @@ fun FoodButton(food: Food, onClick: () -> Unit) {
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = "${food.calories} kcal",
+                        text = "${food.calories.roundToInt()} kcal",
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(Modifier.padding(vertical = 2.dp))

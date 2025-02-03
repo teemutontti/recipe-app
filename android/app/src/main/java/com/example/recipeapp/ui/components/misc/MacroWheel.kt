@@ -1,5 +1,6 @@
 package com.example.recipeapp.ui.components.misc
 
+import android.util.Log
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -41,6 +42,7 @@ fun MacroWheel(value: Number, max: Number, title: String, color: Color, size: St
     val backgroundColor = MaterialTheme.colorScheme.surface
 
     val circleSize = if (size == "large") elementSize else elementSize / 2
+    val innerCircleSize = if (size == "large") circleSize - 16.dp else circleSize - 12.dp
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -62,8 +64,7 @@ fun MacroWheel(value: Number, max: Number, title: String, color: Color, size: St
                 )
             }
             Box(modifier = Modifier
-                .width(if (size === "large") 165.dp else 80.dp)
-                .height(if (size === "large") 165.dp else 80.dp)
+                .size(innerCircleSize)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.background)
             )

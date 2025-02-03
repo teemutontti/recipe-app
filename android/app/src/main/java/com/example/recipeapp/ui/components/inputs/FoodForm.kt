@@ -51,16 +51,16 @@ fun FoodForm(viewModel: LogsScreenViewModel) {
                 name = name,
                 barcode = barcode,
                 servingSize = servingSize.toInt(),
-                calories = calories.toInt(),
+                calories = calories.toDouble(),
                 carbs = if (carbs.isNotEmpty()) {
-                    FormattingUtils.stringToFloat(carbs)
-                } else 0.0f,
+                    FormattingUtils.stringToDouble(carbs)
+                } else 0.0,
                 protein = if (protein.isNotEmpty()) {
-                    FormattingUtils.stringToFloat(protein)
-                } else 0.0f,
+                    FormattingUtils.stringToDouble(protein)
+                } else 0.0,
                 fat = if (fat.isNotEmpty()) {
-                    FormattingUtils.stringToFloat(fat)
-                } else 0.0f,
+                    FormattingUtils.stringToDouble(fat)
+                } else 0.0,
                 createdBy = viewModel.getUserId(),
                 editedBy = viewModel.getUserId(),
             )

@@ -1,0 +1,186 @@
+package com.example.backend.unit.controller;
+
+import com.example.backend.config.SecurityConfig;
+import com.example.backend.controllers.FoodController;
+import com.example.backend.controllers.admin.AdminFoodController;
+import com.example.backend.entities.Food;
+import com.example.backend.services.FoodService;
+import com.example.backend.utils.JwtTokenUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.JOSEException;
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(AdminFoodController.class)
+@ActiveProfiles("test")
+@Import(SecurityConfig.class)
+class AdminFoodControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private FoodService service;
+
+    @MockBean
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private Food testFood;
+    private final String baseUrl = "/api/admin/foods";
+
+    @BeforeEach
+    public void setup() throws JOSEException {
+        testFood = new Food(1, "Kanan rintafilee", "1234567890", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "2025-01-01", "2025-01-01");
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testGetAll_AsAdmin_ReturnsFoods() throws Exception {
+        // Arrange
+        Food food1 = new Food(1, "Kana", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+        Food food2 = new Food(2, "Riisi", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+
+        List<Food> foods = Arrays.asList(food1, food2);
+        Pageable pageable = PageRequest.of(1, 10);
+        Page<Food> mockPage = new PageImpl<>(foods, pageable, foods.size());
+
+        // Mock service layer
+        when(service.getAll(any(Integer.class), any(Integer.class))).thenReturn(new ResponseEntity<>(mockPage, HttpStatus.OK));
+
+        // Act and Assert
+        mockMvc.perform(get(baseUrl)
+                .param("page", "0")
+                .param("size", "10")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()", CoreMatchers.is(2)))
+                .andExpect(jsonPath("$.content[0].name", CoreMatchers.is("Kana")))
+                .andExpect(jsonPath("$.content[1].name", CoreMatchers.is("Riisi")));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void testGetAll_AsUser_ReturnForbidden() throws Exception {
+        mockMvc.perform(get(baseUrl)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    void testGetAll_AsNobody_ReturnForbidden() throws Exception {
+        mockMvc.perform(get(baseUrl)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testUpdateFood_AllFields_ReturnFood() throws Exception {
+        testFood.setName("New name");
+        testFood.setCalories(150.0);
+        testFood.setBarcode("1536473434");
+        testFood.setServingSize(400);
+        testFood.setCarbs(128.0);
+        testFood.setProtein(24.0);
+        testFood.setFat(45.0);
+
+        // Use eq(1L) to match the exact ID and any(Food.class) to allow any User instance.
+        when(service.getById(eq(1L))).thenReturn(new ResponseEntity<>(testFood, HttpStatus.OK));
+        when(service.update(eq(1L), any(Food.class))).thenReturn(new ResponseEntity<>(testFood, HttpStatus.OK));
+
+        mockMvc.perform(patch(baseUrl + "/{id}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testFood)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", CoreMatchers.is("New name")))
+                .andExpect(jsonPath("$.calories", CoreMatchers.is(150.0)))
+                .andExpect(jsonPath("$.barcode", CoreMatchers.is("1536473434")))
+                .andExpect(jsonPath("$.servingSize", CoreMatchers.is(400)))
+                .andExpect(jsonPath("$.carbs", CoreMatchers.is(128.0)))
+                .andExpect(jsonPath("$.protein", CoreMatchers.is(24.0)))
+                .andExpect(jsonPath("$.fat", CoreMatchers.is(45.0)));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testUpdateFood_InvalidObject_ReturnsNotFound() throws Exception {
+        testFood.setCalories(-100.0);
+
+        mockMvc.perform(patch(baseUrl + "/{id}", 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testFood)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testUpdateFood_InvalidId_ReturnsNotFound() throws Exception {
+        when(service.getById(eq(99L))).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
+        mockMvc.perform(patch(baseUrl + "/{id}", 99)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testFood)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void testUpdateFood_AsUser_ReturnForbidden() throws Exception {
+        mockMvc.perform(patch(baseUrl + "/{id}", 99)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    void testUpdateFood_AsNobody_ReturnForbidden() throws Exception {
+        mockMvc.perform(patch(baseUrl + "/{id}", 99)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void testDeleteFood_AsAdmin_ReturnOk() throws Exception {
+        when(service.delete(1L)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+        MvcResult result = mockMvc.perform(delete(baseUrl + "/{id}", 1))
+                .andExpect(status().isOk()).andReturn();
+
+        assertTrue(result.getResponse().getContentAsString().isEmpty());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void testDeleteFood_AsUser_ReturnForbidden() throws Exception {
+        mockMvc.perform(delete(baseUrl + "/{id}", 99)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    void testDeleteFood_AsNobody_ReturnForbidden() throws Exception {
+        mockMvc.perform(delete(baseUrl + "/{id}", 99)).andExpect(status().isForbidden());
+    }
+}

@@ -3,6 +3,7 @@ package com.example.backend.unit.service;
 import com.example.backend.config.RsaKeyConfig;
 import com.example.backend.config.SecurityConfig;
 import com.example.backend.dto.UserDto;
+import com.example.backend.entities.Log;
 import com.example.backend.entities.User;
 import com.example.backend.exceptions.EncryptionKeyException;
 import com.example.backend.exceptions.FailedCryptionException;
@@ -17,6 +18,10 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
@@ -63,6 +68,7 @@ public class UserServiceTest {
     public void testFindById_ReturnsUser() throws FailedCryptionException, EncryptionKeyException {
         // The service expects the email to be encrypted
         testUser.setEmail(SecurityUtil.encrypt(testUser.getEmail()));
+
         when(repository.findById(1L)).thenReturn(Optional.ofNullable(testUser.toUser()));
 
         ResponseEntity<User> response = service.getById(1L);
@@ -80,18 +86,26 @@ public class UserServiceTest {
         User user1 = new User(1, email, "password");
         User user2 = new User(2, email, "password");
 
-        List<User> users = new ArrayList<>();
-        users.add(user1);
-        users.add(user2);
+        List<User> users = List.of(user1, user2);
 
-        when(repository.findAll()).thenReturn(users);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<User> mockPage = new PageImpl<>(users, pageable, users.size());
 
-        ResponseEntity<List<User>> response = service.getAll();
+        when(repository.findAll(pageable)).thenReturn(mockPage);
+
+        ResponseEntity<Page<User>> response = service.getAll(0, 10);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody().size());
-        assertNull(response.getBody().get(0).getPassword());
-        assertNull(response.getBody().get(1).getPassword());
+
+        Page<User> page = response.getBody();
+        assertNotNull(page);
+        assertEquals(2, page.getTotalElements());
+
+        List<User> resUsers = page.getContent();
+
+        assertFalse(resUsers.isEmpty());
+        assertNull(resUsers.get(0).getPassword());
+        assertNull(resUsers.get(1).getPassword());
     }
 
     @Test
@@ -148,8 +162,7 @@ public class UserServiceTest {
     @Test
     public void testIsEmailTaken_ReturnOk() throws Exception {
         testUser.setEmail(SecurityUtil.encrypt(testUser.getEmail()));
-        when(repository.findByEmail(anyString()))
-                .thenReturn(Optional.of(testUser.toUser()));
+        when(repository.findByEmail(anyString())).thenReturn(Optional.of(testUser.toUser()));
 
         ResponseEntity<Boolean> response = service.isEmailTaken("test@gmail.com");
 

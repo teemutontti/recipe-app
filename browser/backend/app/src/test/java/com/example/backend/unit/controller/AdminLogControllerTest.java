@@ -1,12 +1,10 @@
 package com.example.backend.unit.controller;
 
 import com.example.backend.config.SecurityConfig;
-import com.example.backend.controllers.LogController;
+import com.example.backend.controllers.admin.AdminLogController;
 import com.example.backend.entities.Log;
-import com.example.backend.entities.User;
 import com.example.backend.services.LogService;
 import com.example.backend.utils.JwtTokenUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,31 +17,23 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(LogController.class)
+@WebMvcTest(AdminLogController.class)
 @ActiveProfiles("test")
 @Import(SecurityConfig.class)
-public class LogControllerRoleTest {
+public class AdminLogControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -54,15 +44,21 @@ public class LogControllerRoleTest {
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
 
+    private Log testLog;
+    private final String baseUrl = "/api/admin/logs";
+
+    @BeforeEach
+    public void setup() {
+        testLog = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(0,0,0), "BREAKFAST", 1, 1, 24.0);
+    }
+
     @Test
     @WithMockUser(roles = "ADMIN")
     public void testGetAll_AsAdmin_ReturnLogs() throws Exception {
         Log log1 = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "BREAKFAST", 1, 1, 24.0);
         Log log2 = new Log(2, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "LUNCH", 1, 2, 120.0);
 
-        List<Log> logs = new ArrayList<>();
-        logs.add(log1);
-        logs.add(log2);
+        List<Log> logs = List.of(log1, log2);
 
         Pageable pageable = PageRequest.of(1, 10);
         Page<Log> mockPage = new PageImpl<>(logs, pageable, logs.size());
@@ -71,21 +67,74 @@ public class LogControllerRoleTest {
         when(service.getAll(any(Integer.class), any(Integer.class)))
                 .thenReturn(new ResponseEntity<>(mockPage, HttpStatus.OK));
 
-        mockMvc.perform(get("/api/logs"))
+        mockMvc.perform(get(baseUrl))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", CoreMatchers.is(2)))
-                .andExpect(jsonPath("$[0].meal", CoreMatchers.is("BREAKFAST")))
-                .andExpect(jsonPath("$[1].meal", CoreMatchers.is("LUNCH")));
+                .andExpect(jsonPath("$.content.length()", CoreMatchers.is(2)))
+                .andExpect(jsonPath("$.content[0].meal", CoreMatchers.is("BREAKFAST")))
+                .andExpect(jsonPath("$.content[1].meal", CoreMatchers.is("LUNCH")));
     }
 
     @Test
     @WithMockUser(roles = "USER")
     public void testGetAll_AsUser_ReturnUnauthorized() throws Exception {
-        mockMvc.perform(get("/api/logs")).andExpect(status().isForbidden());
+        mockMvc.perform(get(baseUrl)).andExpect(status().isForbidden());
     }
 
     @Test
     public void testGetAll_AsNobody_ReturnUnauthorized() throws Exception {
-        mockMvc.perform(get("/api/logs")).andExpect(status().isForbidden());
+        mockMvc.perform(get(baseUrl)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void testGetById_AsAdmin_ReturnOk() throws Exception {
+        when(service.getById(1L)).thenReturn(new ResponseEntity<>(testLog, HttpStatus.OK));
+
+        mockMvc.perform(get(baseUrl + "/{id}", 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.amount", CoreMatchers.is(testLog.getAmount())))
+                .andExpect(jsonPath("$.meal", CoreMatchers.is(testLog.getMeal())));
+
+        verify(service, times(1)).getById(1L);
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    public void testGetById_AsUser_ReturnForbidden() throws Exception {
+        mockMvc.perform(get(baseUrl + "/{id}", 1)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testGetById_AsNobody_ReturnForbidden() throws Exception {
+        mockMvc.perform(get(baseUrl + "/{id}", 1)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    public void testGetByUserId_AsAdmin_ReturnOk() throws Exception {
+        Log log1 = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "BREAKFAST", 1, 1, 24.0);
+        Log log2 = new Log(2, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "LUNCH", 1, 2, 120.0);
+
+        List<Log> logs = List.of(log1, log2);
+
+        when(service.getLogsByUserId(1)).thenReturn(new ResponseEntity<>(logs, HttpStatus.OK));
+
+        mockMvc.perform(get(baseUrl + "/by-user/{id}", 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].amount").value(24.0))
+                .andExpect(jsonPath("$[1].meal").value("LUNCH"));
+
+        verify(service, times(1)).getLogsByUserId(1);
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    public void testGetByUserId_AsUser_ReturnForbidden() throws Exception {
+        mockMvc.perform(get(baseUrl + "/by-user/{id}", 1)).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testGetByUserId_AsNobody_ReturnForbidden() throws Exception {
+        mockMvc.perform(get(baseUrl + "/by-user/{id}", 1)).andExpect(status().isForbidden());
     }
 }

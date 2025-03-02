@@ -85,4 +85,16 @@ class UserRepositoryTest {
         assertFalse(found.isPresent());
         assertEquals(0, repository.findAll().size());
     }
+
+    @Test
+    public void testFindByEmail_ReturnsUser() {
+        User saved = repository.save(testUser);
+
+        User found = repository.findByEmail(saved.getEmail()).get();
+
+        assertNotNull(found);
+        assertTrue(found.getId() > 0);
+        assertEquals("test@gmail.com", found.getEmail());
+        assertEquals("password", found.getPassword());
+    }
 }

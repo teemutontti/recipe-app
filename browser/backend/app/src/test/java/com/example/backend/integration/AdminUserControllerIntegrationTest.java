@@ -1,6 +1,7 @@
 package com.example.backend.integration;
 
 import com.example.backend.dto.UserDto;
+import com.example.backend.entities.Role;
 import com.example.backend.repositories.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
@@ -35,7 +36,7 @@ class AdminUserControllerIntegrationTest {
 
     @BeforeEach
     public void setup() {
-        testUser = new UserDto(1, "test@gmail.com", "pA55word!");
+        testUser = new UserDto(1, "test@gmail.com", "pA55word!", Role.ROLE_USER);
         userRepository.deleteAll();
     }
 

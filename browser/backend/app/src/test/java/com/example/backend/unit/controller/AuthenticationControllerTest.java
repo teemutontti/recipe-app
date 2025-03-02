@@ -4,6 +4,7 @@ import com.example.backend.config.SecurityConfig;
 import com.example.backend.controllers.AuthenticationController;
 import com.example.backend.dto.AuthRequest;
 import com.example.backend.dto.UserDto;
+import com.example.backend.entities.Role;
 import com.example.backend.services.UserService;
 import com.example.backend.utils.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,7 +47,7 @@ public class AuthenticationControllerTest {
 
     @BeforeEach
     public void setup() {
-        testUser = new UserDto(null, "test@gmail.com", "pA55word!");
+        testUser = new UserDto(null, "test@gmail.com", "pA55word!", Role.ROLE_USER);
     }
 
     @Test
@@ -55,7 +56,7 @@ public class AuthenticationControllerTest {
 
         when(service.isEmailTaken(anyString())).thenReturn(new ResponseEntity<>(false, HttpStatus.NOT_FOUND));
         when(service.create(any(UserDto.class))).thenReturn(new ResponseEntity<>(testUser.toUser(), HttpStatus.CREATED));
-        when(jwtTokenUtil.generateToken(anyString())).thenReturn("mock-jwt-token");
+        when(jwtTokenUtil.generateToken(anyString(), any(Role.class))).thenReturn("mock-jwt-token");
 
         mockMvc.perform(post("/api/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -71,7 +72,7 @@ public class AuthenticationControllerTest {
         testUser.setId(28); // Mock id generation
 
         when(service.login(anyString(), anyString())).thenReturn(new ResponseEntity<>(testUser.toUser(), HttpStatus.OK));
-        when(jwtTokenUtil.generateToken(anyString())).thenReturn("mock-jwt-token");
+        when(jwtTokenUtil.generateToken(anyString(), any(Role.class))).thenReturn("mock-jwt-token");
 
         mockMvc.perform(post("/api/login")
                 .contentType(MediaType.APPLICATION_JSON)

@@ -3,6 +3,7 @@ package com.example.backend.unit.controller;
 import com.example.backend.config.SecurityConfig;
 import com.example.backend.controllers.admin.AdminUserController;
 import com.example.backend.dto.UserDto;
+import com.example.backend.entities.Role;
 import com.example.backend.entities.User;
 import com.example.backend.services.UserService;
 import com.example.backend.utils.JwtTokenUtil;
@@ -61,14 +62,14 @@ public class AdminUserControllerTest {
 
     @BeforeEach
     public void setup() {
-        testUser = new UserDto(1,"test@gmail.com", "pA55word!");
+        testUser = new UserDto(1,"test@gmail.com", "pA55word!", Role.ROLE_USER);
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     public void testGetAll_AsAdmin_ReturnLogs() throws Exception {
-        User user1 = new User(1, "maija@gmail.com", "password");
-        User user2 = new User(2, "essi@gmail.com", "qwerty");
+        User user1 = new User(1, "maija@gmail.com", "password", Role.ROLE_USER);
+        User user2 = new User(2, "essi@gmail.com", "qwerty", Role.ROLE_USER);
 
         List<User> users = List.of(user1, user2);
 

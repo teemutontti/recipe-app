@@ -3,3 +3,6 @@
 
 # Ignore Gradle build output directory
 build
+
+# Ignore 02-insert with possible sensitive hashes and encrypted values
+02-insert.sql

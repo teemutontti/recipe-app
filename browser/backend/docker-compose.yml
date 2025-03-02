@@ -1,0 +1,27 @@
+version: '3.8'
+
+# DISCLAIMER:
+# Includes exposed root password, because this is only
+# used for local testing and running the database.
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: app
+    ports:
+      - "3306:3306"
+    networks:
+      - backend-network
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./sql/init:/docker-entrypoint-initdb.d
+
+networks:
+  backend-network:
+    driver: bridge
+
+volumes:
+  mysql-data:

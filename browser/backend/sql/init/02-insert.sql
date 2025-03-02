@@ -1,9 +1,9 @@
 USE app;
 
 -- Insert users
-INSERT INTO users (id, email, password) VALUES
+INSERT INTO users (id, email, password, role) VALUES
     -- DISCLAIMER: Replace these values with the encrypted and hashed versions of the credentials
-    (1, 'EMAIL_HERE', 'PASSWORD_HERE');
+    (1, 'ENCRYPTED_EMAIL_HERE', 'PASSWORD_HASH_HERE', 'ROLE_ADMIN');
 
 -- Insert foods
 INSERT INTO foods (name, calories, carbs, fat, protein, barcode, serving_size, created_by, edited_by) VALUES

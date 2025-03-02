@@ -3,7 +3,11 @@ package com.example.backend.utils;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+
+import com.example.backend.entities.Role;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -24,9 +28,12 @@ public class JwtTokenUtil {
         this.publicKey = publicKey;
     }
 
-    public String generateToken(String username) throws JOSEException {
+    public String generateToken(String username, Role role) throws JOSEException {
+        System.out.println("Generating token with role: " + role.toString());
+
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .subject(username)
+                .claim("roles", List.of(role.toString()))
                 .issueTime(new Date())
                 .expirationTime(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .build();
@@ -34,7 +41,6 @@ public class JwtTokenUtil {
         RSASSASigner signer = new RSASSASigner(privateKey);
         JWSHeader header = new JWSHeader(JWSAlgorithm.RS256);
         SignedJWT signedJWT = new SignedJWT(header, claimsSet);
-
 
         signedJWT.sign(signer);
 
@@ -58,5 +64,14 @@ public class JwtTokenUtil {
     public String extractUsername(String token) throws ParseException {
         SignedJWT signedJWT = SignedJWT.parse(token);
         return signedJWT.getJWTClaimsSet().getSubject();
+    }
+
+    public List<String> extractRole(String token) throws ParseException {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            return (List<String>) signedJWT.getJWTClaimsSet().getClaim("roles");
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 }

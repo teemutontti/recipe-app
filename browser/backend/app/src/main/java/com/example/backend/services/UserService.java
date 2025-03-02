@@ -1,6 +1,7 @@
 package com.example.backend.services;
 
 import com.example.backend.dto.UserDto;
+import com.example.backend.entities.Role;
 import com.example.backend.exceptions.EncryptionKeyException;
 import com.example.backend.exceptions.FailedCryptionException;
 import com.example.backend.exceptions.FailedDecryptionException;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 import com.example.backend.entities.User;
 import com.example.backend.repositories.UserRepository;
 import com.example.backend.utils.SecurityUtil;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -30,7 +33,7 @@ public class UserService {
             String encryptedEmail = SecurityUtil.encrypt(userDto.getEmail());
             String hashedPassword = SecurityUtil.hashPassword(userDto.getPassword());
 
-            User user = new User(null, encryptedEmail, hashedPassword);
+            User user = new User(null, encryptedEmail, hashedPassword, Role.ROLE_USER);
             User data = repository.save(user);
 
             // Plain text email for the return object
@@ -62,6 +65,7 @@ public class UserService {
 
             return new ResponseEntity<>(decryptedUsers, HttpStatus.OK);
         } catch (Exception e) {
+            System.out.println(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

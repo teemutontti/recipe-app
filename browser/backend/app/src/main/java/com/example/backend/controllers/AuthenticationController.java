@@ -3,6 +3,7 @@ package com.example.backend.controllers;
 import com.example.backend.dto.AuthRequest;
 import com.example.backend.dto.AuthResponse;
 import com.example.backend.dto.UserDto;
+import com.example.backend.entities.Role;
 import com.example.backend.entities.User;
 import com.example.backend.services.UserService;
 import com.example.backend.utils.JwtTokenUtil;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -32,13 +35,13 @@ public class AuthenticationController {
         ResponseEntity<Boolean> response = userService.isEmailTaken(authRequest.getEmail());
         if (response.getStatusCode() == HttpStatus.NOT_FOUND) {
 
-            UserDto newUser = new UserDto(null, authRequest.getEmail(), authRequest.getPassword());
+            UserDto newUser = new UserDto(null, authRequest.getEmail(), authRequest.getPassword(), Role.ROLE_USER);
             ResponseEntity<User> created = userService.create(newUser);
 
             if (created.getStatusCode() == HttpStatus.CREATED) {
                 User user = created.getBody();
                 if (user != null) {
-                    String token = jwtTokenUtil.generateToken(authRequest.getEmail());
+                    String token = jwtTokenUtil.generateToken(authRequest.getEmail(), Role.ROLE_USER);
                     AuthResponse authResponse = new AuthResponse(token, user.getId(), user.getEmail());
                     return new ResponseEntity<>(authResponse, HttpStatus.CREATED);
                 }
@@ -54,7 +57,7 @@ public class AuthenticationController {
 
             User user = response.getBody();
             if (user != null) {
-                String token = jwtTokenUtil.generateToken(authRequest.getEmail());
+                String token = jwtTokenUtil.generateToken(authRequest.getEmail(), user.getRole());
                 AuthResponse authResponse = new AuthResponse(token, user.getId(), user.getEmail());
                 return new ResponseEntity<>(authResponse, HttpStatus.OK);
             }

@@ -1,8 +1,9 @@
 package com.example.backend.unit.controller;
 
 import com.example.backend.config.SecurityConfig;
-import com.example.backend.controllers.UserController;
+import com.example.backend.controllers.admin.AdminUserController;
 import com.example.backend.dto.UserDto;
+import com.example.backend.entities.Food;
 import com.example.backend.entities.User;
 import com.example.backend.services.UserService;
 import com.example.backend.utils.JwtTokenUtil;
@@ -16,10 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,15 +34,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserController.class)
+@WebMvcTest(AdminUserController.class)
 @ActiveProfiles("test")
 @Import(SecurityConfig.class)
-public class UserControllerRoleTest {
+public class AdminUserControllerRoleTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -93,7 +96,12 @@ public class UserControllerRoleTest {
         users.add(user1);
         users.add(user2);
 
-        when(service.getAll()).thenReturn(new ResponseEntity<>(users, HttpStatus.OK));
+        Pageable pageable = PageRequest.of(1, 10);
+        Page<User> mockPage = new PageImpl<>(users, pageable, users.size());
+
+        // Mock service layer
+        when(service.getAll(any(Integer.class), any(Integer.class)))
+                .thenReturn(new ResponseEntity<>(mockPage, HttpStatus.OK));
 
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())

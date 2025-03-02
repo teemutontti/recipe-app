@@ -8,7 +8,6 @@ import com.example.backend.services.UserService;
 import com.example.backend.utils.JwtTokenUtil;
 import com.nimbusds.jose.JOSEException;
 import jakarta.validation.Valid;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

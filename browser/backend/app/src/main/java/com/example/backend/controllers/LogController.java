@@ -2,7 +2,6 @@ package com.example.backend.controllers;
 
 import com.example.backend.services.LogService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.backend.entities.Log;
@@ -13,22 +12,15 @@ import java.util.List;
 @RequestMapping("/api/logs")
 public class LogController {
 
-    @Autowired
-    protected LogService service;
+    protected final LogService service;
+
+    public LogController(LogService service) {
+        this.service = service;
+    }
 
     @PostMapping
     public ResponseEntity<Log> create(@Valid @RequestBody Log entity) {
         return service.create(entity);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<Log>> getAll() {
-        return service.getAll();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Log> getById(@PathVariable("id") Long id) {
-        return service.getById(id);
     }
 
     @PatchMapping("/{id}")
@@ -45,10 +37,5 @@ public class LogController {
     public ResponseEntity<List<Log>> getLogsByDateAndUser(@RequestParam String date, @RequestParam Integer userId) {
         LocalDate parsedDate = LocalDate.parse(date);
         return service.getLogsByDateAndUser(parsedDate, userId);
-    }
-
-    @GetMapping("/by-user")
-    public ResponseEntity<List<Log>> getLogsByUserId(@PathVariable("id") Integer id) {
-        return service.getLogsByUserId(id);
     }
 }

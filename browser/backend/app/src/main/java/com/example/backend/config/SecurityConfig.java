@@ -38,12 +38,8 @@ public class SecurityConfig {
                         .requestMatchers( "/api/register").permitAll()
                         .requestMatchers( "/api/login").permitAll()
 
-                        // Securing getAllLogs
-                        .requestMatchers(HttpMethod.GET, "/api/logs").hasRole("ADMIN")
-
-                        // Securing user endpoints
-                        .requestMatchers("/api/users").hasRole("ADMIN")
-                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        // Securing admin endpoints
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                         // Authenticating all other endpoints
                         .anyRequest().authenticated()

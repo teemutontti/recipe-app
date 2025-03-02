@@ -3,6 +3,7 @@ package com.example.backend.unit.controller;
 import com.example.backend.config.SecurityConfig;
 import com.example.backend.controllers.LogController;
 import com.example.backend.entities.Log;
+import com.example.backend.entities.User;
 import com.example.backend.services.LogService;
 import com.example.backend.utils.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -59,7 +64,12 @@ public class LogControllerRoleTest {
         logs.add(log1);
         logs.add(log2);
 
-        when(service.getAll()).thenReturn(new ResponseEntity<>(logs, HttpStatus.OK));
+        Pageable pageable = PageRequest.of(1, 10);
+        Page<Log> mockPage = new PageImpl<>(logs, pageable, logs.size());
+
+        // Mock service layer
+        when(service.getAll(any(Integer.class), any(Integer.class)))
+                .thenReturn(new ResponseEntity<>(mockPage, HttpStatus.OK));
 
         mockMvc.perform(get("/api/logs"))
                 .andExpect(status().isOk())

@@ -99,3 +99,19 @@ Run unit and integration tests using:
 ```
 ./gradlew test
 ```
+
+## API Documentation
+
+This project uses **Swagger UI** for API documentation.
+
+1. **Run the Application**:
+    ```
+    ./gralew bootRun
+    ```
+2. **Access Swagger UI**:
+    After running the application, open your browser and go to:
+    ```
+    http://localhost:8080/api/swagger-ui/index.html
+    ```
+3. **Authentication**:
+    If the endpoints require JWT authentication (response code 403 usually indicates this), click the **Authorize** button in the top-right corner of the Swagger UI and enter you JWT token.

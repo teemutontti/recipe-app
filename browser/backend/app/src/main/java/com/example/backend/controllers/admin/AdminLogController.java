@@ -2,11 +2,15 @@ package com.example.backend.controllers.admin;
 
 import com.example.backend.entities.Log;
 import com.example.backend.services.LogService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+@Tag(name = "Admin Logs Controller")
 @RestController
 @RequestMapping("/api/admin/logs")
 public class AdminLogController {
@@ -17,6 +21,8 @@ public class AdminLogController {
         this.service = service;
     }
 
+    @Operation(summary = "Get all logs")
+    @SecurityRequirement(name = "bearerAuth", scopes = { "admin" })
     @GetMapping
     public ResponseEntity<Page<Log>> getAll(
             @RequestParam(name = "page", defaultValue = "0") Integer page,
@@ -25,11 +31,15 @@ public class AdminLogController {
         return service.getAll(page, size);
     }
 
+    @Operation(summary = "Get log by id")
+    @SecurityRequirement(name = "bearerAuth", scopes = { "admin" })
     @GetMapping("/{id}")
     public ResponseEntity<Log> getById(@PathVariable("id") Long id) {
         return service.getById(id);
     }
 
+    @Operation(summary = "Get logs by user id")
+    @SecurityRequirement(name = "bearerAuth", scopes = { "admin" })
     @GetMapping("/by-user/{id}")
     public ResponseEntity<List<Log>> getLogsByUserId(@PathVariable("id") Integer id) {
         return service.getLogsByUserId(id);

@@ -27,8 +27,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtFilter(jwtTokenUtil), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         // Allowing register and login generation
-                        .requestMatchers( "/api/register").permitAll()
-                        .requestMatchers( "/api/login").permitAll()
+                        .requestMatchers( "/api/register", "/api/login", "/api/docs/**", "/api/swagger-ui/**").permitAll()
 
                         // Securing admin endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

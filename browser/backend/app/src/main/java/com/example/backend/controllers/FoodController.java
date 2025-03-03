@@ -1,12 +1,16 @@
 package com.example.backend.controllers;
 
 import com.example.backend.services.FoodService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.backend.entities.Food;
 import java.util.List;
 
+@Tag(name = "Foods Controller")
 @RestController
 @RequestMapping("/api/foods")
 public class FoodController {
@@ -17,16 +21,22 @@ public class FoodController {
         this.service = service;
     }
 
+    @Operation(summary = "Create a food")
+    @SecurityRequirement(name = "bearerAuth", scopes = { "user" })
     @PostMapping
     public ResponseEntity<Food> create(@Valid @RequestBody Food entity) {
         return service.create(entity);
     }
 
+    @Operation(summary = "Get food by id")
+    @SecurityRequirement(name = "bearerAuth", scopes = { "user" })
     @GetMapping("/{id}")
     public ResponseEntity<Food> getById(@PathVariable("id") Long id) {
         return service.getById(id);
     }
 
+    @Operation(summary = "Search for foods by name")
+    @SecurityRequirement(name = "bearerAuth", scopes = { "user" })
     @GetMapping("/query")
     public ResponseEntity<List<Food>> getFoodsByQuery(@RequestParam String query) {
         return service.getFoodsByQuery(query);

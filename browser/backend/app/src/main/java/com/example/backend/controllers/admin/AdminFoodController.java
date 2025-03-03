@@ -2,12 +2,16 @@ package com.example.backend.controllers.admin;
 
 import com.example.backend.entities.Food;
 import com.example.backend.services.FoodService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Admin Foods Controller")
 @RestController
 @RequestMapping("/api/admin/foods")
 public class AdminFoodController {
@@ -18,6 +22,8 @@ public class AdminFoodController {
         this.service = service;
     }
 
+    @Operation(summary = "Get all foods")
+    @SecurityRequirement(name = "bearerAuth", scopes = { "admin" })
     @GetMapping
     public ResponseEntity<Page<Food>> getAll(
             @RequestParam(name = "page", defaultValue = "0") Integer page,
@@ -26,6 +32,8 @@ public class AdminFoodController {
         return service.getAll(page, size);
     }
 
+    @Operation(summary = "Update food")
+    @SecurityRequirement(name = "bearerAuth", scopes = { "admin" })
     @PatchMapping("/{id}")
     public ResponseEntity<Food> update(@PathVariable("id") Long id, @Valid @RequestBody Food updated) {
         ResponseEntity<Food> response = service.getById(id);
@@ -54,6 +62,8 @@ public class AdminFoodController {
         return service.update(id, existingFood);
     }
 
+    @Operation(summary = "Delete food")
+    @SecurityRequirement(name = "bearerAuth", scopes = { "admin" })
     @DeleteMapping("/{id}")
     public ResponseEntity<Food> delete(@PathVariable("id") Long id) {
         return service.delete(id);

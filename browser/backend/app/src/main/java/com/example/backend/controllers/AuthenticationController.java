@@ -8,6 +8,8 @@ import com.example.backend.entities.User;
 import com.example.backend.services.UserService;
 import com.example.backend.utils.JwtTokenUtil;
 import com.nimbusds.jose.JOSEException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
+@Tag(name = "Authentication Controller")
 @RestController
 @RequestMapping("/api")
 public class AuthenticationController {
@@ -30,6 +31,7 @@ public class AuthenticationController {
         this.userService = userService;
     }
 
+    @Operation(summary = "Register to the application")
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> signIn(@Valid @RequestBody AuthRequest authRequest) throws JOSEException {
         ResponseEntity<Boolean> response = userService.isEmailTaken(authRequest.getEmail());
@@ -50,6 +52,7 @@ public class AuthenticationController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @Operation(summary = "Login to the application")
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) throws JOSEException {
         ResponseEntity<User> response = userService.login(authRequest.getEmail(), authRequest.getPassword());

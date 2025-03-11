@@ -1,5 +1,6 @@
 package com.example.backend.dto;
 
+import com.example.backend.entities.Role;
 import com.example.backend.entities.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -23,7 +24,9 @@ public class UserDto {
             message = "Password must have at least one uppercase letter, one lowercase letter, one digit, and one special character")
     private String password;
 
+    private Role role;
+
     public User toUser() {
-        return new User(this.id, this.email, this.password);
+        return new User(this.id, this.email, this.password, this.role);
     }
 }

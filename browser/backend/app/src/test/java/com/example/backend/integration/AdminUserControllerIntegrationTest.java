@@ -1,7 +1,7 @@
 package com.example.backend.integration;
 
 import com.example.backend.dto.UserDto;
-import com.example.backend.entities.User;
+import com.example.backend.entities.Role;
 import com.example.backend.repositories.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
@@ -14,15 +14,13 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class UserControllerIntegrationTest {
+class AdminUserControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -34,20 +32,21 @@ class UserControllerIntegrationTest {
     private ObjectMapper objectMapper;
 
     private UserDto testUser;
+    private final String baseUrl = "/api/admin/users";
 
     @BeforeEach
     public void setup() {
-        testUser = new UserDto(1, "test@gmail.com", "pA55word!");
+        testUser = new UserDto(1, "test@gmail.com", "pA55word!", Role.ROLE_USER);
         userRepository.deleteAll();
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     void testGetAll_asAdmin_ReturnEmptyList() throws Exception {
-        mockMvc.perform(get("/api/users"))
+        mockMvc.perform(get(baseUrl))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.size()", CoreMatchers.is(0)));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content.length()").value(0));
     }
 }

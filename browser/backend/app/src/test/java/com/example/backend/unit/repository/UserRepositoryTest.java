@@ -1,5 +1,6 @@
 package com.example.backend.unit.repository;
 
+import com.example.backend.entities.Role;
 import com.example.backend.entities.User;
 import com.example.backend.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +23,7 @@ class UserRepositoryTest {
 
     @BeforeEach
     public void setup() {
-        testUser = new User(1, "test@gmail.com", "password");
+        testUser = new User(1, "test@gmail.com", "password", Role.ROLE_USER);
         repository.deleteAll();
     }
 
@@ -49,8 +50,8 @@ class UserRepositoryTest {
 
     @Test
     public void testFindAll_ReturnsMultipleUsers() {
-        User user1 = new User(null, "maija.meikalainen@gmail.com", "password");
-        User user2 = new User(null, "essi.esimerkki@gmail.com", "qwerty");
+        User user1 = new User(null, "maija.meikalainen@gmail.com", "password", Role.ROLE_USER);
+        User user2 = new User(null, "essi.esimerkki@gmail.com", "qwerty", Role.ROLE_USER);
 
         repository.save(user1);
         repository.save(user2);
@@ -84,5 +85,17 @@ class UserRepositoryTest {
 
         assertFalse(found.isPresent());
         assertEquals(0, repository.findAll().size());
+    }
+
+    @Test
+    public void testFindByEmail_ReturnsUser() {
+        User saved = repository.save(testUser);
+
+        User found = repository.findByEmail(saved.getEmail()).get();
+
+        assertNotNull(found);
+        assertTrue(found.getId() > 0);
+        assertEquals("test@gmail.com", found.getEmail());
+        assertEquals("password", found.getPassword());
     }
 }

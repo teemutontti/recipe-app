@@ -9,7 +9,7 @@ import com.example.recipeapp.models.Recipe
 
 object ConversionUtils {
     val emptyRecipe = Recipe(-1, "", "", 1, emptyList(), emptyList())
-    val emptyFood = Food("","",0,0,0f,0f,0f,-1,-1)
+    val emptyFood = Food("","",0,0.0,0.0,0.0,0.0,-1,-1)
 
     /**
      * Converts a [PersonalRecipe] object to a [Recipe] object.

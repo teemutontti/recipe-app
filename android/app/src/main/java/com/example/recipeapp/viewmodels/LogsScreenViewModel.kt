@@ -9,6 +9,7 @@ import com.example.recipeapp.models.FoodLog
 import com.example.recipeapp.models.Log
 import com.example.recipeapp.models.MealType
 import com.example.recipeapp.models.NutrientSummary
+import com.example.recipeapp.repositories.FineliRepository
 import com.example.recipeapp.repositories.FoodRepository
 import com.example.recipeapp.repositories.LogRepository
 import com.example.recipeapp.utils.AlertType
@@ -23,6 +24,7 @@ import java.time.LocalDate
 class LogsScreenViewModel(application: Application): BaseViewModel(application) {
     private val logRepository = LogRepository(this.encryptedSharedPreferences)
     private val foodRepository = FoodRepository(this.encryptedSharedPreferences)
+    private val fineliRepository = FineliRepository()
 
     private var _logs: MutableState<List<Log>> = mutableStateOf(emptyList())
     private var _breakfastLogs: MutableState<List<FoodLog>> = mutableStateOf(emptyList())
@@ -214,6 +216,13 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
     }
 
     fun searchFoods(query: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val result = fineliRepository.getFoodsByQuery(query)
+            if (result.isSuccessful()) {
+                _foods.value = result.value?.map { it.toFood() } ?: emptyList()
+            }
+        }
+
         viewModelScope.launch(Dispatchers.IO) {
             val result = foodRepository.getFoodsByQuery(query)
             if (result.isSuccessful()) {

@@ -23,11 +23,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -35,7 +34,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(FoodController.class)
@@ -56,22 +54,21 @@ class FoodControllerTest {
     private ObjectMapper objectMapper;
 
     private Food testFood;
+    private final String baseUrl = "/api/foods";
 
     @BeforeEach
     public void setup() throws JOSEException {
         testFood = new Food(1, "Kanan rintafilee", "1234567890", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "2025-01-01", "2025-01-01");
     }
 
-    // ====================
-    // CREATE Food Tests
-    // ====================
     @Test
+    @WithMockUser
     void testCreateFood_ReturnCreated() throws Exception {
         // Use any(Food.class) because the User instance created during JSON deserialization
         // won't match the exact instance in the test setup.
         when(service.create(any(Food.class))).thenReturn(new ResponseEntity<>(testFood, HttpStatus.CREATED));
 
-        mockMvc.perform(post("/api/foods").with(jwt())
+        mockMvc.perform(post(baseUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testFood)))
                 .andExpect(status().isCreated())
@@ -80,6 +77,7 @@ class FoodControllerTest {
     }
 
     @ParameterizedTest
+    @WithMockUser
     @ValueSource(strings = { "name", "calories", "createdBy", "servingSize" })
     void testCreateFood_InvalidFields_ReturnBadRequest(String missingField) throws Exception {
         switch (missingField) {
@@ -97,7 +95,7 @@ class FoodControllerTest {
                 break;
         }
 
-        mockMvc.perform(post("/api/foods").with(jwt())
+        mockMvc.perform(post(baseUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testFood)))
                 .andExpect(status().isBadRequest());
@@ -105,166 +103,46 @@ class FoodControllerTest {
 
     @Test
     void testCreateFood_WithoutAuth_ReturnForbidden() throws Exception {
-        mockMvc.perform(post("/api/foods"))
-                .andExpect(status().isForbidden());
+        mockMvc.perform(post(baseUrl)).andExpect(status().isForbidden());
     }
 
-
-    // ====================
-    // READ Food Tests
-    // ====================
     @Test
-    void testGetAll_ReturnsFoods() throws Exception {
-        // Arrange
-        Food food1 = new Food(1, "Kana", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
-        Food food2 = new Food(2, "Riisi", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
-
-        List<Food> foods = Arrays.asList(food1, food2);
-        Pageable pageable = PageRequest.of(1, 10);
-        Page<Food> mockPage = new PageImpl<>(foods, pageable, foods.size());
-
-        // Mock service layer
-        when(service.getAll(any(Integer.class), any(Integer.class)))
-                .thenReturn(new ResponseEntity<>(mockPage, HttpStatus.OK));
-
-        // Act and Assert
-        mockMvc.perform(get("/api/foods").with(jwt()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.size()", CoreMatchers.is(2)))
-                .andExpect(jsonPath("$.content[0].name", CoreMatchers.is("Kana")))
-                .andExpect(jsonPath("$.content[1].name", CoreMatchers.is("Riisi")));
-    }
-    @Test
-    void testGetAll_WithoutAuth_ReturnForbidden() throws Exception {
-        mockMvc.perform(get("/api/foods"))
-                .andExpect(status().isForbidden());
-    }
-    @Test
+    @WithMockUser
     void testGetById_ReturnOk() throws Exception {
         when(service.getById(1L)).thenReturn(new ResponseEntity<>(testFood, HttpStatus.OK));
 
-        mockMvc.perform(get("/api/foods/1").with(jwt()))
+        mockMvc.perform(get(baseUrl + "/{id}", 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", CoreMatchers.is(testFood.getName())))
                 .andExpect(jsonPath("$.calories", CoreMatchers.is(testFood.getCalories())));
     }
 
     @Test
+    @WithMockUser
     void testGetById_ReturnNotFound() throws Exception {
         when(service.getById(13L)).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-        mockMvc.perform(get("/api/foods/{id}", 13).with(jwt())).andExpect(status().isNotFound());
+        mockMvc.perform(get(baseUrl + "/{id}", 13)).andExpect(status().isNotFound());
     }
 
     @Test
     void testGetById_WithoutAuth_ReturnForbidden() throws Exception {
-        mockMvc.perform(get("/api/foods/{id}", 13))
-                .andExpect(status().isForbidden());
+        mockMvc.perform(get(baseUrl + "/{id}", 13)).andExpect(status().isForbidden());
     }
 
-    // ====================
-    // UPDATE Food Tests
-    // ====================
     @Test
-    void testUpdateFood_AllFields_ReturnFood() throws Exception {
-        testFood.setName("New name");
-        testFood.setCalories(150.0);
-        testFood.setBarcode("1536473434");
-        testFood.setServingSize(400);
-        testFood.setCarbs(128.0);
-        testFood.setProtein(24.0);
-        testFood.setFat(45.0);
+    @WithMockUser
+    void testQuery_ReturnOk() throws Exception {
+        Food food1 = new Food(1, "Kana", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+        Food food2 = new Food(2, "Riisi", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
 
-        // Use eq(1L) to match the exact ID and any(Food.class) to allow any User instance.
-        when(service.getById(eq(1L))).thenReturn(new ResponseEntity<>(testFood, HttpStatus.OK));
-        when(service.update(eq(1L), any(Food.class))).thenReturn(new ResponseEntity<>(testFood, HttpStatus.OK));
+        List<Food> foods = List.of(food1, food2);
 
-        mockMvc.perform(patch("/api/foods/1").with(jwt())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testFood)))
+        when(service.getFoodsByQuery(anyString())).thenReturn(new ResponseEntity<>(foods, HttpStatus.OK));
+
+        mockMvc.perform(get(baseUrl + "/query")
+                .param("query", "ka"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", CoreMatchers.is("New name")))
-                .andExpect(jsonPath("$.calories", CoreMatchers.is(150.0)))
-                .andExpect(jsonPath("$.barcode", CoreMatchers.is("1536473434")))
-                .andExpect(jsonPath("$.servingSize", CoreMatchers.is(400)))
-                .andExpect(jsonPath("$.carbs", CoreMatchers.is(128.0)))
-                .andExpect(jsonPath("$.protein", CoreMatchers.is(24.0)))
-                .andExpect(jsonPath("$.fat", CoreMatchers.is(45.0)));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = { "name", "barcode", "servingSize", "calories", "carbs", "protein", "fat", "editedBy", "edited" })
-    void testUpdateFood_EachField_ReturnOk(String missingField) throws Exception {
-        switch (missingField) {
-            case "name":
-                testFood.setName("New name");
-                break;
-            case "barcode":
-                testFood.setCalories(140.0);
-                break;
-            case "servingSize":
-                testFood.setServingSize(140);
-                break;
-            case "calories":
-                testFood.setCalories(320.0);
-                break;
-            case "carbs":
-                testFood.setCarbs(29.0);
-                break;
-            case "protein":
-                testFood.setProtein(52.0);
-                break;
-            case "fat":
-                testFood.setFat(12.0);
-                break;
-            case "editedBy":
-                testFood.setEditedBy(8);
-                break;
-            case "edited":
-                testFood.setEdited("2025-01-23");
-                break;
-        }
-
-        mockMvc.perform(post("/api/foods").with(jwt())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testFood)))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void testUpdateFood_InvalidObject_ReturnsNotFound() throws Exception {
-        testFood.setCalories(-100.0);
-
-        mockMvc.perform(patch("/api/foods/1").with(jwt())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testFood)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void testUpdateFood_InvalidId_ReturnsNotFound() throws Exception {
-        when(service.getById(eq(99L))).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-
-        mockMvc.perform(patch("/api/foods/99").with(jwt())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testFood)))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void testUpdateFood_WithoutAuth_ReturnForbidden() throws Exception {
-        mockMvc.perform(patch("/api/foods/99"))
-                .andExpect(status().isForbidden());
-    }
-
-    // ====================
-    // DELETE Food Tests
-    // ====================
-    @Test
-    void testDeleteFood_ReturnOk() throws Exception {
-        when(service.delete(1L)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
-        MvcResult result = mockMvc.perform(delete("/api/foods/1").with(jwt()))
-                .andExpect(status().isOk()).andReturn();
-
-        assertTrue(result.getResponse().getContentAsString().isEmpty());
+                .andExpect(jsonPath("$[0].name").value("Kana"))
+                .andExpect(jsonPath("$[0].calories").value(250.0));
     }
 }

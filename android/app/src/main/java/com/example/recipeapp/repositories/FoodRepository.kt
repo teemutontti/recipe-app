@@ -7,12 +7,12 @@ import com.example.recipeapp.utils.Result
 import com.example.recipeapp.utils.SharedPreferencesManager
 
 class FoodRepository(private val encryptedPrefs: SharedPreferences) {
-    private val token: String? = SharedPreferencesManager.getAuthToken(encryptedPrefs)
-    private val userId: Int? = SharedPreferencesManager.getUser(encryptedPrefs)?.id
     private val retrofitInstance = RetrofitInstance()
     private val service = retrofitInstance.foodService
 
     suspend fun getFoods(page: Int, size: Int): Result<List<Food>> {
+        val token: String? = SharedPreferencesManager.getAuthToken(encryptedPrefs)
+
         return try {
             val response = service.getFoods(page, size, "Bearer $token")
             if (response.isSuccessful) {
@@ -26,6 +26,8 @@ class FoodRepository(private val encryptedPrefs: SharedPreferences) {
     }
 
     suspend fun getFoodById(id: Int): Result<Food> {
+        val token: String? = SharedPreferencesManager.getAuthToken(encryptedPrefs)
+
         return try {
             val response = service.getFoodById(id, "Bearer $token")
             if (response.isSuccessful && response.body() != null) Result.success(response.body())
@@ -36,6 +38,8 @@ class FoodRepository(private val encryptedPrefs: SharedPreferences) {
     }
 
     suspend fun getFoodsByQuery(query: String): Result<List<Food>> {
+        val token: String? = SharedPreferencesManager.getAuthToken(encryptedPrefs)
+
         return try {
             val response = service.getFoodByQuery(query, "Bearer $token")
             if (response.isSuccessful && response.body() != null) Result.success(response.body())
@@ -46,6 +50,8 @@ class FoodRepository(private val encryptedPrefs: SharedPreferences) {
     }
 
     suspend fun saveFood(food: Food): Result<Boolean> {
+        val token: String? = SharedPreferencesManager.getAuthToken(encryptedPrefs)
+
         return try {
             val response = service.saveFood(food, "Bearer $token")
             if (response.isSuccessful) Result.success(true)

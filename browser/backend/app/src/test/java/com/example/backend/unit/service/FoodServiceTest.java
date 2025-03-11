@@ -122,4 +122,22 @@ public class FoodServiceTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNull(response.getBody());
     }
+
+    @Test
+    public void testGetFoodsByQuery_ReturnsMultipleFoods() {
+        // Arrange
+        Food food1 = new Food(1, "Kana", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+
+        List<Food> foods = List.of(food1);
+
+        when(repository.findFoodsByNameContainingIgnoreCase(anyString())).thenReturn(foods);
+
+        // Act
+        ResponseEntity<List<Food>> response = service.getFoodsByQuery("ka");
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(1, response.getBody().size());
+        assertEquals("Kana", response.getBody().get(0).getName());
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.backend.unit.utils;
 
+import com.example.backend.entities.Role;
 import com.example.backend.utils.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,8 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -39,14 +42,14 @@ public class JwtTokenUtilTest {
 
     @Test
     public void testGenerateToken() throws Exception {
-        String token = jwtTokenUtil.generateToken("test@gmail.com");
+        String token = jwtTokenUtil.generateToken("test@gmail.com", Role.ROLE_USER);
         assertNotEquals("test@gmail.com", token);
         assertTrue(token.startsWith("eyJ"));
     }
 
     @Test
     public void testValidateToken_validToken() throws Exception {
-        String token = jwtTokenUtil.generateToken("test@gmail.com");
+        String token = jwtTokenUtil.generateToken("test@gmail.com", Role.ROLE_USER);
         boolean valid = jwtTokenUtil.validateToken(token);
         assertTrue(valid);
     }
@@ -59,8 +62,19 @@ public class JwtTokenUtilTest {
 
     @Test
     public void testExtractUser() throws Exception {
-        String token = jwtTokenUtil.generateToken("test@gmail.com");
+        String token = jwtTokenUtil.generateToken("test@gmail.com", Role.ROLE_USER);
         String extractedUsername = jwtTokenUtil.extractUsername(token);
         assertEquals("test@gmail.com", extractedUsername);
+    }
+
+    @Test
+    public void testExtractRole() throws Exception {
+        String token = jwtTokenUtil.generateToken("test@gmail.com", Role.ROLE_USER);
+        List<String> roles = jwtTokenUtil.extractRole(token);
+        assertEquals("ROLE_USER", roles.get(0));
+
+        String token2 = jwtTokenUtil.generateToken("test@gmail.com", Role.ROLE_ADMIN);
+        List<String> roles2 = jwtTokenUtil.extractRole(token2);
+        assertEquals("ROLE_ADMIN", roles2.get(0));
     }
 }

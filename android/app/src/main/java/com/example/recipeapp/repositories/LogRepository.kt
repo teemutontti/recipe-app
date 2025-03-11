@@ -8,12 +8,13 @@ import com.example.recipeapp.utils.SharedPreferencesManager
 import java.time.LocalDate
 
 class LogRepository(private val encryptedPrefs: SharedPreferences) {
-    private val token: String? = SharedPreferencesManager.getAuthToken(encryptedPrefs)
-    private val userId: Int? = SharedPreferencesManager.getUser(encryptedPrefs)?.id
     private val retrofitInstance = RetrofitInstance()
     private val service = retrofitInstance.logsService
 
     suspend fun getLogsByDate(date: LocalDate): Result<List<Log>> {
+        val token: String? = SharedPreferencesManager.getAuthToken(encryptedPrefs)
+        val userId: Int? = SharedPreferencesManager.getUser(encryptedPrefs)?.id
+
         return try {
             android.util.Log.d("LogRepository", "Haetaan avaimella: $token")
             android.util.Log.d("LogRepository", "Haetaan käyttäjällä: ${SharedPreferencesManager.getUser(encryptedPrefs)}")
@@ -30,6 +31,8 @@ class LogRepository(private val encryptedPrefs: SharedPreferences) {
     }
 
     suspend fun saveLog(log: Log): Result<Boolean> {
+        val token: String? = SharedPreferencesManager.getAuthToken(encryptedPrefs)
+
         return try {
             val response = service.saveLog(log, "Bearer $token")
             if (response.isSuccessful) Result.success(true)
@@ -40,6 +43,8 @@ class LogRepository(private val encryptedPrefs: SharedPreferences) {
     }
 
     suspend fun deleteLog(id: Int): Result<Boolean> {
+        val token: String? = SharedPreferencesManager.getAuthToken(encryptedPrefs)
+
         return try {
             val response = service.deleteLog(id, "Bearer $token")
             if (response.isSuccessful) Result.success(true)
@@ -50,6 +55,8 @@ class LogRepository(private val encryptedPrefs: SharedPreferences) {
     }
 
     suspend fun updateLog(log: Log): Result<Log> {
+        val token: String? = SharedPreferencesManager.getAuthToken(encryptedPrefs)
+
         return try {
             if (log.id != null) {
                 val response = service.updateLog(log.id, log, "Bearer $token")

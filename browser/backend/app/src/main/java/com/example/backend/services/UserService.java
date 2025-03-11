@@ -1,11 +1,14 @@
 package com.example.backend.services;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.example.backend.dto.UserDto;
+import com.example.backend.entities.Role;
+import com.example.backend.exceptions.EncryptionKeyException;
+import com.example.backend.exceptions.FailedCryptionException;
 import com.example.backend.exceptions.FailedDecryptionException;
 import com.example.backend.exceptions.FailedEncryptionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -13,52 +16,56 @@ import com.example.backend.entities.User;
 import com.example.backend.repositories.UserRepository;
 import com.example.backend.utils.SecurityUtil;
 
+import java.util.List;
+
 @Service
 public class UserService {
 
+    private final UserRepository repository;
+
     @Autowired
-    private UserRepository repository;
+    public UserService(UserRepository repository) {
+        this.repository = repository;
+    }
 
     public ResponseEntity<User> create(UserDto userDto) {
         try {
-            User user = new User(
-                null,
-                SecurityUtil.encrypt(userDto.getEmail()),
-                SecurityUtil.hashPassword(userDto.getPassword())
-            );
+            String encryptedEmail = SecurityUtil.encrypt(userDto.getEmail());
+            String hashedPassword = SecurityUtil.hashPassword(userDto.getPassword());
 
+            User user = new User(null, encryptedEmail, hashedPassword, Role.ROLE_USER);
             User data = repository.save(user);
 
-            data.setEmail(SecurityUtil.decrypt(data.getEmail()));
+            // Plain text email for the return object
+            data.setEmail(userDto.getEmail());
             data.setPassword(null);
 
             return new ResponseEntity<>(data, HttpStatus.CREATED);
-
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public ResponseEntity<List<User>> getAll() {
+    public ResponseEntity<Page<User>> getAll(Integer page, Integer size) {
         try {
-            List<User> users = repository.findAll();
-            List<User> decryptedUsers = new ArrayList<>();
+            PageRequest pageRequest = PageRequest.of(page, size);
+            Page<User> data = repository.findAll(pageRequest);
 
             // Decrypting user data
-            for (User user: users) {
-                System.out.println(user);
+            Page<User> decryptedUsers = data.map(user -> {
                 try {
-                    user.setEmail(SecurityUtil.decrypt(user.getEmail()));
+                    String decryptedEmail = SecurityUtil.decrypt(user.getEmail());
+                    user.setEmail(decryptedEmail);
                     user.setPassword(null);
-
-                    decryptedUsers.add(user);
-                } catch (FailedDecryptionException e) {
-                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                    return user;
+                } catch (FailedCryptionException | EncryptionKeyException e) {
+                    return null;
                 }
-            }
-            return new ResponseEntity<>(decryptedUsers, HttpStatus.OK);
+            });
 
+            return new ResponseEntity<>(decryptedUsers, HttpStatus.OK);
         } catch (Exception e) {
+            System.out.println(e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

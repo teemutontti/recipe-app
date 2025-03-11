@@ -18,6 +18,10 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
@@ -83,16 +87,17 @@ public class LogServiceTest {
         Log log1 = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "BREAKFAST", 1, 1, 22.0);
         Log log2 = new Log(2, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "LUNCH", 1, 2, 120.0);
 
-        List<Log> logs = new ArrayList<>();
-        logs.add(log1);
-        logs.add(log2);
+        List<Log> logs = List.of(log1, log2);
 
-        when(repository.findAll()).thenReturn(logs);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Log> mockPage = new PageImpl<>(logs, pageable, logs.size());
 
-        ResponseEntity<List<Log>> response = service.getAll();
+        when(repository.findAll(pageable)).thenReturn(mockPage);
+
+        ResponseEntity<Page<Log>> response = service.getAll(0, 10);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody().size());
+        assertEquals(2, response.getBody().getTotalElements());
     }
 
     @Test

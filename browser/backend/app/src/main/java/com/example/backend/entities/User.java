@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 @Entity
 @Data
 @Table(name = "users")
@@ -21,6 +25,10 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     public void setEmail(String email) {
         if (email.length() > 5 && email.contains("@")) {

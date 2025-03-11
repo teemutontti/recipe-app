@@ -1,6 +1,9 @@
 package com.example.backend.services;
 
+import com.example.backend.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,8 +15,12 @@ import java.util.List;
 @Service
 public class LogService {
 
+    private final LogRepository repository;
+
     @Autowired
-    private LogRepository repository;
+    public LogService(LogRepository repository) {
+        this.repository = repository;
+    }
 
     public ResponseEntity<Log> create(Log entity) {
         try {
@@ -24,9 +31,11 @@ public class LogService {
         }
     }
 
-    public ResponseEntity<List<Log>> getAll() {
+    public ResponseEntity<Page<Log>> getAll(Integer page, Integer size) {
         try {
-            List<Log> data = repository.findAll();
+            PageRequest pageRequest = PageRequest.of(page, size);
+            Page<Log> data = repository.findAll(pageRequest);
+
             return new ResponseEntity<>(data, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

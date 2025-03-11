@@ -14,8 +14,8 @@ object FormattingUtils {
         return split[0]
     }
 
-    fun stringToFloat(string: String): Float {
+    fun stringToDouble(string: String): Double {
         val convertedCommas = string.replace(",", ".")
-        return convertedCommas.toFloat()
+        return convertedCommas.toDouble()
     }
 }

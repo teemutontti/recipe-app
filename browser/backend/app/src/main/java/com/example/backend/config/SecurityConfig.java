@@ -1,16 +1,8 @@
 package com.example.backend.config;
 
 import com.example.backend.utils.JwtTokenUtil;
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -35,15 +27,10 @@ public class SecurityConfig {
                 .addFilterBefore(new JwtFilter(jwtTokenUtil), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         // Allowing register and login generation
-                        .requestMatchers( "/api/register").permitAll()
-                        .requestMatchers( "/api/login").permitAll()
+                        .requestMatchers( "/api/register", "/api/login", "/api/docs/**", "/api/swagger-ui/**").permitAll()
 
-                        // Securing getAllLogs
-                        .requestMatchers(HttpMethod.GET, "/api/logs").hasRole("ADMIN")
-
-                        // Securing user endpoints
-                        .requestMatchers("/api/users").hasRole("ADMIN")
-                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+                        // Securing admin endpoints
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                         // Authenticating all other endpoints
                         .anyRequest().authenticated()

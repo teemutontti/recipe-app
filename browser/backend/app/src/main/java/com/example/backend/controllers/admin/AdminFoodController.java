@@ -22,16 +22,6 @@ public class AdminFoodController {
         this.service = service;
     }
 
-    @Operation(summary = "Get all foods")
-    @SecurityRequirement(name = "bearerAuth", scopes = { "admin" })
-    @GetMapping
-    public ResponseEntity<Page<Food>> getAll(
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "size", defaultValue = "10") Integer size
-    ) {
-        return service.getAll(page, size);
-    }
-
     @Operation(summary = "Update food")
     @SecurityRequirement(name = "bearerAuth", scopes = { "admin" })
     @PatchMapping("/{id}")

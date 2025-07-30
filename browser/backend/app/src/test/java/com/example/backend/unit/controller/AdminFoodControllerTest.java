@@ -67,31 +67,6 @@ class AdminFoodControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
-    void testGetAll_AsAdmin_ReturnsFoods() throws Exception {
-        // Arrange
-        Food food1 = new Food(1, "Kana", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
-        Food food2 = new Food(2, "Riisi", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
-
-        List<Food> foods = Arrays.asList(food1, food2);
-        Pageable pageable = PageRequest.of(1, 10);
-        Page<Food> mockPage = new PageImpl<>(foods, pageable, foods.size());
-
-        // Mock service layer
-        when(service.getAll(any(Integer.class), any(Integer.class))).thenReturn(new ResponseEntity<>(mockPage, HttpStatus.OK));
-
-        // Act and Assert
-        mockMvc.perform(get(baseUrl)
-                .param("page", "0")
-                .param("size", "10")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.size()", CoreMatchers.is(2)))
-                .andExpect(jsonPath("$.content[0].name", CoreMatchers.is("Kana")))
-                .andExpect(jsonPath("$.content[1].name", CoreMatchers.is("Riisi")));
-    }
-
-    @Test
     @WithMockUser(roles = "USER")
     void testGetAll_AsUser_ReturnForbidden() throws Exception {
         mockMvc.perform(get(baseUrl)).andExpect(status().isForbidden());

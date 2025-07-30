@@ -1,5 +1,6 @@
 package com.example.recipeapp.screens
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -8,6 +9,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.recipeapp.ui.screens.food.AddFoodScreen
 import com.example.recipeapp.viewmodels.AuthViewModel
+import com.example.recipeapp.viewmodels.BarcodeScannerViewModel
 import com.example.recipeapp.viewmodels.FavouriteRecipesViewModel
 import com.example.recipeapp.viewmodels.LogsScreenViewModel
 import com.example.recipeapp.viewmodels.PersonalRecipesViewModel
@@ -37,12 +39,13 @@ class AddFoodScreenTest {
         shopping = ShoppingListViewModel(ApplicationProvider.getApplicationContext()),
         logsScreen = LogsScreenViewModel(ApplicationProvider.getApplicationContext()),
         authViewModel = AuthViewModel(ApplicationProvider.getApplicationContext()),
+        barcode = BarcodeScannerViewModel(ApplicationProvider.getApplicationContext())
     )
 
     @Test
     fun testComposable_showsScreen() {
         composeTestRule.setContent { 
-            AddFoodScreen(navController = navController, viewModels = viewModels)
+            AddFoodScreen(navController = navController, viewModels = viewModels, snackbarHostState = SnackbarHostState())
         }
 
         composeTestRule.onNodeWithText("Add food").assertIsDisplayed()

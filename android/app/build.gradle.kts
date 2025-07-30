@@ -31,7 +31,7 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "API_KEY", "\"$apiKey\"")
+        buildConfigField("String", "API_KEY", "$apiKey")
     }
 
     buildFeatures {

@@ -1,24 +1,28 @@
 package com.example.recipeapp.ui
 
 import android.content.Context
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.recipeapp.ui.screens.BarcodeScreen
 import com.example.recipeapp.utils.LocalApplicationContext
-import com.example.recipeapp.ui.screens.RecipeEditorScreen
+import com.example.recipeapp.ui.screens.recipe.RecipeEditorScreen
 import com.example.recipeapp.ui.screens.DiscoverScreen
-import com.example.recipeapp.ui.screens.CookbookScreen
-import com.example.recipeapp.ui.screens.FoodEditorScreen
-import com.example.recipeapp.ui.screens.AddFoodScreen
+import com.example.recipeapp.ui.screens.cookbook.CookbookScreen
+import com.example.recipeapp.ui.screens.food.FoodEditorScreen
+import com.example.recipeapp.ui.screens.food.AddFoodScreen
 import com.example.recipeapp.ui.screens.LoginScreen
 import com.example.recipeapp.ui.screens.LogsScreen
 import com.example.recipeapp.ui.screens.MealScreen
-import com.example.recipeapp.ui.screens.RecipeScreen
+import com.example.recipeapp.ui.screens.recipe.RecipeScreen
 import com.example.recipeapp.ui.screens.ShoppingListScreen
 import com.example.recipeapp.viewmodels.AuthViewModel
+import com.example.recipeapp.viewmodels.BarcodeScannerViewModel
 import com.example.recipeapp.viewmodels.FavouriteRecipesViewModel
 import com.example.recipeapp.viewmodels.LogsScreenViewModel
 import com.example.recipeapp.viewmodels.PersonalRecipesViewModel
@@ -39,6 +43,7 @@ import com.example.recipeapp.viewmodels.ViewModelWrapper
  */
 @Composable
 fun App(applicationContext: Context) {
+    val snackbarHostState = remember { SnackbarHostState() }
     val navController = rememberNavController()
 
     val inspectionViewModel: RecipeUnderInspectionViewModel = viewModel()
@@ -49,6 +54,7 @@ fun App(applicationContext: Context) {
     val shoppingListViewModel: ShoppingListViewModel = viewModel()
     val logsScreenViewModel: LogsScreenViewModel = viewModel()
     val authViewModel: AuthViewModel = viewModel()
+    val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
 
     val viewModels = ViewModelWrapper(
         favourite = favouriteRecipesViewModel,
@@ -59,6 +65,7 @@ fun App(applicationContext: Context) {
         shopping = shoppingListViewModel,
         logsScreen = logsScreenViewModel,
         authViewModel = authViewModel,
+        barcode = barcodeScannerViewModel,
     )
 
     CompositionLocalProvider(LocalApplicationContext provides applicationContext) {

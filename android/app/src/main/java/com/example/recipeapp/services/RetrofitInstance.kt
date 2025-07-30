@@ -1,13 +1,19 @@
 package com.example.recipeapp.services
 
+import com.example.recipeapp.BuildConfig
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitInstance {
     private val baseUrlSpoonacular = "https://api.spoonacular.com/"
-    private val baseUrlDb = "https://recipeapp-api-amejacd4cjf2gqep.swedencentral-01.azurewebsites.net"
+    private val baseUrlDb = BuildConfig.BASE_URL
     private val baseUrlFineli = "https://fineli.fi/"
+
+    val logging = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
 
     private val retrofitSpoonacular = Retrofit.Builder()
         .baseUrl(baseUrlSpoonacular)
@@ -20,6 +26,7 @@ class RetrofitInstance {
         .build()
 
     private val client = OkHttpClient.Builder()
+        .addInterceptor(logging)
         .addInterceptor { chain ->
             val request = chain.request().newBuilder()
                 .header("User-Agent", "RecipeApp")

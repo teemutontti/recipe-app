@@ -14,6 +14,7 @@ object Constants {
     const val LANDSCAPE_ASPECT_RATIO: Float = 1.7777778f
     const val IMAGE_WIDTH: Int = 288
     const val IMAGE_HEIGHT: Int = 162
+    const val IS_DEV = true
 
     val categories = listOf(
         Category(R.drawable.chicken, "Chicken", "chicken"),
@@ -22,8 +23,22 @@ object Constants {
         Category(R.drawable.fish, "Seafood", "seafood"),
         Category(R.drawable.spaghetti, "Pasta", "pasta"),
         Category(R.drawable.rice, "Rice", "rice"),
-        Category(R.drawable.vegetable, "Vegetable", "vegetable"),
+        Category(R.drawable.vegetable, "Veggies", "vegetable"),
         Category(R.drawable.fruit, "Fruit", "fruit"),
     )
+
+    enum class Screen {
+        FOOD_ADD,
+        FOOD_EDIT,
+        COOKBOOK,
+        DISCOVER,
+        LOGIN,
+        LOGS,
+        MEAL,
+        RECIPE_EDIT,
+        RECIPE_VIEW,
+        SHOPPING_LIST,
+        BARCODE,
+    }
 }
 

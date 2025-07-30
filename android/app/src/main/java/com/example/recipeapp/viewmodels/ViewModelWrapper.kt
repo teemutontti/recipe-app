@@ -21,4 +21,5 @@ data class ViewModelWrapper (
     val shopping: ShoppingListViewModel,
     val logsScreen: LogsScreenViewModel,
     val authViewModel: AuthViewModel,
+    val barcode: BarcodeScannerViewModel,
 )

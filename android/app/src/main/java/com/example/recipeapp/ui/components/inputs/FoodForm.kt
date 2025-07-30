@@ -29,13 +29,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.recipeapp.models.Food
 import com.example.recipeapp.ui.components.layout.TitledContainer
 import com.example.recipeapp.utils.FormattingUtils
-import com.example.recipeapp.viewmodels.LogsScreenViewModel
+import com.example.recipeapp.viewmodels.ViewModelWrapper
 
 @Composable
-fun FoodForm(viewModel: LogsScreenViewModel) {
+fun FoodForm(navController: NavController, viewModels: ViewModelWrapper) {
     var name by remember { mutableStateOf("") }
     var barcode by remember { mutableStateOf("") }
     var servingSize by remember { mutableStateOf("100") }
@@ -45,7 +46,7 @@ fun FoodForm(viewModel: LogsScreenViewModel) {
     var fat by remember { mutableStateOf("") }
 
     LaunchedEffect(name, barcode, servingSize, calories, carbs, protein, fat) {
-        viewModel.setSavableFood(null)
+        viewModels.logsScreen.setSavableFood(null)
         if (name.isNotEmpty() && servingSize.isNotEmpty() && calories.isNotEmpty()) {
             val food = Food(
                 name = name,
@@ -61,10 +62,10 @@ fun FoodForm(viewModel: LogsScreenViewModel) {
                 fat = if (fat.isNotEmpty()) {
                     FormattingUtils.stringToDouble(fat)
                 } else 0.0,
-                createdBy = viewModel.getUserId(),
-                editedBy = viewModel.getUserId(),
+                createdBy = viewModels.logsScreen.getUserId(),
+                editedBy = viewModels.logsScreen.getUserId(),
             )
-            viewModel.setSavableFood(food)
+            viewModels.logsScreen.setSavableFood(food)
         }
     }
 
@@ -107,7 +108,10 @@ fun FoodForm(viewModel: LogsScreenViewModel) {
             }
         }
         Spacer(modifier = Modifier.padding(vertical = 16.dp))
-        Row {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
             TextField(
                 value = barcode,
                 onValueChange = { barcode = it },
@@ -117,11 +121,13 @@ fun FoodForm(viewModel: LogsScreenViewModel) {
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = MaterialTheme.colorScheme.surface
                 ),
-                modifier = Modifier.clip(RoundedCornerShape(6.dp, 0.dp, 0.dp, 6.dp))
+                modifier = Modifier
+                    .clip(RoundedCornerShape(6.dp, 0.dp, 0.dp, 6.dp))
+                    .fillMaxWidth(0.85f)
             )
             Spacer(modifier = Modifier.padding(horizontal = 2.dp))
             IconButton(
-                onClick = { /*TODO: Add barcode scanner implementation*/ },
+                onClick = { navController.navigate("barcode") },
                 modifier = Modifier
                     .clip(RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp))
                     .background(MaterialTheme.colorScheme.surface)

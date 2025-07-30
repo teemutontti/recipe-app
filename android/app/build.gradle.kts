@@ -10,24 +10,28 @@ android {
     namespace = "com.example.recipeapp"
     compileSdk = 34
 
+    // Load keystore
+    val keystoreFile = rootProject.file("api.keystore")
+    val properties = Properties().apply {
+        load(keystoreFile.inputStream())
+    }
+
+    val apiKey = properties.getProperty("API_KEY") ?: ""
+    val releaseBaseUrl = properties.getProperty("RELEASE_BASE_URL") ?: ""
+
     defaultConfig {
         applicationId = "com.example.recipeapp"
         minSdk = 26
         targetSdk = 34
         versionCode = 5
-        versionName = "1.3.1"
+        versionName = "1.3.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
 
-        val keystoreFile = project.rootProject.file("api.keystore")
-        val properties = Properties()
-        properties.load(keystoreFile.inputStream())
-
-        val apiKey: String = properties.getProperty("API_KEY") ?: ""
-        buildConfigField("String", "API_KEY", apiKey)
+        buildConfigField("String", "API_KEY", "\"$apiKey\"")
     }
 
     buildFeatures {
@@ -35,12 +39,17 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/\"")
+        }
+
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "BASE_URL", "\"$releaseBaseUrl\"")
         }
     }
     compileOptions {
@@ -61,6 +70,9 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    testOptions {
+        animationsDisabled = true
+    }
 }
 
 dependencies {
@@ -79,6 +91,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.androidx.navigation.testing)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
@@ -96,4 +109,13 @@ dependencies {
     implementation(libs.androidx.room.ktx) // Needed for coroutine support
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.security.crypto)
+    implementation (libs.logging.interceptor) // check latest version
+
+    // Barcode dependencies
+    implementation(libs.barcode.scanning)
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.kotlinx.serialization.json)
 }

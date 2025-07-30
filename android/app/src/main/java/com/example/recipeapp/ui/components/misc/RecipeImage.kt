@@ -2,6 +2,7 @@ package com.example.recipeapp.ui.components.misc
 
 import android.net.Uri
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -37,31 +38,33 @@ fun RecipeImage(
         fixedModel = Uri.parse(model.toString())
     }
 
-    val imageModifier: Modifier = Modifier
-        .aspectRatio(Constants.LANDSCAPE_ASPECT_RATIO)
-        .clip(RoundedCornerShape(8.dp))
-        .fillMaxWidth()
+    BoxWithConstraints {
+        val screenWidth = maxWidth
+        val imageModifier: Modifier = Modifier
+            .aspectRatio(Constants.LANDSCAPE_ASPECT_RATIO)
+            .clip(RoundedCornerShape(16.dp))
+            .fillMaxWidth()
+        val previewImageModifier: Modifier = Modifier
+            .size(screenWidth, Constants.IMAGE_HEIGHT.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .fillMaxWidth()
 
-    val previewImageModifier: Modifier = Modifier
-        .size(Constants.IMAGE_WIDTH.dp, Constants.IMAGE_HEIGHT.dp)
-        .clip(RoundedCornerShape(8.dp))
-        .fillMaxWidth()
-
-    if (fixedModel != null) {
-        AsyncImage(
-            model = fixedModel,
-            contentDescription = "recipe",
-            contentScale = ContentScale.Crop,
-            modifier = if (isPreview) previewImageModifier else imageModifier,
-            onError = { onLoadError() },
-            onSuccess = { onLoadSuccess() },
-        )
-    } else if (painter != null) {
-        Image(
-            painter = painter,
-            contentDescription = "recipe",
-            contentScale = ContentScale.Crop,
-            modifier = if (isPreview) previewImageModifier else imageModifier
-        )
+        if (fixedModel != null) {
+            AsyncImage(
+                model = fixedModel,
+                contentDescription = "recipe",
+                contentScale = ContentScale.Crop,
+                modifier = if (isPreview) previewImageModifier else imageModifier,
+                onError = { onLoadError() },
+                onSuccess = { onLoadSuccess() },
+            )
+        } else if (painter != null) {
+            Image(
+                painter = painter,
+                contentDescription = "recipe",
+                contentScale = ContentScale.Crop,
+                modifier = if (isPreview) previewImageModifier else imageModifier
+            )
+        }
     }
 }

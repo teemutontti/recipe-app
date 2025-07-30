@@ -68,7 +68,7 @@ fun TodaysSpecialButton(
             contentColor = MaterialTheme.colorScheme.scrim
         )
     ) {
-        Box(modifier = Modifier.height(162.dp)) {
+        Box {
             if (!imageError) {
                 RecipeImage(
                     model = recipe.image,

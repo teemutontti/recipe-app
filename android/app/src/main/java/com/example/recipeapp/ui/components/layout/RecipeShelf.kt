@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -67,37 +68,42 @@ fun RecipeShelf(
         }
     }
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        LazyRow(
-            state = lazyRowState,
-            modifier = Modifier.width(Constants.IMAGE_WIDTH.dp)
-        ) {
-            itemsIndexed(recipes) { index, recipe ->
-                Column(modifier = Modifier.fillParentMaxWidth()) {
-                    TodaysSpecialButton(navController, index, recipe, viewModels.inspection)
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val screenWidth = maxWidth
+        val imageHeight = screenWidth * 0.56f
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            LazyRow(
+                state = lazyRowState,
+                modifier = Modifier.width(screenWidth).height(imageHeight)
+            ) {
+                itemsIndexed(recipes) { index, recipe ->
+                    Column(modifier = Modifier.fillParentMaxWidth().fillParentMaxHeight()) {
+                        TodaysSpecialButton(navController, index, recipe, viewModels.inspection)
+                    }
+                    if (index < recipes.size - 1) Spacer(modifier = Modifier.width(32.dp))
                 }
-                if (index < recipes.size - 1) Spacer(modifier = Modifier.width(32.dp))
             }
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            repeat(times = recipes.size) {
-                Box(modifier = Modifier
-                    .padding(4.dp)
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .clickable { specialInView = it }
-                    .background(
-                        if (lazyRowState.firstVisibleItemIndex == it) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.surfaceVariant
-                        }
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                repeat(times = recipes.size) {
+                    Box(modifier = Modifier
+                        .padding(4.dp)
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .clickable { specialInView = it }
+                        .background(
+                            if (lazyRowState.firstVisibleItemIndex == it) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.surfaceVariant
+                            }
+                        )
                     )
-                )
+                }
             }
         }
     }

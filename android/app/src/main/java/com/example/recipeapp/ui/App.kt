@@ -71,35 +71,38 @@ fun App(applicationContext: Context) {
     CompositionLocalProvider(LocalApplicationContext provides applicationContext) {
         NavHost(navController = navController, startDestination = "login") {
             composable("login") {
-                LoginScreen(navController, viewModels)
+                LoginScreen(navController, viewModels, snackbarHostState)
             }
             composable("discover") {
-                DiscoverScreen(navController, viewModels)
+                DiscoverScreen(navController, viewModels, snackbarHostState)
             }
             composable("logs") {
-                LogsScreen(navController, viewModels)
+                LogsScreen(navController, viewModels, snackbarHostState)
             }
             composable("add_food") {
-                AddFoodScreen(navController, viewModels)
+                AddFoodScreen(navController, viewModels, snackbarHostState)
             }
             composable("food_editor/{mode}") {
                 val mode = it.arguments?.getString("mode")
-                FoodEditorScreen(navController, viewModels, mode ?: "VIEW")
+                FoodEditorScreen(navController, viewModels, snackbarHostState, mode ?: "VIEW")
             }
             composable("cookbook") {
-                CookbookScreen(navController, viewModels)
+                CookbookScreen(navController, viewModels, snackbarHostState)
             }
             composable("recipe") {
-                RecipeScreen(navController, viewModels)
+                RecipeScreen(navController, viewModels, snackbarHostState)
             }
             composable("recipe_editor") {
-                RecipeEditorScreen(navController, viewModels)
+                RecipeEditorScreen(navController, viewModels, snackbarHostState)
             }
             composable("shopping_list") {
-                ShoppingListScreen(navController, viewModels)
+                ShoppingListScreen(navController, viewModels, snackbarHostState)
             }
             composable("meal") {
-                MealScreen(navController, viewModels)
+                MealScreen(navController, viewModels, snackbarHostState)
+            }
+            composable("barcode") {
+                BarcodeScreen(navController, viewModels, snackbarHostState)
             }
         }
     }

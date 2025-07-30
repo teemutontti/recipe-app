@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,6 +21,7 @@ import com.example.recipeapp.ui.components.inputs.DateNavigator
 import com.example.recipeapp.ui.components.layout.MacroWheels
 import com.example.recipeapp.ui.components.navigation.NavBar
 import com.example.recipeapp.ui.components.layout.TopBar
+import com.example.recipeapp.utils.Constants
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 
 /**
@@ -31,8 +30,14 @@ import com.example.recipeapp.viewmodels.ViewModelWrapper
  * @param viewModels The ViewModelWrapper containing the necessary view models for the screen.
  */
 @Composable
-fun LogsScreen(navController: NavController, viewModels: ViewModelWrapper) {
-    val snackbarHostState = remember { SnackbarHostState() }
+fun LogsScreen(
+    navController: NavController,
+    viewModels: ViewModelWrapper,
+    snackbarHostState: SnackbarHostState,
+) {
+    LaunchedEffect(Unit) {
+        viewModels.logsScreen.loadLogs()
+    }
 
     LaunchedEffect(viewModels.logsScreen.alert) {
         viewModels.logsScreen.alert?.let {
@@ -41,33 +46,14 @@ fun LogsScreen(navController: NavController, viewModels: ViewModelWrapper) {
         }
     }
 
-    Scaffold(
+    Screen(
         topBar = { TopBar("Logs") },
-        content = { LogsScreenContent(navController, viewModels, it) },
         bottomBar = { NavBar(navController, "logs") },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        screen = Constants.Screen.LOGS,
+        viewModels,
+        navController,
         floatingActionButton = { AddButton { navController.navigate("add_food") } }
-    )
-}
-
-/**
- * Composable function for the content of the Logs screen.
- * @param navController The navigation controller for navigating between screens.
- * @param viewModels The ViewModelWrapper containing the necessary view models for the screen.
- * @param paddingValues Padding values for the content.
- */
-@Composable
-private fun LogsScreenContent(
-    navController: NavController,
-    viewModels: ViewModelWrapper,
-    paddingValues: PaddingValues,
-) {
-
-    LaunchedEffect(Unit) {
-        viewModels.logsScreen.loadLogs()
-    }
-
-    Column(modifier = Modifier.padding(paddingValues)) {
+    ) {
         LazyColumn(modifier = Modifier.padding(horizontal = 24.dp)) {
             item {
                 Column(modifier = Modifier.padding(horizontal = 24.dp)) {

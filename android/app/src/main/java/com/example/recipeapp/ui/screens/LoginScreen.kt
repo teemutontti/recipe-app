@@ -1,8 +1,8 @@
 package com.example.recipeapp.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,8 +18,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -38,39 +36,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.recipeapp.models.Auth
+import com.example.recipeapp.utils.Constants.Screen
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 
 @Composable
 fun LoginScreen(
     navController: NavController,
     viewModels: ViewModelWrapper,
-) {
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(viewModels.logsScreen.alert) {
-        viewModels.logsScreen.alert?.let {
-            snackbarHostState.showSnackbar(it.message)
-            viewModels.logsScreen.clearAlert()
-        }
-    }
-
-    Scaffold(
-        content = {
-            LoginScreenContent(
-                navController = navController,
-                paddingValues = it,
-                viewModels = viewModels,
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    )
-}
-
-@Composable
-private fun LoginScreenContent(
-    navController: NavController,
-    paddingValues: PaddingValues,
-    viewModels: ViewModelWrapper,
+    snackbarHostState: SnackbarHostState,
 ) {
     var mode by remember { mutableStateOf("LOGIN") }
     var email by remember { mutableStateOf("") }
@@ -83,19 +56,6 @@ private fun LoginScreenContent(
         }
     }
 
-    fun toggleMode() {
-        mode = if (mode == "LOGIN") "REGISTER" else "LOGIN"
-    }
-    
-    fun handleLogin() {
-        val auth = Auth(email, password)
-        if (mode == "LOGIN") {
-            viewModels.authViewModel.login(auth) { navigateToMainScreen() }
-        } else {
-            viewModels.authViewModel.register(auth) { navigateToMainScreen() }
-        }
-    }
-
     LaunchedEffect(Unit) {
         if (viewModels.authViewModel.checkAuthToken()) {
             navigateToMainScreen()
@@ -103,11 +63,36 @@ private fun LoginScreenContent(
         viewModels.logsScreen.setLoading(false)
     }
 
-    Column(modifier = Modifier.padding(paddingValues)) {
+    LaunchedEffect(viewModels.logsScreen.alert) {
+        viewModels.logsScreen.alert?.let {
+            snackbarHostState.showSnackbar(it.message)
+            viewModels.logsScreen.clearAlert()
+        }
+    }
+
+    fun toggleMode() {
+        mode = if (mode == "LOGIN") "REGISTER" else "LOGIN"
+    }
+    
+    fun handleLogin() {
+        val auth = Auth(email, password)
+        Log.d("AuthScreen", "Auth: ${auth}")
+        if (mode == "LOGIN") {
+            viewModels.authViewModel.login(auth) { navigateToMainScreen() }
+        } else {
+            viewModels.authViewModel.register(auth) { navigateToMainScreen() }
+        }
+    }
+
+    Screen(
+        topBar = {},
+        bottomBar = {},
+        screen = Screen.LOGIN,
+        viewModels,
+        navController,
+    ) {
         Column(
-            modifier = Modifier
-                .padding(horizontal = 40.dp)
-                .fillMaxSize(),
+            modifier = Modifier.padding(horizontal = 40.dp).fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -129,19 +114,19 @@ private fun LoginScreenContent(
                     onValueChange = { password = it },
                     singleLine = true,
                     visualTransformation =
-                        if (passwordVisible) VisualTransformation.None
-                        else PasswordVisualTransformation(),
+                    if (passwordVisible) VisualTransformation.None
+                    else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(
                                 imageVector =
-                                    if (passwordVisible) Icons.Filled.VisibilityOff
-                                    else Icons.Filled.Visibility
+                                if (passwordVisible) Icons.Filled.VisibilityOff
+                                else Icons.Filled.Visibility
                                 ,
                                 contentDescription =
-                                    if (passwordVisible) "Hide password"
-                                    else "Show password"
+                                if (passwordVisible) "Hide password"
+                                else "Show password"
                             )
                         }
                     }

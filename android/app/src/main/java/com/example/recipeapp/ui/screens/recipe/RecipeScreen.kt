@@ -1,4 +1,4 @@
-package com.example.recipeapp.ui.screens
+package com.example.recipeapp.ui.screens.recipe
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
@@ -67,9 +68,9 @@ import com.example.recipeapp.viewmodels.ViewModelWrapper
 fun RecipeScreen(
     navController: NavController,
     viewModels: ViewModelWrapper,
+    snackbarHostState: SnackbarHostState,
     isPreview: Boolean = false,
 ) {
-    // State variables for recipe details
     val recipe by viewModels.inspection.recipe
     var imageLoading by remember { mutableStateOf(true) }
     var isFavourite by remember { mutableStateOf(false) }
@@ -139,9 +140,7 @@ fun RecipeScreen(
 
     Column(modifier =
         if (isPreview) Modifier.padding(32.dp)
-        else Modifier
-            .padding(32.dp)
-            .verticalScroll(rememberScrollState())
+        else Modifier.padding(32.dp).verticalScroll(rememberScrollState())
     ) {
         if (viewModels.inspection.loading) LinearProgressIndicator()
         else {

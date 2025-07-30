@@ -9,10 +9,12 @@ import com.example.recipeapp.models.FoodLog
 import com.example.recipeapp.models.Log
 import com.example.recipeapp.models.MealType
 import com.example.recipeapp.models.NutrientSummary
+import com.example.recipeapp.models.SelectedFood
 import com.example.recipeapp.repositories.FineliRepository
 import com.example.recipeapp.repositories.FoodRepository
 import com.example.recipeapp.repositories.LogRepository
 import com.example.recipeapp.utils.AlertType
+import com.example.recipeapp.utils.ConversionUtils.calculatePev
 import com.example.recipeapp.utils.ConversionUtils.emptyFood
 import com.example.recipeapp.utils.Result
 import com.example.recipeapp.utils.SharedPreferencesManager
@@ -57,9 +59,14 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
     val nutrients get() = _mealNutrients.value
     val setNutrients: (Map<MealType, NutrientSummary>) -> Unit = { _mealNutrients.value = it }
 
-    private var _selectedFood = mutableStateOf<Food?>(null)
+    private var _selectedFood = mutableStateOf<SelectedFood?>(null)
     val selectedFood get() = _selectedFood.value
-    val setSelectedFood: (Food?) -> Unit = { _selectedFood.value = it }
+    val setSelectedFood: (Food?) -> Unit = {
+        _selectedFood.value = SelectedFood(
+            food = it,
+            pev = calculatePev(it?.calories, it?.protein),
+        )
+    }
 
     private var _selectedMeal = mutableStateOf<MealType?>(null)
     val selectedMeal get() = _selectedMeal.value

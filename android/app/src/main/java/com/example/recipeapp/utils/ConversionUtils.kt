@@ -77,4 +77,11 @@ object ConversionUtils {
             return String.format("%.0f", number)
         }
     }
+
+    fun calculatePev(calories: Double?, proteins: Double?): Double {
+        if (calories !== null && proteins !== null) {
+            return "%.2f".format((proteins.times(4).div(calories)).times(100)).toDouble()
+        }
+        return 0.0
+    }
 }

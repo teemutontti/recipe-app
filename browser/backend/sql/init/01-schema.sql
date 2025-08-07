@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS users;
 
 -- Users table
 CREATE TABLE users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id CHAR(36) PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role VARCHAR(255) NOT NULL
@@ -17,7 +17,7 @@ CREATE TABLE users (
 
 -- Foods table
 CREATE TABLE foods (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id CHAR(36) PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     calories DECIMAL(10,2) NOT NULL,
     carbs DECIMAL(10,2) NOT NULL,
@@ -26,9 +26,9 @@ CREATE TABLE foods (
     barcode VARCHAR(255),
     serving_size INT,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created_by INT,
+    created_by CHAR(36),
     edited TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    edited_by INT,
+    edited_by CHAR(36),
     FOREIGN KEY (edited_by) REFERENCES users(id) ON DELETE SET NULL,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
@@ -40,8 +40,8 @@ CREATE TABLE logs (
     meal VARCHAR(255) NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
     time TIME,
-    user_id INT,
-    food_id INT,
+    user_id CHAR(36),
+    food_id CHAR(36),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (food_id) REFERENCES foods(id) ON DELETE CASCADE
 );

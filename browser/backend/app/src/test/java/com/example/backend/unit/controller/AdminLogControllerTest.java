@@ -4,6 +4,7 @@ import com.example.backend.config.SecurityConfig;
 import com.example.backend.controllers.admin.AdminLogController;
 import com.example.backend.entities.Log;
 import com.example.backend.services.LogService;
+import com.example.backend.unit.utils.TestObjects;
 import com.example.backend.utils.JwtTokenUtil;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,21 +45,17 @@ public class AdminLogControllerTest {
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
 
-    private Log testLog;
     private final String baseUrl = "/api/admin/logs";
 
     @BeforeEach
     public void setup() {
-        testLog = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(0,0,0), "BREAKFAST", 1, 1, 24.0);
+        TestObjects.reset();
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     public void testGetAll_AsAdmin_ReturnLogs() throws Exception {
-        Log log1 = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "BREAKFAST", 1, 1, 24.0);
-        Log log2 = new Log(2, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "LUNCH", 1, 2, 120.0);
-
-        List<Log> logs = List.of(log1, log2);
+        List<Log> logs = List.of(TestObjects.log1, TestObjects.log2);
 
         Pageable pageable = PageRequest.of(1, 10);
         Page<Log> mockPage = new PageImpl<>(logs, pageable, logs.size());
@@ -88,14 +85,14 @@ public class AdminLogControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void testGetById_AsAdmin_ReturnOk() throws Exception {
-        when(service.getById(1L)).thenReturn(new ResponseEntity<>(testLog, HttpStatus.OK));
+        when(service.getById(TestObjects.id)).thenReturn(new ResponseEntity<>(TestObjects.log1, HttpStatus.OK));
 
-        mockMvc.perform(get(baseUrl + "/{id}", 1))
+        mockMvc.perform(get(baseUrl + "/{id}", TestObjects.id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.amount", CoreMatchers.is(testLog.getAmount())))
-                .andExpect(jsonPath("$.meal", CoreMatchers.is(testLog.getMeal())));
+                .andExpect(jsonPath("$.amount", CoreMatchers.is(TestObjects.log1.getAmount())))
+                .andExpect(jsonPath("$.meal", CoreMatchers.is(TestObjects.log1.getMeal())));
 
-        verify(service, times(1)).getById(1L);
+        verify(service, times(1)).getById(TestObjects.id);
     }
 
     @Test
@@ -112,19 +109,16 @@ public class AdminLogControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void testGetByUserId_AsAdmin_ReturnOk() throws Exception {
-        Log log1 = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "BREAKFAST", 1, 1, 24.0);
-        Log log2 = new Log(2, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "LUNCH", 1, 2, 120.0);
+        List<Log> logs = List.of(TestObjects.log1, TestObjects.log2);
 
-        List<Log> logs = List.of(log1, log2);
+        when(service.getLogsByUserId(TestObjects.userId1)).thenReturn(new ResponseEntity<>(logs, HttpStatus.OK));
 
-        when(service.getLogsByUserId(1)).thenReturn(new ResponseEntity<>(logs, HttpStatus.OK));
-
-        mockMvc.perform(get(baseUrl + "/by-user/{id}", 1))
+        mockMvc.perform(get(baseUrl + "/by-user/{id}", TestObjects.userId1))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].amount").value(24.0))
+                .andExpect(jsonPath("$[0].amount").value(22.0))
                 .andExpect(jsonPath("$[1].meal").value("LUNCH"));
 
-        verify(service, times(1)).getLogsByUserId(1);
+        verify(service, times(1)).getLogsByUserId(TestObjects.userId1);
     }
 
     @Test

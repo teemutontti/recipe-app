@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.backend.entities.Food;
 import java.util.List;
+import java.util.UUID;
 
 @Tag(name = "Foods Controller")
 @RestController
@@ -32,7 +33,7 @@ public class FoodController {
     @Operation(summary = "Get food by id")
     @SecurityRequirement(name = "bearerAuth", scopes = { "user" })
     @GetMapping("/{id}")
-    public ResponseEntity<Food> getById(@PathVariable("id") Long id) {
+    public ResponseEntity<Food> getById(@PathVariable("id") UUID id) {
         return service.getById(id);
     }
 

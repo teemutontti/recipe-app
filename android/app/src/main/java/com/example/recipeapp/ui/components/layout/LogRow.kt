@@ -18,8 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.recipeapp.models.Food
-import com.example.recipeapp.models.Log
+import com.example.recipeapp.models.database.Food
+import com.example.recipeapp.models.database.Log
 import com.example.recipeapp.viewmodels.LogsScreenViewModel
 
 /**

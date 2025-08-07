@@ -29,9 +29,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.recipeapp.models.Recipe
+import com.example.recipeapp.models.database.Recipe
 import com.example.recipeapp.ui.components.buttons.TodaysSpecialButton
-import com.example.recipeapp.utils.Constants
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 import kotlinx.coroutines.delay
 

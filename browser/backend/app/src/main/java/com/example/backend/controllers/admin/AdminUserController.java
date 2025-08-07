@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.backend.entities.User;
 
+import java.util.UUID;
+
 @Tag(name = "Admin Users Controller")
 @RestController
 @RequestMapping("/api/admin/users")
@@ -35,21 +37,21 @@ public class AdminUserController {
     @Operation(summary = "Get user by id")
     @SecurityRequirement(name = "bearerAuth", scopes = { "admin" })
     @GetMapping("/{id}")
-    public ResponseEntity<User> getById(@PathVariable("id") Long id) {
+    public ResponseEntity<User> getById(@PathVariable("id") UUID id) {
         return service.getById(id);
     }
 
     @Operation(summary = "Update user")
     @SecurityRequirement(name = "bearerAuth", scopes = { "admin" })
     @PatchMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable("id") Long id, @Valid @RequestBody UserDto item) {
+    public ResponseEntity<User> update(@PathVariable("id") UUID id, @Valid @RequestBody UserDto item) {
         return service.update(id, item);
     }
 
     @Operation(summary = "Delete user")
     @SecurityRequirement(name = "bearerAuth", scopes = { "admin" })
     @DeleteMapping("/{id}")
-    public ResponseEntity<User> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<User> delete(@PathVariable("id") UUID id) {
         return service.delete(id);
     }
 }

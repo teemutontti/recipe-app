@@ -7,8 +7,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
 import lombok.Data;
+import org.hibernate.type.SqlTypes;
+
+import java.util.UUID;
 
 @Entity
 @Data
@@ -18,8 +22,16 @@ import lombok.Data;
 public class Food {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "id", columnDefinition = "CHAR(36)")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    private UUID id;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID();
+        }
+    }
 
     @Column(nullable = false)
     @NotBlank
@@ -47,11 +59,11 @@ public class Food {
 
     @Column(nullable = false)
     @NotNull
-    private Integer createdBy;
+    private UUID createdBy;
 
     @Column(nullable = false)
     @NotNull
-    private Integer editedBy;
+    private UUID editedBy;
 
     @CreationTimestamp
     @Column(nullable = false)

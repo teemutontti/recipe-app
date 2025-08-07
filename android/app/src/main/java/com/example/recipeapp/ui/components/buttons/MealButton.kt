@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.example.recipeapp.models.MealType
+import com.example.recipeapp.models.database.MealType
 import com.example.recipeapp.utils.FormattingUtils.toLowerCaseCapitalizeFirst
 import com.example.recipeapp.viewmodels.LogsScreenViewModel
 

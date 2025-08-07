@@ -4,6 +4,7 @@ import com.example.backend.config.SecurityConfig;
 import com.example.backend.controllers.FoodController;
 import com.example.backend.entities.Food;
 import com.example.backend.services.FoodService;
+import com.example.backend.unit.utils.TestObjects;
 import com.example.backend.utils.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
@@ -53,12 +54,11 @@ class FoodControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Food testFood;
     private final String baseUrl = "/api/foods";
 
     @BeforeEach
     public void setup() throws JOSEException {
-        testFood = new Food(1, "Kanan rintafilee", "1234567890", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "2025-01-01", "2025-01-01");
+        TestObjects.reset();
     }
 
     @Test
@@ -66,24 +66,20 @@ class FoodControllerTest {
     void testCreateFood_ReturnCreated() throws Exception {
         // Use any(Food.class) because the User instance created during JSON deserialization
         // won't match the exact instance in the test setup.
-        when(service.create(any(Food.class))).thenReturn(new ResponseEntity<>(testFood, HttpStatus.CREATED));
+        when(service.create(any(Food.class))).thenReturn(new ResponseEntity<>(TestObjects.food1, HttpStatus.CREATED));
 
         mockMvc.perform(post(baseUrl)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testFood)))
+                .content(objectMapper.writeValueAsString(TestObjects.food1)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name", CoreMatchers.is(testFood.getName())))
-                .andExpect(jsonPath("$.calories", CoreMatchers.is(testFood.getCalories())));
+                .andExpect(jsonPath("$.name", CoreMatchers.is(TestObjects.food1.getName())))
+                .andExpect(jsonPath("$.calories", CoreMatchers.is(TestObjects.food1.getCalories())));
     }
 
     @Test
     @WithMockUser
     void testGetAll_ReturnsFoods() throws Exception {
-        // Arrange
-        Food food1 = new Food(1, "Kana", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
-        Food food2 = new Food(2, "Riisi", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
-
-        List<Food> foods = Arrays.asList(food1, food2);
+        List<Food> foods = Arrays.asList(TestObjects.food1, TestObjects.food2);
         Pageable pageable = PageRequest.of(1, 10);
         Page<Food> mockPage = new PageImpl<>(foods, pageable, foods.size());
 
@@ -97,8 +93,8 @@ class FoodControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.size()", CoreMatchers.is(2)))
-                .andExpect(jsonPath("$.content[0].name", CoreMatchers.is("Kana")))
-                .andExpect(jsonPath("$.content[1].name", CoreMatchers.is("Riisi")));
+                .andExpect(jsonPath("$.content[0].name", CoreMatchers.is("Kanan rintafilee")))
+                .andExpect(jsonPath("$.content[1].name", CoreMatchers.is("Riisi (keitetty)")));
     }
 
     @ParameterizedTest
@@ -107,22 +103,22 @@ class FoodControllerTest {
     void testCreateFood_InvalidFields_ReturnBadRequest(String missingField) throws Exception {
         switch (missingField) {
             case "name":
-                testFood.setName(null);
+                TestObjects.food1.setName(null);
                 break;
             case "calories":
-                testFood.setCalories(null);
+                TestObjects.food1.setCalories(null);
                 break;
             case "createdBy":
-                testFood.setCreatedBy(null);
+                TestObjects.food1.setCreatedBy(null);
                 break;
             case "servingSize":
-                testFood.setServingSize(0);
+                TestObjects.food1.setServingSize(0);
                 break;
         }
 
         mockMvc.perform(post(baseUrl)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testFood)))
+                .content(objectMapper.writeValueAsString(TestObjects.food1)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -134,19 +130,19 @@ class FoodControllerTest {
     @Test
     @WithMockUser
     void testGetById_ReturnOk() throws Exception {
-        when(service.getById(1L)).thenReturn(new ResponseEntity<>(testFood, HttpStatus.OK));
+        when(service.getById(TestObjects.id)).thenReturn(new ResponseEntity<>(TestObjects.food1, HttpStatus.OK));
 
-        mockMvc.perform(get(baseUrl + "/{id}", 1))
+        mockMvc.perform(get(baseUrl + "/{id}", TestObjects.id))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name", CoreMatchers.is(testFood.getName())))
-                .andExpect(jsonPath("$.calories", CoreMatchers.is(testFood.getCalories())));
+                .andExpect(jsonPath("$.name", CoreMatchers.is(TestObjects.food1.getName())))
+                .andExpect(jsonPath("$.calories", CoreMatchers.is(TestObjects.food1.getCalories())));
     }
 
     @Test
     @WithMockUser
     void testGetById_ReturnNotFound() throws Exception {
-        when(service.getById(13L)).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-        mockMvc.perform(get(baseUrl + "/{id}", 13)).andExpect(status().isNotFound());
+        when(service.getById(TestObjects.id)).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        mockMvc.perform(get(baseUrl + "/{id}", TestObjects.id)).andExpect(status().isNotFound());
     }
 
     @Test
@@ -157,17 +153,14 @@ class FoodControllerTest {
     @Test
     @WithMockUser
     void testQuery_ReturnOk() throws Exception {
-        Food food1 = new Food(1, "Kana", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
-        Food food2 = new Food(2, "Riisi", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
-
-        List<Food> foods = List.of(food1, food2);
+        List<Food> foods = List.of(TestObjects.food1, TestObjects.food2);
 
         when(service.getFoodsByQuery(anyString())).thenReturn(new ResponseEntity<>(foods, HttpStatus.OK));
 
         mockMvc.perform(get(baseUrl + "/query")
                 .param("query", "ka"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Kana"))
+                .andExpect(jsonPath("$[0].name").value("Kanan rintafilee"))
                 .andExpect(jsonPath("$[0].calories").value(250.0));
     }
 }

@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.recipeapp.models.Food
+import com.example.recipeapp.models.database.Food
 import kotlin.math.roundToInt
 
 @Composable

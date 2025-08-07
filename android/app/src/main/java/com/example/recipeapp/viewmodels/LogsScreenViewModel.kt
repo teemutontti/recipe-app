@@ -4,24 +4,23 @@ import android.app.Application
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
-import com.example.recipeapp.models.Food
-import com.example.recipeapp.models.FoodLog
-import com.example.recipeapp.models.Log
-import com.example.recipeapp.models.MealType
-import com.example.recipeapp.models.NutrientSummary
-import com.example.recipeapp.models.SelectedFood
-import com.example.recipeapp.repositories.FineliRepository
-import com.example.recipeapp.repositories.FoodRepository
-import com.example.recipeapp.repositories.LogRepository
+import com.example.recipeapp.models.database.Food
+import com.example.recipeapp.models.database.FoodLog
+import com.example.recipeapp.models.database.Log
+import com.example.recipeapp.models.database.MealType
+import com.example.recipeapp.models.database.NutrientSummary
+import com.example.recipeapp.models.database.SelectedFood
+import com.example.recipeapp.repositories.database.FineliRepository
+import com.example.recipeapp.repositories.database.FoodRepository
+import com.example.recipeapp.repositories.database.LogRepository
 import com.example.recipeapp.utils.AlertType
 import com.example.recipeapp.utils.ConversionUtils.calculatePev
 import com.example.recipeapp.utils.ConversionUtils.emptyFood
 import com.example.recipeapp.utils.Result
-import com.example.recipeapp.utils.SharedPreferencesManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.util.UUID
 
 class LogsScreenViewModel(application: Application): BaseViewModel(application) {
     private val logRepository = LogRepository(this.encryptedSharedPreferences)
@@ -150,6 +149,7 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
     }
 
     fun loadFoods() {
+        android.util.Log.d("LogsScreenViewModel", "foods")
         foodPage = 0 // Reset food page
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -163,6 +163,7 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
     }
 
     fun loadMoreFoods() {
+        android.util.Log.d("LogsScreenViewModel", "MORE foods")
         if (loading) return
         setLoading(true)
 
@@ -170,6 +171,7 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
             foodPage++
             val result = foodRepository.getFoods(foodPage, foodPageSize)
             if (result.isSuccessful()) {
+                android.util.Log.d("LogsScreenViewModel", "LoadMoreFoods result: ${result.value}")
                 _foods.value += result.value ?: emptyList()
             }
             setLoading(false)
@@ -208,7 +210,7 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
         }
     }
 
-    fun deleteLog(id: Int) {
+    fun deleteLog(id: UUID) {
         viewModelScope.launch(Dispatchers.IO) {
             val result = logRepository.deleteLog(id)
             if (result.isSuccessful()) {
@@ -224,26 +226,31 @@ class LogsScreenViewModel(application: Application): BaseViewModel(application) 
 
     fun searchFoods(query: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val result = fineliRepository.getFoodsByQuery(query)
-            if (result.isSuccessful()) {
-                _foods.value = result.value?.map { it.toFood() } ?: emptyList()
-            }
-        }
+            val fineliResult = fineliRepository.getFoodsByQuery(query)
+            val repositoryResult = foodRepository.getFoodsByQuery(query)
 
-        viewModelScope.launch(Dispatchers.IO) {
-            val result = foodRepository.getFoodsByQuery(query)
-            if (result.isSuccessful()) {
-                _foods.value = result.value ?: emptyList()
+            val combinedFoods = mutableListOf<Food>()
+
+            if (fineliResult.isSuccessful()) {
+                combinedFoods.addAll(fineliResult.value?.map { it.toFood() } ?: emptyList())
             }
+            if (repositoryResult.isSuccessful()) {
+                combinedFoods.addAll(repositoryResult.value ?: emptyList())
+            }
+
+            _foods.value = combinedFoods
         }
     }
 
-    suspend fun fetchFoodById(id: Int): Food?  {
+    suspend fun fetchFoodById(id: UUID): Food?  {
         val result = foodRepository.getFoodById(id)
         return if (result.isSuccessful()) result.value else null
     }
 
     fun saveFood(food: Food) {
+        android.util.Log.d("LogsScreenViewModel", "Saving food: $food")
+
+
         viewModelScope.launch(Dispatchers.IO) {
             val result = foodRepository.saveFood(food)
             if (result.isSuccessful()) {

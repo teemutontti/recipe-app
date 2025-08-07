@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class FoodService {
@@ -25,6 +26,7 @@ public class FoodService {
             Food data = repository.save(entity);
             return new ResponseEntity<>(data, HttpStatus.CREATED);
         } catch (Exception e) {
+            System.out.println("Exception in adding food:" + e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -40,7 +42,7 @@ public class FoodService {
         }
     }
 
-    public ResponseEntity<Food> getById(Long id) {
+    public ResponseEntity<Food> getById(UUID id) {
         try {
             Food data = repository.findById(id).orElse(null);
             if (data == null) {
@@ -52,7 +54,7 @@ public class FoodService {
         }
     }
 
-    public ResponseEntity<Food> update(Long id, Food entity) {
+    public ResponseEntity<Food> update(UUID id, Food entity) {
         try {
             Food existingEntity = repository.findById(id).orElse(null);
 
@@ -66,7 +68,7 @@ public class FoodService {
         }
     }
 
-    public ResponseEntity<Food> delete(Long id) {
+    public ResponseEntity<Food> delete(UUID id) {
         try {
             repository.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);

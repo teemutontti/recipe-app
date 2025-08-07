@@ -4,6 +4,7 @@ import com.example.backend.config.SecurityConfig;
 import com.example.backend.entities.Food;
 import com.example.backend.repositories.FoodRepository;
 import com.example.backend.services.FoodService;
+import com.example.backend.unit.utils.TestObjects;
 import com.example.backend.utils.JwtTokenUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,95 +41,81 @@ public class FoodServiceTest {
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
 
-    private Food testFood;
-
     @BeforeEach
     public void setup() {
-        testFood = new Food(1, "Kanan rintafilee", "1234567890", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
+        TestObjects.reset();
         repository.deleteAll();
     }
 
     @Test
     @WithMockUser
     public void testSaveFood_ReturnsFood() {
-        when(repository.save(any(Food.class))).thenReturn(testFood);
+        when(repository.save(any(Food.class))).thenReturn(TestObjects.food1);
 
-        ResponseEntity<Food> response = service.create(testFood);
+        ResponseEntity<Food> response = service.create(TestObjects.food1);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(1, response.getBody().getId());
         assertEquals("Kanan rintafilee", response.getBody().getName());
         assertEquals(250.0, response.getBody().getCalories());
     }
 
     @Test
     public void testFindById_ReturnsFood() {
-        when(repository.findById(1L)).thenReturn(Optional.ofNullable(testFood));
+        when(repository.findById(TestObjects.id)).thenReturn(Optional.ofNullable(TestObjects.food1));
 
-        ResponseEntity<Food> response = service.getById(1L);
+        ResponseEntity<Food> response = service.getById(TestObjects.id);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(1, response.getBody().getId());
         assertEquals("Kanan rintafilee", response.getBody().getName());
         assertEquals(250.0, response.getBody().getCalories());
     }
 
     @Test
     public void testGetAll_ReturnsMultipleFoods() {
-        // Arrange
-        Food food1 = new Food(1, "Kana", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
-        Food food2 = new Food(2, "Riisi", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
-
         List<Food> foods = new ArrayList<>();
-        foods.add(food1);
-        foods.add(food2);
+        foods.add(TestObjects.food1);
+        foods.add(TestObjects.food2);
 
         Pageable pageable = PageRequest.of(1, 10);
         Page<Food> mockPage = new PageImpl<>(foods, pageable, foods.size());
 
         when(repository.findAll(any(Pageable.class))).thenReturn(mockPage);
 
-        // Act
         ResponseEntity<Page<Food>> response = service.getAll(1, 10);
 
-        // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(2, response.getBody().getContent().size());
     }
 
     @Test
     public void testUpdateFood_ReturnsFood() {
-        when(repository.findById(1L)).thenReturn(Optional.of(testFood));
-        when(repository.save(any(Food.class))).thenReturn(testFood);
+        when(repository.findById(TestObjects.id)).thenReturn(Optional.of(TestObjects.food1));
+        when(repository.save(any(Food.class))).thenReturn(TestObjects.food1);
 
-        testFood.setName("Riisi");
-        testFood.setCalories(245.0);
-        ResponseEntity<Food> response = service.update(1L, testFood);
+        TestObjects.food1.setName("Riisi");
+        TestObjects.food1.setCalories(245.0);
+        ResponseEntity<Food> response = service.update(TestObjects.id, TestObjects.food1);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertTrue(response.getBody().getId() > 0);
         assertEquals("Riisi", response.getBody().getName());
         assertEquals(245.0, response.getBody().getCalories());
     }
 
     @Test
     public void testDeleteFood_ReturnsNullBody() {
-        doNothing().when(repository).deleteById(1L);
+        doNothing().when(repository).deleteById(TestObjects.id);
 
-        ResponseEntity<Food> response = service.delete(1L);
+        ResponseEntity<Food> response = service.delete(TestObjects.id);
 
-        verify(repository, times(1)).deleteById(1L);
+        verify(repository, times(1)).deleteById(TestObjects.id);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNull(response.getBody());
     }
 
     @Test
     public void testGetFoodsByQuery_ReturnsMultipleFoods() {
-        // Arrange
-        Food food1 = new Food(1, "Kana", "", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "", "");
-
-        List<Food> foods = List.of(food1);
+        List<Food> foods = List.of(TestObjects.food1);
 
         when(repository.findFoodsByNameContainingIgnoreCase(anyString())).thenReturn(foods);
 
@@ -138,6 +125,6 @@ public class FoodServiceTest {
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, response.getBody().size());
-        assertEquals("Kana", response.getBody().get(0).getName());
+        assertEquals("Kanan rintafilee", response.getBody().get(0).getName());
     }
 }

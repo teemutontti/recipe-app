@@ -11,6 +11,7 @@ import com.example.backend.entities.Log;
 import com.example.backend.repositories.LogRepository;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class LogService {
@@ -42,7 +43,7 @@ public class LogService {
         }
     }
 
-    public ResponseEntity<Log> getById(Long id) {
+    public ResponseEntity<Log> getById(UUID id) {
         try {
             Log data = repository.findById(id).orElse(null);
             if (data == null) {
@@ -54,7 +55,7 @@ public class LogService {
         }
     }
 
-    public ResponseEntity<Log> update(Long id, Log entity) {
+    public ResponseEntity<Log> update(UUID id, Log entity) {
         try {
             Log existingEntity = repository.findById(id).orElse(null);
 
@@ -68,7 +69,7 @@ public class LogService {
         }
     }
 
-    public ResponseEntity<Log> delete(Long id) {
+    public ResponseEntity<Log> delete(UUID id) {
         try {
             repository.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -77,7 +78,7 @@ public class LogService {
         }
     }
 
-    public ResponseEntity<List<Log>> getLogsByDateAndUser(LocalDate date, Integer userId) {
+    public ResponseEntity<List<Log>> getLogsByDateAndUser(LocalDate date, UUID userId) {
         try {
             List<Log> logs = repository.findByDateAndUserId(date, userId);
             return new ResponseEntity<>(logs, HttpStatus.OK);
@@ -86,7 +87,7 @@ public class LogService {
         }
     }
 
-    public ResponseEntity<List<Log>> getLogsByUserId(Integer id) {
+    public ResponseEntity<List<Log>> getLogsByUserId(UUID id) {
         try {
             List<Log> logs = repository.findByUserId(id);
             return new ResponseEntity<>(logs, HttpStatus.OK);

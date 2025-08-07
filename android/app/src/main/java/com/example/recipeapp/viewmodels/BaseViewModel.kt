@@ -7,11 +7,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
-import com.example.recipeapp.repositories.AuthRepository
 import com.example.recipeapp.utils.Alert
 import com.example.recipeapp.utils.AlertType
 import com.example.recipeapp.utils.SharedPreferencesKeys
 import com.example.recipeapp.utils.SharedPreferencesManager
+import java.util.UUID
 
 open class BaseViewModel(application: Application): AndroidViewModel(application) {
     protected val encryptedSharedPreferences: SharedPreferences;
@@ -38,8 +38,9 @@ open class BaseViewModel(application: Application): AndroidViewModel(application
         _alert.value = Alert(message, type)
     }
 
-    fun getUserId(): Int {
-        return SharedPreferencesManager.getUser(encryptedSharedPreferences)?.id ?: -1
+    fun getUserId(): UUID {
+        return SharedPreferencesManager.getUser(encryptedSharedPreferences)?.id
+            ?: UUID.fromString("ff9bd4c4-8292-49ad-8b56-9c638051212e")
     }
 
     fun clearAlert() {

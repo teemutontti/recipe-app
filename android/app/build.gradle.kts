@@ -6,6 +6,12 @@ plugins {
     id("kotlin-kapt")
 }
 
+kapt {
+    arguments {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
+}
+
 android {
     namespace = "com.example.recipeapp"
     compileSdk = 34
@@ -18,20 +24,24 @@ android {
 
     val apiKey = properties.getProperty("API_KEY") ?: ""
     val releaseBaseUrl = properties.getProperty("RELEASE_BASE_URL") ?: ""
+    val appUUID = properties.getProperty("APP_UUID") ?: ""
+    val fineliUUID = properties.getProperty("FINELI_UUID") ?: ""
 
     defaultConfig {
         applicationId = "com.example.recipeapp"
         minSdk = 26
         targetSdk = 34
         versionCode = 5
-        versionName = "1.3.2"
+        versionName = "1.3.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "API_KEY", "$apiKey")
+        buildConfigField("String", "API_KEY", apiKey)
+        buildConfigField("String", "APP_UUID", appUUID)
+        buildConfigField("String", "FINELI_UUID", fineliUUID)
     }
 
     buildFeatures {
@@ -40,7 +50,9 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/\"")
+            // Use 10.0... url for emulators and 127.0... for actual devices
+            //buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/\"")
+            buildConfigField("String", "BASE_URL", "\"http://127.0.0.1:8080/\"")
         }
 
         release {
@@ -49,21 +61,21 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "BASE_URL", "\"$releaseBaseUrl\"")
+            buildConfigField("String", "BASE_URL", releaseBaseUrl)
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.13"
     }
     packaging {
         resources {
@@ -109,7 +121,7 @@ dependencies {
     implementation(libs.androidx.room.ktx) // Needed for coroutine support
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.security.crypto)
-    implementation (libs.logging.interceptor) // check latest version
+    implementation (libs.logging.interceptor)
 
     // Barcode dependencies
     implementation(libs.barcode.scanning)

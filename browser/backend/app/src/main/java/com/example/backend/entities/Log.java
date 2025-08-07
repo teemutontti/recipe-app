@@ -1,9 +1,8 @@
 package com.example.backend.entities;
 
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
-
+import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -11,6 +10,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Data
@@ -20,8 +21,16 @@ import lombok.NoArgsConstructor;
 public class Log {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @Column(name = "id", columnDefinition = "CHAR(36)")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    private UUID id;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID();
+        }
+    }
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Column(nullable = false)
@@ -39,11 +48,11 @@ public class Log {
 
     @Column(nullable = false)
     @NotNull
-    private Integer userId;
+    private UUID userId;
 
     @Column(nullable = false)
     @NotNull
-    private Integer foodId;
+    private UUID foodId;
 
     @Column(nullable = false)
     @NotNull

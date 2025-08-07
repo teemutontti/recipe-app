@@ -29,7 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import com.example.recipeapp.models.ShoppingListItem
+import com.example.recipeapp.models.room.ShoppingListItem
 import com.example.recipeapp.ui.components.misc.SwipeBackgroundElement
 import com.example.recipeapp.ui.components.misc.CheckCircle
 import com.example.recipeapp.viewmodels.ShoppingListViewModel

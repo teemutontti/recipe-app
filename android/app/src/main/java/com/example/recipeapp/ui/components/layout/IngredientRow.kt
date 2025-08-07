@@ -31,8 +31,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.example.recipeapp.models.Ingredient
-import com.example.recipeapp.models.ShoppingListItem
+import com.example.recipeapp.models.database.Ingredient
+import com.example.recipeapp.models.room.ShoppingListItem
 import com.example.recipeapp.ui.components.misc.SwipeBackgroundElement
 import com.example.recipeapp.ui.components.buttons.RemoveButton
 import com.example.recipeapp.utils.ConversionUtils.convertToFraction

@@ -2,6 +2,7 @@ package com.example.backend.unit.repository;
 
 import com.example.backend.entities.Log;
 import com.example.backend.repositories.LogRepository;
+import com.example.backend.unit.utils.TestObjects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +21,15 @@ class LogRepositoryTest {
     @Autowired
     private LogRepository repository;
 
-    private Log testLog;
-
     @BeforeEach
     public void setup() {
-        testLog = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(9,0, 0), "BREAKFAST", 1, 1, 22.0);
+        TestObjects.reset();
         repository.deleteAll();
     }
 
     @Test
     public void testSaveLog_ReturnsSavedLog() {
-        Log saved = repository.save(testLog);
+        Log saved = repository.save(TestObjects.log1);
 
         assertNotNull(saved.getId());
         assertEquals(22, saved.getAmount());
@@ -39,23 +38,19 @@ class LogRepositoryTest {
 
     @Test
     public void testFindById_ReturnsLog() {
-        Log saved = repository.save(testLog);
+        Log saved = repository.save(TestObjects.log1);
 
-        Log found = repository.findById(Long.valueOf(saved.getId())).get();
+        Log found = repository.findById(saved.getId()).get();
 
         assertNotNull(found);
-        assertTrue(found.getId() > 0);
         assertEquals(22, found.getAmount());
         assertEquals("BREAKFAST", found.getMeal());
     }
 
     @Test
     public void testFindAll_ReturnsMultipleLogs() {
-        Log log1 = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(9,0, 0), "BREAKFAST", 1, 1, 22.0);
-        Log log2 = new Log(2, LocalDate.of(2025, 1, 15), LocalTime.of(13,0, 0), "LUNCH", 1, 2, 150.0);
-
-        repository.save(log1);
-        repository.save(log2);
+        repository.save(TestObjects.log1);
+        repository.save(TestObjects.log2);
 
         List<Log> found = repository.findAll();
 
@@ -66,7 +61,7 @@ class LogRepositoryTest {
 
     @Test
     public void testUpdateUser_ReturnsLog() {
-        Log saved = repository.save(testLog);
+        Log saved = repository.save(TestObjects.log1);
 
         saved.setAmount(120.0);
         saved.setMeal("SNACKS");
@@ -79,10 +74,10 @@ class LogRepositoryTest {
 
     @Test
     public void testDeleteUser_ReturnsEmptyList() {
-        Log saved = repository.save(testLog);
+        Log saved = repository.save(TestObjects.log1);
 
         repository.delete(saved);
-        Optional<Log> found = repository.findById(Long.valueOf(saved.getId()));
+        Optional<Log> found = repository.findById(saved.getId());
 
         assertFalse(found.isPresent());
         assertEquals(0, repository.findAll().size());
@@ -90,37 +85,27 @@ class LogRepositoryTest {
 
     @Test
     public void testFindByDate_ReturnsMultipleLogs() {
-        Log log1 = new Log(null, LocalDate.of(2025, 1, 15), LocalTime.of(9,0, 0), "BREAKFAST", 1, 1, 22.0);
-        Log log2 = new Log(null, LocalDate.of(2025, 1, 15), LocalTime.of(13,0, 0), "LUNCH", 1, 2, 150.0);
-        Log log3 = new Log(null, LocalDate.of(2025, 1, 20), LocalTime.of(13,0, 0), "LUNCH", 1, 2, 150.0);
+        repository.save(TestObjects.log1);
+        repository.save(TestObjects.log2);
+        repository.save(TestObjects.log3);
 
-        repository.save(log1);
-        repository.save(log2);
-        repository.save(log3);
-
-        LocalDate date1 = LocalDate.of(2025, 1, 15);
-        List<Log> found1 = repository.findByDateAndUserId(date1, 1);
+        List<Log> found1 = repository.findByDateAndUserId(TestObjects.date, TestObjects.userId1);
         assertEquals(2, found1.size());
 
-        LocalDate date2 = LocalDate.of(2025, 1, 20);
-        List<Log> found2 = repository.findByDateAndUserId(date2, 1);
+        List<Log> found2 = repository.findByDateAndUserId(TestObjects.date, TestObjects.userId2);
         assertEquals(1, found2.size());
     }
 
     @Test
     public void testFindByUserId_ReturnsMultipleLogs() {
-        Log log1 = new Log(null, LocalDate.of(2025, 1, 15), LocalTime.of(9,0, 0), "BREAKFAST", 1, 1, 22.0);
-        Log log2 = new Log(null, LocalDate.of(2025, 1, 15), LocalTime.of(13,0, 0), "LUNCH", 2, 2, 150.0);
-        Log log3 = new Log(null, LocalDate.of(2025, 1, 20), LocalTime.of(13,0, 0), "LUNCH", 1, 2, 150.0);
+        repository.save(TestObjects.log1);
+        repository.save(TestObjects.log2);
+        repository.save(TestObjects.log3);
 
-        repository.save(log1);
-        repository.save(log2);
-        repository.save(log3);
-
-        List<Log> found1 = repository.findByUserId(1);
+        List<Log> found1 = repository.findByUserId(TestObjects.userId1);
         assertEquals(2, found1.size());
 
-        List<Log> found2 = repository.findByUserId(2);
+        List<Log> found2 = repository.findByUserId(TestObjects.userId2);
         assertEquals(1, found2.size());
     }
 }

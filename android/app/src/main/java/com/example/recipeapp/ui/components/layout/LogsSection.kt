@@ -4,7 +4,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
-import com.example.recipeapp.models.Log
+import com.example.recipeapp.models.database.Log
 import com.example.recipeapp.ui.components.misc.ItemDivider
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 

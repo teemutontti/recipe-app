@@ -5,6 +5,7 @@ import com.example.backend.controllers.FoodController;
 import com.example.backend.controllers.admin.AdminFoodController;
 import com.example.backend.entities.Food;
 import com.example.backend.services.FoodService;
+import com.example.backend.unit.utils.TestObjects;
 import com.example.backend.utils.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
@@ -58,12 +59,11 @@ class AdminFoodControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Food testFood;
     private final String baseUrl = "/api/admin/foods";
 
     @BeforeEach
     public void setup() throws JOSEException {
-        testFood = new Food(1, "Kanan rintafilee", "1234567890", 100, 250.0, 0.0, 0.0, 0.0, 1, 1, "2025-01-01", "2025-01-01");
+        TestObjects.reset();
     }
 
     @Test
@@ -80,21 +80,21 @@ class AdminFoodControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void testUpdateFood_AllFields_ReturnFood() throws Exception {
-        testFood.setName("New name");
-        testFood.setCalories(150.0);
-        testFood.setBarcode("1536473434");
-        testFood.setServingSize(400);
-        testFood.setCarbs(128.0);
-        testFood.setProtein(24.0);
-        testFood.setFat(45.0);
+        TestObjects.food1.setName("New name");
+        TestObjects.food1.setCalories(150.0);
+        TestObjects.food1.setBarcode("1536473434");
+        TestObjects.food1.setServingSize(400);
+        TestObjects.food1.setCarbs(128.0);
+        TestObjects.food1.setProtein(24.0);
+        TestObjects.food1.setFat(45.0);
 
         // Use eq(1L) to match the exact ID and any(Food.class) to allow any User instance.
-        when(service.getById(eq(1L))).thenReturn(new ResponseEntity<>(testFood, HttpStatus.OK));
-        when(service.update(eq(1L), any(Food.class))).thenReturn(new ResponseEntity<>(testFood, HttpStatus.OK));
+        when(service.getById(TestObjects.id)).thenReturn(new ResponseEntity<>(TestObjects.food1, HttpStatus.OK));
+        when(service.update(eq(TestObjects.id), any(Food.class))).thenReturn(new ResponseEntity<>(TestObjects.food1, HttpStatus.OK));
 
-        mockMvc.perform(patch(baseUrl + "/{id}", 1)
+        mockMvc.perform(patch(baseUrl + "/{id}", TestObjects.id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testFood)))
+                .content(objectMapper.writeValueAsString(TestObjects.food1)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", CoreMatchers.is("New name")))
                 .andExpect(jsonPath("$.calories", CoreMatchers.is(150.0)))
@@ -108,22 +108,22 @@ class AdminFoodControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void testUpdateFood_InvalidObject_ReturnsNotFound() throws Exception {
-        testFood.setCalories(-100.0);
+        TestObjects.food1.setCalories(-100.0);
 
         mockMvc.perform(patch(baseUrl + "/{id}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testFood)))
+                .content(objectMapper.writeValueAsString(TestObjects.food1)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     void testUpdateFood_InvalidId_ReturnsNotFound() throws Exception {
-        when(service.getById(eq(99L))).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        when(service.getById(TestObjects.id)).thenReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
-        mockMvc.perform(patch(baseUrl + "/{id}", 99)
+        mockMvc.perform(patch(baseUrl + "/{id}", TestObjects.id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testFood)))
+                .content(objectMapper.writeValueAsString(TestObjects.food1)))
                 .andExpect(status().isNotFound());
     }
 
@@ -141,8 +141,8 @@ class AdminFoodControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void testDeleteFood_AsAdmin_ReturnOk() throws Exception {
-        when(service.delete(1L)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
-        MvcResult result = mockMvc.perform(delete(baseUrl + "/{id}", 1))
+        when(service.delete(TestObjects.id)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+        MvcResult result = mockMvc.perform(delete(baseUrl + "/{id}", TestObjects.id))
                 .andExpect(status().isOk()).andReturn();
 
         assertTrue(result.getResponse().getContentAsString().isEmpty());

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.backend.entities.Log;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Tag(name = "Logs Controller")
 @RestController
@@ -32,21 +33,21 @@ public class LogController {
     @Operation(summary = "Update log")
     @SecurityRequirement(name = "bearerAuth", scopes = { "user" })
     @PatchMapping("/{id}")
-    public ResponseEntity<Log> update(@PathVariable("id") Long id, @Valid @RequestBody Log item) {
+    public ResponseEntity<Log> update(@PathVariable("id") UUID id, @Valid @RequestBody Log item) {
         return service.update(id, item);
     }
 
     @Operation(summary = "Delete log")
     @SecurityRequirement(name = "bearerAuth", scopes = { "user" })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Log> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Log> delete(@PathVariable("id") UUID id) {
         return service.delete(id);
     }
 
     @Operation(summary = "Get logs by date and user id")
     @SecurityRequirement(name = "bearerAuth", scopes = { "user" })
     @GetMapping("/by-date")
-    public ResponseEntity<List<Log>> getLogsByDateAndUser(@RequestParam String date, @RequestParam Integer userId) {
+    public ResponseEntity<List<Log>> getLogsByDateAndUser(@RequestParam String date, @RequestParam UUID userId) {
         LocalDate parsedDate = LocalDate.parse(date);
         return service.getLogsByDateAndUser(parsedDate, userId);
     }

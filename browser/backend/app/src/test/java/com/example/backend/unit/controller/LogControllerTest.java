@@ -4,6 +4,7 @@ import com.example.backend.config.SecurityConfig;
 import com.example.backend.controllers.LogController;
 import com.example.backend.entities.Log;
 import com.example.backend.services.LogService;
+import com.example.backend.unit.utils.TestObjects;
 import com.example.backend.utils.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
@@ -49,12 +50,11 @@ public class LogControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Log testLog;
     private final String baseUrl = "/api/logs";
 
     @BeforeEach
     public void setup() {
-        testLog = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(0,0,0), "BREAKFAST", 1, 1, 24.0);
+        TestObjects.reset();
     }
 
     @Test
@@ -62,24 +62,24 @@ public class LogControllerTest {
     public void testCreateLog_ReturnCreated() throws Exception {
         // Use any(Log.class) because the User instance created during JSON deserialization
         // won't match the exact instance in the test setup.
-        when(service.create(any(Log.class))).thenReturn(new ResponseEntity<>(testLog, HttpStatus.CREATED));
+        when(service.create(any(Log.class))).thenReturn(new ResponseEntity<>(TestObjects.log1, HttpStatus.CREATED));
 
         mockMvc.perform(post(baseUrl)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testLog)))
+                .content(objectMapper.writeValueAsString(TestObjects.log1)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.amount", CoreMatchers.is(testLog.getAmount())))
-                .andExpect(jsonPath("$.meal", CoreMatchers.is(testLog.getMeal())));
+                .andExpect(jsonPath("$.amount", CoreMatchers.is(TestObjects.log1.getAmount())))
+                .andExpect(jsonPath("$.meal", CoreMatchers.is(TestObjects.log1.getMeal())));
     }
 
     @Test
     @WithMockUser
     public void testCreateLog_InvalidAmount_ReturnBadRequest() throws Exception {
-        testLog.setAmount(-1.0);
+        TestObjects.log1.setAmount(-1.0);
 
         mockMvc.perform(post(baseUrl)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testLog)))
+                .content(objectMapper.writeValueAsString(TestObjects.log1)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -91,15 +91,15 @@ public class LogControllerTest {
     @Test
     @WithMockUser
     public void testUpdateLog_ReturnFood() throws Exception {
-        testLog.setAmount(100.0);
-        testLog.setMeal("SNACKS");
+        TestObjects.log1.setAmount(100.0);
+        TestObjects.log1.setMeal("SNACKS");
 
         // Use eq(1L) to match the exact ID and any(Log.class) to allow any User instance.
-        when(service.update(eq(1L), any(Log.class))).thenReturn(new ResponseEntity<>(testLog, HttpStatus.OK));
+        when(service.update(eq(TestObjects.id), any(Log.class))).thenReturn(new ResponseEntity<>(TestObjects.log1, HttpStatus.OK));
 
-        mockMvc.perform(patch(baseUrl + "/{id}", 1)
+        mockMvc.perform(patch(baseUrl + "/{id}", TestObjects.id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testLog)))
+                .content(objectMapper.writeValueAsString(TestObjects.log1)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.amount", CoreMatchers.is(100.0)))
                 .andExpect(jsonPath("$.meal", CoreMatchers.is("SNACKS")));
@@ -113,8 +113,8 @@ public class LogControllerTest {
     @Test
     @WithMockUser
     public void testDeleteLog_ReturnEmpty() throws Exception {
-        when(service.delete(1L)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
-        MvcResult result = mockMvc.perform(delete(baseUrl + "/{id}", 1))
+        when(service.delete(TestObjects.id)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+        MvcResult result = mockMvc.perform(delete(baseUrl + "/{id}", TestObjects.id))
                 .andExpect(status().isOk()).andReturn();
 
         assertTrue(result.getResponse().getContentAsString().isEmpty());
@@ -128,20 +128,15 @@ public class LogControllerTest {
     @Test
     @WithMockUser
     public void testGetByDate_ReturnLogs() throws Exception {
-        LocalDate date = LocalDate.of(2025, 1, 15);
-
-        Log log1 = new Log(1, date, LocalTime.of(0,0, 0), "BREAKFAST", 1, 1, 24.0);
-        Log log2 = new Log(2, date, LocalTime.of(0,0, 0), "LUNCH", 1, 2, 120.0);
-
         List<Log> logs = new ArrayList<>();
-        logs.add(log1);
-        logs.add(log2);
+        logs.add(TestObjects.log1);
+        logs.add(TestObjects.log2);
 
-        when(service.getLogsByDateAndUser(date, 1)).thenReturn(new ResponseEntity<>(logs, HttpStatus.OK));
+        when(service.getLogsByDateAndUser(TestObjects.date, TestObjects.id)).thenReturn(new ResponseEntity<>(logs, HttpStatus.OK));
 
         mockMvc.perform(get(baseUrl + "/by-date")
-                .param("date", date.toString())
-                .param("userId", "1"))
+                .param("date", TestObjects.date.toString())
+                .param("userId", TestObjects.id.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()", CoreMatchers.is(2)));
     }

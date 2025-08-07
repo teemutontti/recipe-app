@@ -10,6 +10,7 @@ import com.example.backend.exceptions.EncryptionKeyException;
 import com.example.backend.exceptions.FailedCryptionException;
 import com.example.backend.repositories.UserRepository;
 import com.example.backend.services.UserService;
+import com.example.backend.unit.utils.TestObjects;
 import com.example.backend.utils.JwtTokenUtil;
 import com.example.backend.utils.SecurityUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +30,8 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -46,11 +49,9 @@ public class UserServiceTest {
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
 
-    private UserDto testUser;
-
     @BeforeEach
     public void setup() {
-        testUser = new UserDto(null, "test@gmail.com", "password", Role.ROLE_USER);
+        TestObjects.reset();
         repository.deleteAll();
     }
 
@@ -58,7 +59,7 @@ public class UserServiceTest {
     public void testSaveUser_ReturnsUser() {
         when(repository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        ResponseEntity<User> response = service.create(testUser);
+        ResponseEntity<User> response = service.create(TestObjects.user1);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals("test@gmail.com", response.getBody().getEmail());
@@ -68,11 +69,11 @@ public class UserServiceTest {
     @Test
     public void testFindById_ReturnsUser() throws FailedCryptionException, EncryptionKeyException {
         // The service expects the email to be encrypted
-        testUser.setEmail(SecurityUtil.encrypt(testUser.getEmail()));
+        TestObjects.user1.setEmail(SecurityUtil.encrypt(TestObjects.user1.getEmail()));
 
-        when(repository.findById(1L)).thenReturn(Optional.ofNullable(testUser.toUser()));
+        when(repository.findById(TestObjects.id)).thenReturn(Optional.ofNullable(TestObjects.user1.toUser()));
 
-        ResponseEntity<User> response = service.getById(1L);
+        ResponseEntity<User> response = service.getById(TestObjects.id);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("test@gmail.com", response.getBody().getEmail());
@@ -84,8 +85,8 @@ public class UserServiceTest {
         // The service expects the emails to be encrypted
         String email = SecurityUtil.encrypt("maija@gmail.com");
 
-        User user1 = new User(1, email, "password", Role.ROLE_USER);
-        User user2 = new User(2, email, "password", Role.ROLE_USER);
+        User user1 = new User(UUID.randomUUID(), email, "password", Role.ROLE_USER);
+        User user2 = new User(UUID.randomUUID(), email, "password", Role.ROLE_USER);
 
         List<User> users = List.of(user1, user2);
 
@@ -111,10 +112,10 @@ public class UserServiceTest {
 
     @Test
     public void testUpdateUser_ReturnsUser() {
-        when(repository.findById(1L)).thenReturn(Optional.of(testUser.toUser()));
-        when(repository.save(any(User.class))).thenReturn(testUser.toUser());
+        when(repository.findById(TestObjects.id)).thenReturn(Optional.of(TestObjects.user1.toUser()));
+        when(repository.save(any(User.class))).thenReturn(TestObjects.user1.toUser());
 
-        ResponseEntity<User> response = service.update(1L, testUser);
+        ResponseEntity<User> response = service.update(TestObjects.id, TestObjects.user1);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -124,11 +125,11 @@ public class UserServiceTest {
 
     @Test
     public void testDeleteUser_ReturnsNullBody() {
-        doNothing().when(repository).deleteById(1L);
+        doNothing().when(repository).deleteById(TestObjects.id);
 
-        ResponseEntity<User> response = service.delete(1L);
+        ResponseEntity<User> response = service.delete(TestObjects.id);
 
-        verify(repository, times(1)).deleteById(1L);
+        verify(repository, times(1)).deleteById(TestObjects.id);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNull(response.getBody());
     }
@@ -136,8 +137,8 @@ public class UserServiceTest {
     @Test
     public void testLoginSuccess() {
         // Service expects a hashed password
-        testUser.setPassword(SecurityUtil.hashPassword(testUser.getPassword()));
-        when(repository.findByEmail(any(String.class))).thenReturn(Optional.of(testUser.toUser()));
+        TestObjects.user1.setPassword(SecurityUtil.hashPassword(TestObjects.user1.getPassword()));
+        when(repository.findByEmail(any(String.class))).thenReturn(Optional.of(TestObjects.user1.toUser()));
 
         ResponseEntity<User> response = service.login("test@gmail.com", "password");
 
@@ -151,8 +152,8 @@ public class UserServiceTest {
     @Test
     public void testLoginFail() throws Exception {
         // Service expects a hashed password
-        testUser.setPassword(SecurityUtil.hashPassword(testUser.getPassword()));
-        when(repository.findById(1L)).thenReturn(Optional.of(testUser.toUser()));
+        TestObjects.user1.setPassword(SecurityUtil.hashPassword(TestObjects.user1.getPassword()));
+        when(repository.findById(TestObjects.id)).thenReturn(Optional.of(TestObjects.user1.toUser()));
 
         ResponseEntity<User> response = service.login("test@gmail.com", "wrong_password");
 
@@ -162,8 +163,8 @@ public class UserServiceTest {
 
     @Test
     public void testIsEmailTaken_ReturnOk() throws Exception {
-        testUser.setEmail(SecurityUtil.encrypt(testUser.getEmail()));
-        when(repository.findByEmail(anyString())).thenReturn(Optional.of(testUser.toUser()));
+        TestObjects.user1.setEmail(SecurityUtil.encrypt(TestObjects.user1.getEmail()));
+        when(repository.findByEmail(anyString())).thenReturn(Optional.of(TestObjects.user1.toUser()));
 
         ResponseEntity<Boolean> response = service.isEmailTaken("test@gmail.com");
 
@@ -173,7 +174,7 @@ public class UserServiceTest {
 
     @Test
     public void testIsEmailTaken_ReturnNotFound() throws Exception {
-        testUser.setEmail(SecurityUtil.encrypt(testUser.getEmail()));
+        TestObjects.user1.setEmail(SecurityUtil.encrypt(TestObjects.user1.getEmail()));
         when(repository.findByEmail(anyString()))
                 .thenReturn(Optional.empty());
 

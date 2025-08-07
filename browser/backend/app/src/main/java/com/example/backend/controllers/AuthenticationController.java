@@ -56,11 +56,17 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) throws JOSEException {
         ResponseEntity<User> response = userService.login(authRequest.getEmail(), authRequest.getPassword());
+
+        System.out.println("Login response: " + response);
+
         if (response.getStatusCode() == HttpStatus.OK) {
 
             User user = response.getBody();
             if (user != null) {
                 String token = jwtTokenUtil.generateToken(authRequest.getEmail(), user.getRole());
+
+                System.out.println("Login token: " + token);
+
                 AuthResponse authResponse = new AuthResponse(token, user.getId(), user.getEmail());
                 return new ResponseEntity<>(authResponse, HttpStatus.OK);
             }

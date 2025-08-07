@@ -6,6 +6,7 @@ import com.example.backend.dto.UserDto;
 import com.example.backend.entities.Role;
 import com.example.backend.entities.User;
 import com.example.backend.services.UserService;
+import com.example.backend.unit.utils.TestObjects;
 import com.example.backend.utils.JwtTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.CoreMatchers;
@@ -57,21 +58,17 @@ public class AdminUserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private UserDto testUser;
     private final String baseUrl = "/api/admin/users";
 
     @BeforeEach
     public void setup() {
-        testUser = new UserDto(1,"test@gmail.com", "pA55word!", Role.ROLE_USER);
+        TestObjects.reset();
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     public void testGetAll_AsAdmin_ReturnLogs() throws Exception {
-        User user1 = new User(1, "maija@gmail.com", "password", Role.ROLE_USER);
-        User user2 = new User(2, "essi@gmail.com", "qwerty", Role.ROLE_USER);
-
-        List<User> users = List.of(user1, user2);
+        List<User> users = List.of(TestObjects.user1.toUser(), TestObjects.user2.toUser());
 
         Pageable pageable = PageRequest.of(1, 10);
         Page<User> mockPage = new PageImpl<>(users, pageable, users.size());
@@ -86,8 +83,8 @@ public class AdminUserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(2))
-                .andExpect(jsonPath("$.content[0].email").value("maija@gmail.com"))
-                .andExpect(jsonPath("$.content[1].email").value("essi@gmail.com"));
+                .andExpect(jsonPath("$.content[0].email").value("test@gmail.com"))
+                .andExpect(jsonPath("$.content[1].email").value("test2@gmail.com"));
     }
 
     @Test
@@ -104,13 +101,13 @@ public class AdminUserControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void testGetById_AsAdmin_ReturnOk() throws Exception {
-        when(service.getById(1L))
-                .thenReturn(new ResponseEntity<>(testUser.toUser(), HttpStatus.OK));
+        when(service.getById(TestObjects.id))
+                .thenReturn(new ResponseEntity<>(TestObjects.user1.toUser(), HttpStatus.OK));
 
-        mockMvc.perform(get(baseUrl + "/{id}", 1))
+        mockMvc.perform(get(baseUrl + "/{id}", TestObjects.id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email", CoreMatchers.is("test@gmail.com")))
-                .andExpect(jsonPath("$.password", CoreMatchers.is("pA55word!")));
+                .andExpect(jsonPath("$.password", CoreMatchers.is("password")));
     }
 
     @Test
@@ -128,16 +125,16 @@ public class AdminUserControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void testUpdateUser_AsAdmin_ReturnUser() throws Exception {
-        testUser.setEmail("again@gmail.com");
-        testUser.setPassword("mYS3cur3!Pa55");
+        TestObjects.user1.setEmail("again@gmail.com");
+        TestObjects.user1.setPassword("mYS3cur3!Pa55");
 
         // Use eq(1L) to match the exact ID and any(User.class) to allow any User instance.
-        when(service.update(eq(1L), any(UserDto.class)))
-                .thenReturn(new ResponseEntity<>(testUser.toUser(), HttpStatus.OK));
+        when(service.update(eq(TestObjects.id), any(UserDto.class)))
+                .thenReturn(new ResponseEntity<>(TestObjects.user1.toUser(), HttpStatus.OK));
 
-        mockMvc.perform(patch(baseUrl + "/{id}", 1)
+        mockMvc.perform(patch(baseUrl + "/{id}", TestObjects.id)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testUser)))
+                .content(objectMapper.writeValueAsString(TestObjects.user1)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email", CoreMatchers.is("again@gmail.com")))
                 .andExpect(jsonPath("$.password", CoreMatchers.is("mYS3cur3!Pa55")));
@@ -149,14 +146,14 @@ public class AdminUserControllerTest {
     public void testUpdateUser_AsAdmin_InvalidInput_ReturnBadRequest(String values) throws Exception {
         switch (values) {
             case "email":
-                testUser.setEmail("mywebsite.fi");
+                TestObjects.user1.setEmail("mywebsite.fi");
             case "password":
-                testUser.setPassword("qwerty");
+                TestObjects.user1.setPassword("qwerty");
         }
 
         mockMvc.perform(patch(baseUrl + "/{id}", 1)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testUser)))
+                .content(objectMapper.writeValueAsString(TestObjects.user1)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -176,8 +173,8 @@ public class AdminUserControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     public void testDeleteUser_AsAdmin_ReturnEmpty() throws Exception {
-        when(service.delete(1L)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
-        MvcResult result = mockMvc.perform(delete(baseUrl + "/{id}", 1)).andExpect(status().isOk()).andReturn();
+        when(service.delete(TestObjects.id)).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+        MvcResult result = mockMvc.perform(delete(baseUrl + "/{id}", TestObjects.id)).andExpect(status().isOk()).andReturn();
         assertTrue(result.getResponse().getContentAsString().isEmpty());
     }
 

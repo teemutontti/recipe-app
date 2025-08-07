@@ -4,6 +4,7 @@ build/
 
 # Properties files
 local.properties
+gradle.properties
 
 # Log/OS Files
 *.log

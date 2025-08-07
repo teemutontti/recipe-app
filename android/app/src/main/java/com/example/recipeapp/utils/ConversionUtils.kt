@@ -1,15 +1,17 @@
 package com.example.recipeapp.utils
 
 import android.util.Log
-import com.example.recipeapp.models.FavouriteRecipe
-import com.example.recipeapp.models.Food
-import com.example.recipeapp.models.Fraction
-import com.example.recipeapp.models.PersonalRecipe
-import com.example.recipeapp.models.Recipe
+import com.example.recipeapp.BuildConfig
+import com.example.recipeapp.models.room.FavouriteRecipe
+import com.example.recipeapp.models.database.Food
+import com.example.recipeapp.models.other.Fraction
+import com.example.recipeapp.models.room.PersonalRecipe
+import com.example.recipeapp.models.database.Recipe
+import java.util.UUID
 
 object ConversionUtils {
     val emptyRecipe = Recipe(-1, "", "", 1, emptyList(), emptyList())
-    val emptyFood = Food("","",0,0.0,0.0,0.0,0.0,-1,-1)
+    val emptyFood = Food("","",0,0.0,0.0,0.0,0.0, UUID.randomUUID(), UUID.randomUUID())
 
     /**
      * Converts a [PersonalRecipe] object to a [Recipe] object.
@@ -79,8 +81,12 @@ object ConversionUtils {
     }
 
     fun calculatePev(calories: Double?, proteins: Double?): Double {
+        if (calories == 0.0) return 0.0
+
         if (calories !== null && proteins !== null) {
-            return "%.2f".format((proteins.times(4).div(calories)).times(100)).toDouble()
+            val result = String.format("%.2f", (proteins.times(4).div(calories)).times(100))
+            Log.d("ConversionUtils", "Calories: $calories proteins: $proteins result: $result")
+            return result.replace(",", ".").toDouble()
         }
         return 0.0
     }

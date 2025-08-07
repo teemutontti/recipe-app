@@ -9,6 +9,7 @@ import com.example.backend.repositories.LogRepository;
 import com.example.backend.repositories.UserRepository;
 import com.example.backend.services.LogService;
 import com.example.backend.services.UserService;
+import com.example.backend.unit.utils.TestObjects;
 import com.example.backend.utils.JwtTokenUtil;
 import com.example.backend.utils.SecurityUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +33,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -50,44 +52,37 @@ public class LogServiceTest {
     @MockBean
     private JwtTokenUtil jwtTokenUtil;
 
-    private Log testLog;
-
     @BeforeEach
     public void setup() {
-        testLog = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(9,0, 0), "BREAKFAST", 1, 1, 22.0);
+        TestObjects.reset();
         repository.deleteAll();
     }
 
     @Test
     public void testSaveLog_ReturnsLog() {
-        when(repository.save(any(Log.class))).thenReturn(testLog);
+        when(repository.save(any(Log.class))).thenReturn(TestObjects.log1);
 
-        ResponseEntity<Log> response = service.create(testLog);
+        ResponseEntity<Log> response = service.create(TestObjects.log1);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertTrue(response.getBody().getId() > 0);
         assertEquals(22, response.getBody().getAmount());
         assertEquals("BREAKFAST", response.getBody().getMeal());
     }
 
     @Test
     public void testFindById_ReturnsLog() {
-        when(repository.findById(1L)).thenReturn(Optional.ofNullable(testLog));
+        when(repository.findById(TestObjects.id)).thenReturn(Optional.ofNullable(TestObjects.log1));
 
-        ResponseEntity<Log> response = service.getById(1L);
+        ResponseEntity<Log> response = service.getById(TestObjects.id);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody().getId() > 0);
         assertEquals(22, response.getBody().getAmount());
         assertEquals("BREAKFAST", response.getBody().getMeal());
     }
 
     @Test
     public void testFindAll_ReturnsMultipleLogs() {
-        Log log1 = new Log(1, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "BREAKFAST", 1, 1, 22.0);
-        Log log2 = new Log(2, LocalDate.of(2025, 1, 15), LocalTime.of(0,0, 0), "LUNCH", 1, 2, 120.0);
-
-        List<Log> logs = List.of(log1, log2);
+        List<Log> logs = List.of(TestObjects.log1, TestObjects.log2);
 
         Pageable pageable = PageRequest.of(0, 10);
         Page<Log> mockPage = new PageImpl<>(logs, pageable, logs.size());
@@ -102,44 +97,39 @@ public class LogServiceTest {
 
     @Test
     public void testUpdateUser_ReturnsLog() {
-        when(repository.findById(1L)).thenReturn(Optional.of(testLog));
-        when(repository.save(any(Log.class))).thenReturn(testLog);
+        when(repository.findById(TestObjects.id)).thenReturn(Optional.of(TestObjects.log1));
+        when(repository.save(any(Log.class))).thenReturn(TestObjects.log1);
 
-        testLog.setMeal("LUNCH");
-        testLog.setAmount(54.0);
-        ResponseEntity<Log> response = service.update(1L, testLog);
+        TestObjects.log1.setMeal("LUNCH");
+        TestObjects.log1.setAmount(54.0);
+        ResponseEntity<Log> response = service.update(TestObjects.id, TestObjects.log1);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertTrue(response.getBody().getId() > 0);
         assertEquals("LUNCH", response.getBody().getMeal());
         assertEquals(54, response.getBody().getAmount());
     }
 
     @Test
     public void testDeleteUser_ReturnsNullBody() {
-        doNothing().when(repository).deleteById(1L);
+        doNothing().when(repository).deleteById(TestObjects.id);
 
-        ResponseEntity<Log> response = service.delete(1L);
+        ResponseEntity<Log> response = service.delete(TestObjects.id);
 
-        verify(repository, times(1)).deleteById(1L);
+        verify(repository, times(1)).deleteById(TestObjects.id);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNull(response.getBody());
     }
 
     @Test
     public void testFindLogsByDate_ReturnsMultipleLogs() {
-        LocalDate date = LocalDate.of(2025, 1, 15);
-        Log log1 = new Log(1, date, LocalTime.of(9,0, 0), "BREAKFAST", 1, 1, 22.0);
-        Log log2 = new Log(2, date, LocalTime.of(9,0, 0), "LUNCH", 1, 2, 120.0);
-
         List<Log> logs = new ArrayList<>();
-        logs.add(log1);
-        logs.add(log2);
+        logs.add(TestObjects.log1);
+        logs.add(TestObjects.log2);
 
-        when(repository.findByDateAndUserId(date, 1)).thenReturn(logs);
+        when(repository.findByDateAndUserId(TestObjects.date, TestObjects.id)).thenReturn(logs);
 
-        ResponseEntity<List<Log>> response = service.getLogsByDateAndUser(date, 1);
+        ResponseEntity<List<Log>> response = service.getLogsByDateAndUser(TestObjects.date, TestObjects.id);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(2, response.getBody().size());
@@ -147,17 +137,13 @@ public class LogServiceTest {
 
     @Test
     public void testFindLogsByUser_ReturnsMultipleLogs() {
-        LocalDate date = LocalDate.of(2025, 1, 15);
-        Log log1 = new Log(1, date, LocalTime.of(9,0, 0), "BREAKFAST", 19, 1, 22.0);
-        Log log2 = new Log(2, date, LocalTime.of(9,0, 0), "LUNCH", 19, 2, 120.0);
-
         List<Log> logs = new ArrayList<>();
-        logs.add(log1);
-        logs.add(log2);
+        logs.add(TestObjects.log1);
+        logs.add(TestObjects.log2);
 
-        when(repository.findByUserId(eq(19))).thenReturn(logs);
+        when(repository.findByUserId(TestObjects.userId1)).thenReturn(logs);
 
-        ResponseEntity<List<Log>> response = service.getLogsByUserId(19);
+        ResponseEntity<List<Log>> response = service.getLogsByUserId(TestObjects.userId1);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(2, response.getBody().size());

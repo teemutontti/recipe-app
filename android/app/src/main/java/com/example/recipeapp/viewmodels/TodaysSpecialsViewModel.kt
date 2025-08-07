@@ -4,10 +4,10 @@ import android.app.Application
 import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
-import com.example.recipeapp.models.Recipe
+import com.example.recipeapp.models.database.Recipe
 import com.example.recipeapp.utils.SharedPreferencesKeys.PREFS_NAME
-import com.example.recipeapp.models.FavouriteRecipe
-import com.example.recipeapp.repositories.TodaysSpecialsRepository
+import com.example.recipeapp.models.room.FavouriteRecipe
+import com.example.recipeapp.repositories.room.TodaysSpecialsRepository
 import com.example.recipeapp.utils.ConversionUtils.toRecipe
 import kotlinx.coroutines.launch
 

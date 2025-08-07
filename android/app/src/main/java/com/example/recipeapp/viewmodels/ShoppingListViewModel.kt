@@ -4,8 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.compose.runtime.mutableStateListOf
-import com.example.recipeapp.models.ShoppingListItem
-import com.example.recipeapp.repositories.ShoppingListRepository
+import com.example.recipeapp.models.room.ShoppingListItem
+import com.example.recipeapp.repositories.room.ShoppingListRepository
 import com.example.recipeapp.utils.SharedPreferencesKeys.PREFS_NAME
 
 class ShoppingListViewModel(application: Application): BaseViewModel(application) {

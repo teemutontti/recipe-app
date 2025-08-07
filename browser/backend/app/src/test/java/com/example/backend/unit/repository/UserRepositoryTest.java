@@ -3,6 +3,7 @@ package com.example.backend.unit.repository;
 import com.example.backend.entities.Role;
 import com.example.backend.entities.User;
 import com.example.backend.repositories.UserRepository;
+import com.example.backend.unit.utils.TestObjects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +20,15 @@ class UserRepositoryTest {
     @Autowired
     private UserRepository repository;
 
-    private User testUser;
-
     @BeforeEach
     public void setup() {
-        testUser = new User(1, "test@gmail.com", "password", Role.ROLE_USER);
+        TestObjects.reset();
         repository.deleteAll();
     }
 
     @Test
     public void testSaveUser_ReturnsSavedUser() {
-        User saved = repository.save(testUser);
+        User saved = repository.save(TestObjects.user1.toUser());
 
         assertNotNull(saved.getId());
         assertEquals("test@gmail.com", saved.getEmail());
@@ -38,34 +37,30 @@ class UserRepositoryTest {
 
     @Test
     public void testFindById_ReturnsUser() {
-        User saved = repository.save(testUser);
+        User saved = repository.save(TestObjects.user1.toUser());
 
-        User found = repository.findById(Long.valueOf(saved.getId())).get();
+        User found = repository.findById(saved.getId()).get();
 
         assertNotNull(found);
-        assertTrue(found.getId() > 0);
         assertEquals("test@gmail.com", found.getEmail());
         assertEquals("password", found.getPassword());
     }
 
     @Test
     public void testFindAll_ReturnsMultipleUsers() {
-        User user1 = new User(null, "maija.meikalainen@gmail.com", "password", Role.ROLE_USER);
-        User user2 = new User(null, "essi.esimerkki@gmail.com", "qwerty", Role.ROLE_USER);
-
-        repository.save(user1);
-        repository.save(user2);
+        repository.save(TestObjects.user1.toUser());
+        repository.save(TestObjects.user2.toUser());
 
         List<User> found = repository.findAll();
 
         assertEquals(2, found.size());
-        assertEquals("maija.meikalainen@gmail.com", found.get(0).getEmail());
-        assertEquals("essi.esimerkki@gmail.com", found.get(1).getEmail());
+        assertEquals("test@gmail.com", found.get(0).getEmail());
+        assertEquals("test2@gmail.com", found.get(1).getEmail());
     }
 
     @Test
     public void testUpdateUser_ReturnsFood() {
-        User saved = repository.save(testUser);
+        User saved = repository.save(TestObjects.user1.toUser());
 
         saved.setEmail("changed@gmail.com");
         saved.setPassword("1234");
@@ -78,10 +73,10 @@ class UserRepositoryTest {
 
     @Test
     public void testDeleteUser_ReturnsEmptyList() {
-        User saved = repository.save(testUser);
+        User saved = repository.save(TestObjects.user1.toUser());
 
         repository.delete(saved);
-        Optional<User> found = repository.findById(Long.valueOf(saved.getId()));
+        Optional<User> found = repository.findById(saved.getId());
 
         assertFalse(found.isPresent());
         assertEquals(0, repository.findAll().size());
@@ -89,12 +84,11 @@ class UserRepositoryTest {
 
     @Test
     public void testFindByEmail_ReturnsUser() {
-        User saved = repository.save(testUser);
+        User saved = repository.save(TestObjects.user1.toUser());
 
         User found = repository.findByEmail(saved.getEmail()).get();
 
         assertNotNull(found);
-        assertTrue(found.getId() > 0);
         assertEquals("test@gmail.com", found.getEmail());
         assertEquals("password", found.getPassword());
     }

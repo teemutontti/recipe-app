@@ -58,7 +58,6 @@ fun CustomSearchBar(
     onClear: (() -> Unit)? = null,
     search: (String) -> Unit,
 ) {
-    var loading by remember { mutableStateOf(false) }
     var query by remember { mutableStateOf("") }
     val coroutineScope = rememberCoroutineScope()
     var debounceJob by remember { mutableStateOf<Job?>(null) }
@@ -66,10 +65,8 @@ fun CustomSearchBar(
 
     fun handleSearch() {
         if (query != "") {
-            loading = true
             handleShowResult(true)
             search(query)
-            loading = false
         }
     }
 

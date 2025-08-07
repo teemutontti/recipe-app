@@ -8,11 +8,12 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 public class UserDto {
-    private Integer id;
+    private UUID id;
 
     @NotNull
     @Email

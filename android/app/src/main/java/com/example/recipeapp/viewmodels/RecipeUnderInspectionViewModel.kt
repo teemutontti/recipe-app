@@ -4,14 +4,15 @@ import android.app.Application
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
-import com.example.recipeapp.models.Ingredient
-import com.example.recipeapp.models.Instruction
-import com.example.recipeapp.models.Recipe
-import com.example.recipeapp.repositories.RecipeUnderInspectionRepository
+import com.example.recipeapp.models.database.Ingredient
+import com.example.recipeapp.models.database.Instruction
+import com.example.recipeapp.models.database.Recipe
+import com.example.recipeapp.repositories.room.RecipeUnderInspectionRepository
 import com.example.recipeapp.utils.ConversionUtils.emptyRecipe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 /**
  * ViewModel class responsible for managing the recipe under inspection.

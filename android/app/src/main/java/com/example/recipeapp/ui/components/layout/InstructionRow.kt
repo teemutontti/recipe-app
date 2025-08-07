@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import com.example.recipeapp.models.Instruction
+import com.example.recipeapp.models.database.Instruction
 import com.example.recipeapp.ui.components.misc.CheckCircle
 import com.example.recipeapp.ui.components.buttons.RemoveButton
 

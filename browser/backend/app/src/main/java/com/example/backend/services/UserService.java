@@ -17,6 +17,7 @@ import com.example.backend.repositories.UserRepository;
 import com.example.backend.utils.SecurityUtil;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -70,7 +71,7 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<User> getById(Long id) {
+    public ResponseEntity<User> getById(UUID id) {
         try {
             User user = repository.findById(id).orElse(null);
 
@@ -88,7 +89,7 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<User> update(Long id, UserDto userDto) {
+    public ResponseEntity<User> update(UUID id, UserDto userDto) {
         try {
             User existingUser = repository.findById(id).orElse(null);
 
@@ -126,7 +127,7 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<User> delete(Long id) {
+    public ResponseEntity<User> delete(UUID id) {
         try {
             repository.deleteById(id);
             return new ResponseEntity<>(HttpStatus.OK);

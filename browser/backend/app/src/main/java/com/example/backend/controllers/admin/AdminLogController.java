@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.UUID;
 
 @Tag(name = "Admin Logs Controller")
 @RestController
@@ -34,14 +35,14 @@ public class AdminLogController {
     @Operation(summary = "Get log by id")
     @SecurityRequirement(name = "bearerAuth", scopes = { "admin" })
     @GetMapping("/{id}")
-    public ResponseEntity<Log> getById(@PathVariable("id") Long id) {
+    public ResponseEntity<Log> getById(@PathVariable("id") UUID id) {
         return service.getById(id);
     }
 
     @Operation(summary = "Get logs by user id")
     @SecurityRequirement(name = "bearerAuth", scopes = { "admin" })
     @GetMapping("/by-user/{id}")
-    public ResponseEntity<List<Log>> getLogsByUserId(@PathVariable("id") Integer id) {
+    public ResponseEntity<List<Log>> getLogsByUserId(@PathVariable("id") UUID id) {
         return service.getLogsByUserId(id);
     }
 }

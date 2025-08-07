@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @Tag(name = "Admin Foods Controller")
 @RestController
 @RequestMapping("/api/admin/foods")
@@ -25,7 +27,7 @@ public class AdminFoodController {
     @Operation(summary = "Update food")
     @SecurityRequirement(name = "bearerAuth", scopes = { "admin" })
     @PatchMapping("/{id}")
-    public ResponseEntity<Food> update(@PathVariable("id") Long id, @Valid @RequestBody Food updated) {
+    public ResponseEntity<Food> update(@PathVariable("id") UUID id, @Valid @RequestBody Food updated) {
         ResponseEntity<Food> response = service.getById(id);
 
         if (!response.hasBody()) {
@@ -55,7 +57,7 @@ public class AdminFoodController {
     @Operation(summary = "Delete food")
     @SecurityRequirement(name = "bearerAuth", scopes = { "admin" })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Food> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Food> delete(@PathVariable("id") UUID id) {
         return service.delete(id);
     }
 }

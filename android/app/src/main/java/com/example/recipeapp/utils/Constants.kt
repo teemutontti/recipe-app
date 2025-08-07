@@ -2,9 +2,7 @@ package com.example.recipeapp.utils
 
 
 import com.example.recipeapp.R
-import com.example.recipeapp.models.Category
-import com.example.recipeapp.models.Recipe
-import com.example.recipeapp.models.Food
+import com.example.recipeapp.models.other.Category
 
 /**
  * Utility functions and constants used throughout the application.
@@ -14,7 +12,7 @@ object Constants {
     const val LANDSCAPE_ASPECT_RATIO: Float = 1.7777778f
     const val IMAGE_WIDTH: Int = 288
     const val IMAGE_HEIGHT: Int = 162
-    const val IS_DEV = true
+    const val IS_DEV = false
 
     val categories = listOf(
         Category(R.drawable.chicken, "Chicken", "chicken"),

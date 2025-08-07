@@ -3,10 +3,10 @@ package com.example.recipeapp.viewmodels
 import android.app.Application
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
-import com.example.recipeapp.models.Recipe
-import com.example.recipeapp.models.DatabaseProvider
-import com.example.recipeapp.models.PersonalRecipe
-import com.example.recipeapp.repositories.PersonalRecipeRepository
+import com.example.recipeapp.models.database.Recipe
+import com.example.recipeapp.models.room.DatabaseProvider
+import com.example.recipeapp.models.room.PersonalRecipe
+import com.example.recipeapp.repositories.room.PersonalRecipeRepository
 import com.example.recipeapp.utils.ConversionUtils.toRecipe
 import kotlinx.coroutines.launch
 

@@ -1,6 +1,6 @@
 package com.example.recipeapp.viewmodels
 
-import com.example.recipeapp.models.Recipe
+import com.example.recipeapp.models.database.Recipe
 
 /**
  * Interface defining the contract for view models managing recipes.

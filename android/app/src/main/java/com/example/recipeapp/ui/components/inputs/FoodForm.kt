@@ -1,5 +1,6 @@
 package com.example.recipeapp.ui.components.inputs
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,8 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.Icon
@@ -30,9 +33,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.recipeapp.models.Food
+import com.example.recipeapp.models.database.Food
 import com.example.recipeapp.ui.components.layout.TitledContainer
 import com.example.recipeapp.utils.FormattingUtils
+import com.example.recipeapp.viewmodels.BarScanState
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 
 @Composable
@@ -44,6 +48,10 @@ fun FoodForm(navController: NavController, viewModels: ViewModelWrapper) {
     var carbs by remember { mutableStateOf("") }
     var protein by remember { mutableStateOf("") }
     var fat by remember { mutableStateOf("") }
+
+    LaunchedEffect(viewModels.barcode.barScanResult) {
+        barcode = viewModels.barcode.barScanResult ?: ""
+    }
 
     LaunchedEffect(name, barcode, servingSize, calories, carbs, protein, fat) {
         viewModels.logsScreen.setSavableFood(null)
@@ -69,7 +77,7 @@ fun FoodForm(navController: NavController, viewModels: ViewModelWrapper) {
         }
     }
 
-    Column {
+    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         TextField(
             value = name,
             onValueChange = { name = it },
@@ -79,35 +87,7 @@ fun FoodForm(navController: NavController, viewModels: ViewModelWrapper) {
                 unfocusedContainerColor = MaterialTheme.colorScheme.surface
             ),
         )
-        Spacer(modifier = Modifier.padding(vertical = 24.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            NutrientInputRow("Nutrients per", servingSize,
-                suffixText = "g",
-                fillMaxWidth = false,
-                onChange = { servingSize = it }
-            )
-        }
-        TitledContainer(
-            title = "Nutrients",
-            titleSize = MaterialTheme.typography.titleLarge,
-            backgroundColor = MaterialTheme.colorScheme.background,
-        ) {
-            Column(modifier = Modifier.padding(start = 8.dp)) {
-                NutrientInputRow("Calories *", calories, 120.dp, "kcal") {
-                    calories = it
-                }
-                NutrientInputRow("Carbohydrates", carbs, suffixText = "g") {
-                    carbs = it
-                }
-                NutrientInputRow("Protein", protein, suffixText = "g") {
-                    protein = it
-                }
-                NutrientInputRow("Fat", fat, suffixText = "g") {
-                    fat = it
-                }
-            }
-        }
-        Spacer(modifier = Modifier.padding(vertical = 16.dp))
+        Spacer(modifier = Modifier.padding(vertical = 8.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -127,7 +107,10 @@ fun FoodForm(navController: NavController, viewModels: ViewModelWrapper) {
             )
             Spacer(modifier = Modifier.padding(horizontal = 2.dp))
             IconButton(
-                onClick = { navController.navigate("barcode") },
+                onClick = {
+                    Log.d("FoodForm", "Navigating to barcode")
+                    navController.navigate("barcode")
+                },
                 modifier = Modifier
                     .clip(RoundedCornerShape(topEnd = 6.dp, bottomEnd = 6.dp))
                     .background(MaterialTheme.colorScheme.surface)
@@ -138,6 +121,35 @@ fun FoodForm(navController: NavController, viewModels: ViewModelWrapper) {
                     imageVector = Icons.Default.QrCodeScanner,
                     contentDescription = "Barcode Scanner",
                 )
+            }
+        }
+        Spacer(modifier = Modifier.padding(vertical = 24.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            NutrientInputRow("Nutrients per", servingSize,
+                suffixText = "g",
+                fillMaxWidth = false,
+                onChange = { servingSize = it }
+            )
+        }
+        Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+        TitledContainer(
+            title = "Nutrients",
+            titleSize = MaterialTheme.typography.titleLarge,
+            backgroundColor = MaterialTheme.colorScheme.background,
+        ) {
+            Column(modifier = Modifier.padding(start = 8.dp)) {
+                NutrientInputRow("Calories *", calories, 120.dp, "kcal") {
+                    calories = it
+                }
+                NutrientInputRow("Carbohydrates", carbs, suffixText = "g") {
+                    carbs = it
+                }
+                NutrientInputRow("Protein", protein, suffixText = "g") {
+                    protein = it
+                }
+                NutrientInputRow("Fat", fat, suffixText = "g") {
+                    fat = it
+                }
             }
         }
     }

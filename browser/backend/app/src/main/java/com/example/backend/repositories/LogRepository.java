@@ -4,8 +4,9 @@ import com.example.backend.entities.Log;
 import org.springframework.http.ResponseEntity;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
-public interface LogRepository extends JpaRepository<Log, Long> {
-    List<Log> findByDateAndUserId(LocalDate date, Integer userId);
-    List<Log> findByUserId(Integer id);
+public interface LogRepository extends JpaRepository<Log, UUID> {
+    List<Log> findByDateAndUserId(LocalDate date, UUID userId);
+    List<Log> findByUserId(UUID id);
 }

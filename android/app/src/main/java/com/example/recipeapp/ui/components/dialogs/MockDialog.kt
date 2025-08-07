@@ -17,7 +17,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import com.example.recipeapp.models.Auth
 import com.example.recipeapp.utils.Constants.Screen
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 import kotlinx.coroutines.launch
@@ -102,17 +101,10 @@ private fun MockDialogOptions(
             }
         }
         Screen.LOGIN -> {
-            TextButton(onClick = { viewModels.authViewModel.login(Auth("test@gmail.com", "qwerty")) {
-                println("Mocked login!")
+            TextButton(onClick = {
                 navController.navigate("discover")
-            }}) {
+            }) {
                 Text(text = "Login")
-            }
-            TextButton(onClick = { viewModels.authViewModel.register(Auth("test@gmail.com", "qwerty")) {
-                println("Mocked register!")
-                navController.navigate("discover")
-            }}) {
-                Text(text = "Register")
             }
         }
         Screen.LOGS -> {

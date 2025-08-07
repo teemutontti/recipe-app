@@ -3,9 +3,9 @@ package com.example.recipeapp.viewmodels
 import android.app.Application
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.viewModelScope
-import com.example.recipeapp.models.Recipe
-import com.example.recipeapp.models.SpoonacularRecipe
-import com.example.recipeapp.repositories.SearchRepository
+import com.example.recipeapp.models.database.Recipe
+import com.example.recipeapp.models.database.SpoonacularRecipe
+import com.example.recipeapp.repositories.database.SearchRepository
 import com.example.recipeapp.utils.ConversionUtils.emptyRecipe
 import kotlinx.coroutines.launch
 

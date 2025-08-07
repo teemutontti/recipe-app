@@ -27,7 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.example.recipeapp.models.ShoppingListItem
+import com.example.recipeapp.models.room.ShoppingListItem
 import com.example.recipeapp.viewmodels.ShoppingListViewModel
 
 @Composable

@@ -83,6 +83,19 @@ fun BarcodeScreen(
         }
     }
 
+    LaunchedEffect(barScanState) {
+        if (barScanState is BarScanState.ScanSuccess) {
+            val cameraProviderFuture: ListenableFuture<ProcessCameraProvider> =
+                ProcessCameraProvider.getInstance(context)
+
+            val cameraProvider = cameraProviderFuture.get()
+
+            cameraProvider.unbindAll()
+            navController.navigateUp()
+            viewModels.barcode.resetState()
+        }
+    }
+
     Screen(
         topBar = { TopBar(subtitle = { BackButton(navController) }) },
         bottomBar = {
@@ -99,8 +112,9 @@ fun BarcodeScreen(
             }
         },
         screen = Constants.Screen.BARCODE,
-        viewModels = viewModels,
-        navController = navController
+        viewModels,
+        navController,
+        snackbarHostState,
     ) {
         Column(
             modifier = Modifier

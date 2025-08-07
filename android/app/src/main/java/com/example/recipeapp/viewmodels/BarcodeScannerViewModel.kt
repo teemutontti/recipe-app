@@ -6,11 +6,11 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.example.recipeapp.BuildConfig
-import com.example.recipeapp.models.BarModel
+import com.example.recipeapp.models.other.BarModel
 import com.google.mlkit.vision.barcode.common.Barcode
 import kotlinx.coroutines.launch
 
-sealed interface BarScanState {
+interface BarScanState {
     data object Ideal : BarScanState
     data class ScanSuccess(val barStateModel: BarModel) : BarScanState
     data class Error(val error: String) : BarScanState
@@ -19,7 +19,10 @@ sealed interface BarScanState {
 
 class BarcodeScannerViewModel(application: Application): BaseViewModel(application) {
     private var _barScanState: MutableState<BarScanState?> = mutableStateOf(null)
+    private var _barScanResult: MutableState<String?> = mutableStateOf(null)
+
     val barScanState get() = _barScanState.value
+    val barScanResult get() = _barScanResult.value
 
     init {
         setLoading(true)
@@ -33,13 +36,12 @@ class BarcodeScannerViewModel(application: Application): BaseViewModel(applicati
                 return@launch
             }
 
-            _barScanState.value = BarScanState.Loading
-
             barcodes.forEach { barcode ->
                 barcode.rawValue?.let { barcodeValue ->
                     try {
                         Log.d("BARCODE", "Barcode value: $barcodeValue")
                         _barScanState.value = BarScanState.ScanSuccess(barStateModel = BarModel(barcodeValue))
+                        _barScanResult.value = barcodeValue
                     } catch (e: Exception) {
                         Log.i("BARCODE", "onBarCodeDetected: $e", )
                         _barScanState.value = BarScanState.Error("Invalid JSON format in barcode")

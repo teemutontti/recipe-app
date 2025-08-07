@@ -69,6 +69,7 @@ fun DiscoverScreen(
         screen = Constants.Screen.DISCOVER,
         viewModels,
         navController,
+        snackbarHostState,
         floatingActionButton = {
             AddRecipeButton(navController, viewModels.inspection)
         }

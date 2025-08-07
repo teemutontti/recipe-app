@@ -35,7 +35,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.recipeapp.models.Auth
+import com.example.recipeapp.models.database.AuthRequest
 import com.example.recipeapp.utils.Constants.Screen
 import com.example.recipeapp.viewmodels.ViewModelWrapper
 
@@ -63,10 +63,13 @@ fun LoginScreen(
         viewModels.logsScreen.setLoading(false)
     }
 
-    LaunchedEffect(viewModels.logsScreen.alert) {
-        viewModels.logsScreen.alert?.let {
-            snackbarHostState.showSnackbar(it.message)
-            viewModels.logsScreen.clearAlert()
+    LaunchedEffect(viewModels.authViewModel.alert) {
+        Log.d("LoginScreen", "${viewModels.authViewModel.alert}")
+        viewModels.authViewModel.alert?.let {
+            Log.d("LoginScreen", "alert let: $it")
+
+            snackbarHostState.showSnackbar(it.message, withDismissAction = true)
+            viewModels.authViewModel.clearAlert()
         }
     }
 
@@ -75,12 +78,12 @@ fun LoginScreen(
     }
     
     fun handleLogin() {
-        val auth = Auth(email, password)
-        Log.d("AuthScreen", "Auth: ${auth}")
+        val authRequest = AuthRequest(email, password)
+        Log.d("AuthScreen", "Auth: ${authRequest}")
         if (mode == "LOGIN") {
-            viewModels.authViewModel.login(auth) { navigateToMainScreen() }
+            viewModels.authViewModel.login(authRequest) { navigateToMainScreen() }
         } else {
-            viewModels.authViewModel.register(auth) { navigateToMainScreen() }
+            viewModels.authViewModel.register(authRequest) { navigateToMainScreen() }
         }
     }
 
@@ -90,9 +93,12 @@ fun LoginScreen(
         screen = Screen.LOGIN,
         viewModels,
         navController,
+        snackbarHostState,
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 40.dp).fillMaxSize(),
+            modifier = Modifier
+                .padding(horizontal = 40.dp)
+                .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

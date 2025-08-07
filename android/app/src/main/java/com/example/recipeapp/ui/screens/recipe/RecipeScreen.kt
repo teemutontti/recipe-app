@@ -47,6 +47,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.recipeapp.BuildConfig
 import com.example.recipeapp.R
 import com.example.recipeapp.ui.components.dialogs.DeleteDialog
 import com.example.recipeapp.ui.components.layout.IngredientRow
@@ -55,6 +56,7 @@ import com.example.recipeapp.ui.components.inputs.NumberCounter
 import com.example.recipeapp.ui.components.misc.RecipeImage
 import com.example.recipeapp.ui.components.misc.UserFeedbackMessage
 import com.example.recipeapp.viewmodels.ViewModelWrapper
+import java.util.UUID
 
 /**
  * Composable function for rendering the recipe screen.

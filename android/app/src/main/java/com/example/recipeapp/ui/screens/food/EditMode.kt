@@ -17,7 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.recipeapp.models.NutrientSummary
+import com.example.recipeapp.models.database.NutrientSummary
 import com.example.recipeapp.ui.components.inputs.NutrientInputRow
 import com.example.recipeapp.ui.components.inputs.NutrientTextField
 import com.example.recipeapp.ui.components.layout.NutrientColumn

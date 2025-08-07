@@ -25,7 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.recipeapp.models.Instruction
+import com.example.recipeapp.models.database.Instruction
 import com.example.recipeapp.ui.components.layout.InstructionRow
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel
 

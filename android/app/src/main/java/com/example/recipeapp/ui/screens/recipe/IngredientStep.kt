@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.recipeapp.models.Ingredient
+import com.example.recipeapp.models.database.Ingredient
 import com.example.recipeapp.ui.components.inputs.IngredientForm
 import com.example.recipeapp.ui.components.layout.IngredientRow
 import com.example.recipeapp.viewmodels.RecipeUnderInspectionViewModel

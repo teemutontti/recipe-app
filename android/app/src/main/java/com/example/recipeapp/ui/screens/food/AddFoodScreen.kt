@@ -97,6 +97,7 @@ fun AddFoodScreen(
         screen = Constants.Screen.FOOD_ADD,
         viewModels,
         navController,
+        snackbarHostState,
     ) {
         Column(modifier = Modifier.padding(horizontal = 40.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -124,7 +125,10 @@ fun AddFoodScreen(
                     state = listState,
                     flingBehavior = ScrollableDefaults.flingBehavior(),
                 ) {
-                    itemsIndexed(viewModels.logsScreen.foods) {index, food ->
+                    itemsIndexed(
+                        viewModels.logsScreen.foods,
+                        key = { index, food -> food.id!! }
+                    ) {index, food ->
                         FoodButton(food) {
                             viewModels.logsScreen.setSelectedFood(food)
                             navController.navigate("food_editor/EDIT")

@@ -14,7 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.recipeapp.models.MealType
+import com.example.recipeapp.models.database.MealType
 import com.example.recipeapp.ui.components.buttons.AddButton
 import com.example.recipeapp.ui.components.buttons.MealButton
 import com.example.recipeapp.ui.components.inputs.DateNavigator
@@ -52,6 +52,7 @@ fun LogsScreen(
         screen = Constants.Screen.LOGS,
         viewModels,
         navController,
+        snackbarHostState,
         floatingActionButton = { AddButton { navController.navigate("add_food") } }
     ) {
         LazyColumn(modifier = Modifier.padding(horizontal = 24.dp)) {

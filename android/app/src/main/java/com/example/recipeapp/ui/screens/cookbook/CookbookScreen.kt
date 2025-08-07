@@ -43,6 +43,7 @@ fun CookbookScreen(
         screen = Constants.Screen.COOKBOOK,
         viewModels,
         navController,
+        snackbarHostState,
         floatingActionButton = {
             AddRecipeButton(navController, viewModels.inspection)
         }

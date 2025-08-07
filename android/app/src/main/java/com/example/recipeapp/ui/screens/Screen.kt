@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.recipeapp.ui.components.buttons.MockButton
 import com.example.recipeapp.ui.components.dialogs.MockDialog
+import com.example.recipeapp.ui.components.misc.CustomSnackbar
 import com.example.recipeapp.utils.Constants.Screen
 import com.example.recipeapp.utils.Constants.IS_DEV
 import com.example.recipeapp.viewmodels.ViewModelWrapper
@@ -26,10 +27,10 @@ fun Screen(
     screen: Screen,
     viewModels: ViewModelWrapper,
     navController: NavController,
+    snackbarHostState: SnackbarHostState,
     floatingActionButton: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
     var showMockDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -45,7 +46,7 @@ fun Screen(
         bottomBar = { Column {
             bottomBar()
         }},
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = { CustomSnackbar(snackbarHostState) },
         floatingActionButton = {
             Column(horizontalAlignment = Alignment.End) {
                 if (IS_DEV) MockButton { showMockDialog = true }

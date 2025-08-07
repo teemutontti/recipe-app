@@ -38,6 +38,7 @@ fun ShoppingListScreen(
         screen = Constants.Screen.SHOPPING_LIST,
         viewModels,
         navController,
+        snackbarHostState,
     ) {
         Box(contentAlignment = Alignment.BottomEnd) {
             Column(modifier = Modifier

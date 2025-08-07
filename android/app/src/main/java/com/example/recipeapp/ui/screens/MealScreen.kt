@@ -25,8 +25,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.recipeapp.models.FoodLog
-import com.example.recipeapp.models.MealType
+import com.example.recipeapp.models.database.FoodLog
+import com.example.recipeapp.models.database.MealType
 import com.example.recipeapp.ui.components.buttons.AddButton
 import com.example.recipeapp.ui.components.buttons.BackButton
 import com.example.recipeapp.ui.components.buttons.MealLogButton
@@ -73,6 +73,7 @@ fun MealScreen(
         screen = Constants.Screen.MEAL,
         viewModels,
         navController,
+        snackbarHostState,
         floatingActionButton = { AddButton { navController.navigate("add_food") }
     }) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
